@@ -1,0 +1,330 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import csv
+import pathlib
+import sys
+from typing import Iterable
+
+import duckdb
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+
+from access_build_utils import ensure_data_layout, normalize_varnumber, parse_years
+
+
+def setup_logging(log_path: str | None) -> None:
+    if not log_path:
+        return
+    log_file = pathlib.Path(log_path)
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+    f = log_file.open("a", buffering=1)
+
+    class Tee:
+        def __init__(self, *streams):
+            self.streams = streams
+
+        def write(self, data):
+            for s in self.streams:
+                s.write(data)
+
+        def flush(self):
+            for s in self.streams:
+                s.flush()
+
+    sys.stdout = Tee(sys.stdout, f)
+    sys.stderr = Tee(sys.stderr, f)
+
+
+def parse_args() -> argparse.Namespace:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--root", default=None, help="External IPEDSDB_ROOT")
+    ap.add_argument("--years", default="2004:2023")
+    ap.add_argument("--output-dir", default=None)
+    ap.add_argument("--parts-dir-base", default=None)
+    ap.add_argument("--chunksize", type=int, default=50_000)
+    ap.add_argument("--value-cols-per-chunk", type=int, default=250)
+    ap.add_argument("--dedupe", action=argparse.BooleanOptionalAction, default=True)
+    ap.add_argument("--final-dedupe", action=argparse.BooleanOptionalAction, default=True)
+    ap.add_argument("--dedupe-priority", default="HD,IC,IC_AY,IC_PY,ADM,AL,C_A,C_B,C_C,CDEP,COST,EAP,EFA,EFA_DIST,EFB,EFC,EFCP,EFFY,EFFY_DIST,EFIA,F_F,F_FA,F_FA_F,F_FA_G,GR,GR200,GR_PELL_SSL,OM,SAL_A,SAL_A_LT,SAL_B,SAL_FACULTY,SAL_IS,S_ABD,S_CN,S_F,S_G,S_IS,S_NH,S_OC,S_SIS,SFA,SFAV")
+    ap.add_argument("--release-strict", action=argparse.BooleanOptionalAction, default=True)
+    ap.add_argument("--log-file", default=None)
+    return ap.parse_args()
+
+
+def read_table_iter(fp: pathlib.Path, chunksize: int = 50_000):
+    attempts = (
+        dict(dtype=str, low_memory=False, index_col=False, chunksize=chunksize),
+        dict(dtype=str, engine="python", on_bad_lines="skip", index_col=False, chunksize=chunksize),
+        dict(dtype=str, engine="python", encoding="latin1", on_bad_lines="skip", index_col=False, chunksize=chunksize),
+    )
+    last_err = None
+    for kwargs in attempts:
+        try:
+            reader = pd.read_csv(fp, **kwargs)
+            first = next(reader, None)
+            if first is None:
+                return
+            cols = [str(c).strip().upper() for c in first.columns]
+            if "UNITID" in cols:
+                unitid_col = first.columns[cols.index("UNITID")]
+                if pd.to_numeric(first[unitid_col], errors="coerce").notna().sum() == 0:
+                    raise ValueError("suspicious parse: UNITID present but no numeric values in first chunk")
+            yield first
+            for chunk in reader:
+                yield chunk
+            return
+        except Exception as exc:  # noqa: BLE001
+            last_err = exc
+            continue
+    print(f"[warn] failed to read {fp}: {last_err}")
+    return
+
+
+def chunk_cols(cols: list[str], size: int) -> Iterable[list[str]]:
+    for i in range(0, len(cols), size):
+        yield cols[i : i + size]
+
+
+def select_dict_source(dict_year: pd.DataFrame, source_file: str, access_table_name: str) -> pd.DataFrame:
+    source_norm = str(source_file or "").strip().upper()
+    access_norm = str(access_table_name or "").strip().upper()
+    subset = dict_year[
+        (dict_year["source_file"].fillna("").astype(str).str.upper() == source_norm)
+        | (dict_year["access_table_name"].fillna("").astype(str).str.upper() == access_norm)
+    ].copy()
+    if subset.empty and source_norm:
+        subset = dict_year[dict_year["source_file"].fillna("").astype(str).str.upper() == source_norm].copy()
+    if subset.empty:
+        return subset
+    subset["metadata_source"] = subset["metadata_source"].fillna("").astype(str)
+    subset = subset.sort_values(["varname", "metadata_source", "metadata_table_name", "varnumber"]).drop_duplicates(["varname"], keep="first")
+    return subset
+
+
+def write_parquet_parts(out_path: pathlib.Path, frames: Iterable[pd.DataFrame], parts_dir: pathlib.Path) -> None:
+    parts_dir.mkdir(parents=True, exist_ok=True)
+    idx = 0
+    for chunk in frames:
+        if chunk.empty:
+            continue
+        pq.write_table(pa.Table.from_pandas(chunk, preserve_index=False), parts_dir / f"part_{idx:05d}.parquet", compression="snappy")
+        idx += 1
+    if idx == 0:
+        return
+    tmp_out = out_path.with_suffix(out_path.suffix + ".tmp")
+    if tmp_out.exists():
+        tmp_out.unlink()
+    writer = None
+    for part in sorted(parts_dir.glob("part_*.parquet")):
+        pf = pq.ParquetFile(part)
+        for batch in pf.iter_batches():
+            if writer is None:
+                writer = pq.ParquetWriter(tmp_out, batch.schema, compression="snappy")
+            writer.write_batch(batch)
+    if writer:
+        writer.close()
+        tmp_out.replace(out_path)
+
+
+def dedupe_long_panel(out_path: pathlib.Path, priority_list: list[str]) -> None:
+    con = duckdb.connect()
+    try:
+        priority_list = [src.strip().upper() for src in priority_list if src.strip()]
+        case = "CASE"
+        for i, src in enumerate(priority_list, start=1):
+            src_esc = src.replace("'", "''")
+            case += f" WHEN UPPER(source_file) = '{src_esc}' THEN {i}"
+        case += " ELSE 999 END"
+
+        tmp_path = out_path.with_suffix(out_path.suffix + ".dedupe.tmp")
+        con.execute(
+            f"""
+            COPY (
+                WITH ranked AS (
+                    SELECT *,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY UNITID, year, varnumber, source_file
+                               ORDER BY {case}, access_table_name, varname
+                           ) AS _rn
+                    FROM read_parquet('{str(out_path).replace("'", "''")}')
+                )
+                SELECT * EXCLUDE (_rn)
+                FROM ranked
+                WHERE _rn = 1
+            ) TO '{str(tmp_path).replace("'", "''")}' (FORMAT PARQUET, COMPRESSION SNAPPY)
+            """
+        )
+        tmp_path.replace(out_path)
+    finally:
+        con.close()
+
+
+def main() -> None:
+    args = parse_args()
+    setup_logging(args.log_file)
+    layout = ensure_data_layout(args.root)
+    years = parse_years(args.years)
+    output_dir = pathlib.Path(args.output_dir) if args.output_dir else layout.cross_sections
+    parts_dir_base = pathlib.Path(args.parts_dir_base) if args.parts_dir_base else layout.cross_sections
+    output_dir.mkdir(parents=True, exist_ok=True)
+    (layout.checks / "harmonize_qc").mkdir(parents=True, exist_ok=True)
+    (layout.checks / "release_qc").mkdir(parents=True, exist_ok=True)
+
+    dict_path = layout.dictionary / "dictionary_lake.parquet"
+    if not dict_path.exists():
+        raise SystemExit(f"Missing dictionary lake: {dict_path}")
+    dict_df = pd.read_parquet(dict_path)
+    dict_df["varnumber"] = dict_df["varnumber"].map(normalize_varnumber)
+    dict_df["varname"] = dict_df["varname"].fillna("").astype(str).str.upper().str.strip()
+    dict_df["imputationvar"] = dict_df["imputationvar"].fillna("").astype(str).str.upper().str.strip()
+    dict_df.loc[dict_df["imputationvar"].isin({"NAN", "NONE", "<NA>", "NAT"}), "imputationvar"] = ""
+
+    for year in years:
+        year_dir = layout.raw_access / str(year)
+        manifest_path = year_dir / "manifest.csv"
+        inventory_path = year_dir / "metadata" / "table_inventory.csv"
+        if not manifest_path.exists() or not inventory_path.exists():
+            raise SystemExit(f"Missing manifest or table inventory for year {year}")
+        manifest = pd.read_csv(manifest_path, dtype=str).fillna("")
+        release_type = manifest.iloc[0]["release_type"].strip().lower()
+        release_summary = pd.DataFrame([{"year": year, "release_type": release_type, "allowed": release_type == "final"}])
+        release_summary.to_csv(layout.checks / "release_qc" / f"release_summary_{year}.csv", index=False)
+        if args.release_strict and release_type != "final":
+            raise SystemExit(f"Unexpected non-final release for year {year}: {release_type}")
+
+        inventory = pd.read_csv(inventory_path, dtype=str).fillna("")
+        data_tables = inventory[
+            (inventory["table_role"] == "data")
+            & (inventory["has_unitid"].astype(str).str.lower().isin({"true", "1"}))
+        ].copy()
+        if data_tables.empty:
+            raise SystemExit(f"No data tables with UNITID found for year {year}")
+        dict_year = dict_df[pd.to_numeric(dict_df["year"], errors="coerce") == year].copy()
+        if dict_year.empty:
+            raise SystemExit(f"No dictionary rows found for year {year}")
+
+        year_summary_rows: list[dict] = []
+        na_drop_rows: list[dict] = []
+
+        def frames() -> Iterable[pd.DataFrame]:
+            for rec in data_tables.to_dict("records"):
+                table_path = year_dir / rec["csv_path"]
+                access_table_name = str(rec["table_name"])
+                source_file = str(rec.get("normalized_table_name", "") or "")
+                dict_source = select_dict_source(dict_year, rec.get("normalized_table_name", ""), access_table_name)
+                if dict_source.empty:
+                    year_summary_rows.append(
+                        {
+                            "year": year,
+                            "table_name": access_table_name,
+                            "source_file": source_file,
+                            "selected": False,
+                            "exclude_reason": "no_dictionary_source_match",
+                            "matched_cols": 0,
+                            "output_rows": 0,
+                        }
+                    )
+                    continue
+                dict_vars = set(dict_source["varname"].tolist())
+                table_output_rows = 0
+                matched_any = False
+                matched_cols_count = 0
+                for df in read_table_iter(table_path, chunksize=args.chunksize):
+                    if df.empty:
+                        continue
+                    df.columns = [str(c).strip().upper() for c in df.columns]
+                    if "UNITID" not in df.columns:
+                        raise SystemExit(f"[fatal] missing UNITID column in data table {access_table_name}")
+                    df["UNITID"] = pd.to_numeric(df["UNITID"], errors="coerce").astype("Int64")
+                    before_rows = len(df)
+                    df = df.dropna(subset=["UNITID"])
+                    dropped = before_rows - len(df)
+                    if dropped > 0:
+                        na_drop_rows.append(
+                            {
+                                "year": year,
+                                "file": table_path.name,
+                                "stage": "pre_melt",
+                                "dropped_rows_missing_UNITID": int(dropped),
+                                "rows_before": int(before_rows),
+                                "rows_after": int(len(df)),
+                            }
+                        )
+                    if args.release_strict and dropped > 0:
+                        raise SystemExit(f"[fatal] missing UNITID rows detected in {table_path.name} (dropped={dropped})")
+                    if df.empty:
+                        continue
+                    df = df.reset_index(drop=True)
+                    df["_rowid"] = df.index.astype("int64")
+                    value_cols = [c for c in df.columns if c not in {"UNITID", "_rowID", "_rowid"} and c in dict_vars]
+                    if not value_cols:
+                        continue
+                    matched_any = True
+                    matched_cols_count = max(matched_cols_count, len(value_cols))
+                    for col_chunk in chunk_cols(value_cols, args.value_cols_per_chunk):
+                        long = df.melt(id_vars=["UNITID", "_rowid"], value_vars=col_chunk, var_name="varname", value_name="value")
+                        before_merge = len(long)
+                        merged = long.merge(dict_source, on="varname", how="left", validate="m:1")
+                        if len(merged) != before_merge:
+                            raise SystemExit(f"[fatal] dictionary merge expanded rows for table {access_table_name}")
+                        if merged["varnumber"].isna().sum() > 0:
+                            raise SystemExit(f"[fatal] missing varnumber after dictionary merge for table {access_table_name}")
+                        imp_cols = sorted({c for c in merged["imputationvar"].dropna().astype(str).str.upper().tolist() if c and c in df.columns})
+                        if imp_cols:
+                            imp_long = df[["_rowid"] + imp_cols].melt(id_vars=["_rowid"], value_vars=imp_cols, var_name="imputationvar", value_name="imputation_value")
+                            merged = merged.merge(imp_long, on=["_rowid", "imputationvar"], how="left")
+                        else:
+                            merged["imputation_value"] = ""
+                        merged["year"] = year
+                        merged["access_table_name"] = access_table_name
+                        table_output_rows += len(merged)
+                        yield merged[
+                            [
+                                "year",
+                                "UNITID",
+                                "varname",
+                                "varnumber",
+                                "value",
+                                "varTitle",
+                                "longDescription",
+                                "DataType",
+                                "format",
+                                "Fieldwidth",
+                                "imputationvar",
+                                "imputation_value",
+                                "source_file",
+                                "access_table_name",
+                            ]
+                        ]
+                year_summary_rows.append(
+                    {
+                        "year": year,
+                        "table_name": access_table_name,
+                        "source_file": source_file,
+                        "selected": matched_any,
+                        "exclude_reason": "" if matched_any else "zero_dictionary_overlap",
+                        "matched_cols": matched_cols_count if matched_any else 0,
+                        "output_rows": table_output_rows,
+                    }
+                )
+
+        out_path = output_dir / f"panel_long_varnum_{year}.parquet"
+        parts_dir = parts_dir_base / f"parts_{year}"
+        write_parquet_parts(out_path, frames(), parts_dir)
+        if not out_path.exists():
+            raise SystemExit(f"No long parquet output was created for year {year}")
+        if args.dedupe and out_path.exists():
+            dedupe_long_panel(out_path, [x.strip() for x in args.dedupe_priority.split(",") if x.strip()])
+        if args.final_dedupe and args.dedupe and out_path.exists():
+            pq.ParquetFile(out_path)
+
+        pd.DataFrame(year_summary_rows).to_csv(layout.checks / "harmonize_qc" / f"harmonize_summary_{year}.csv", index=False)
+        pd.DataFrame(na_drop_rows).to_csv(layout.checks / "harmonize_qc" / f"dropped_missing_unitid_{year}.csv", index=False)
+        print(f"[year {year}] wrote {out_path}")
+
+
+if __name__ == "__main__":
+    main()

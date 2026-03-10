@@ -1,0 +1,34 @@
+__pycache__/
+.venv/
+venv/
+.venv-*/
+venv-*/
+.pytest_cache/
+.DS_Store
+**/.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# Large generated data
+Raw_Access_Databases/
+Dictionary/
+Cross_sections/
+Panels/
+Checks/
+build/
+audit_pack/
+
+# Binary outputs
+*.parquet
+*.parquet.tmp
+*.duckdb
+*.duckdb.wal
+*.feather
+*.arrow
+
+# Temp artifacts
+*.tmp
+*.dedupe.tmp
+**/parts_*/
