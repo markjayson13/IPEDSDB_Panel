@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """
-Apply PRCH parent/child cleaning to a stitched wide panel.
+Stage 07: apply PRCH parent/child cleaning to the stitched wide panel.
 
-Safest policy:
+Reads:
+- `Panels/panel_wide_analysis_*.parquet`
+- `Dictionary/dictionary_lake.parquet`
+
+Writes:
+- `Panels/panel_clean_analysis_*.parquet`
+- `Checks/prch_qc/*`
+
+Policy:
 - keep all `UNITID-year` rows
-- if a `PRCH_*` flag indicates a child observation, null only the affected
+- if a `PRCH_*` flag marks a child observation, null only the affected
   component-family columns
-
-This is the final cleaning step for the stitched `2004:2023` analysis-wide
-panel and preserves the PRCH parent/child policy from the original project.
 """
 from __future__ import annotations
 

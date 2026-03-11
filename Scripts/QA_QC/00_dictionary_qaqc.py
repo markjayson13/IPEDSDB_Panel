@@ -1,4 +1,21 @@
 #!/usr/bin/env python3
+"""
+QA 00: audit the stitched metadata dictionaries for consistency and coverage.
+
+Reads:
+- `Dictionary/dictionary_lake.parquet`
+- `Dictionary/dictionary_codes.parquet`
+- `Checks/extract_qc/table_inventory_all_years.csv` when present
+
+Writes:
+- `Checks/dictionary_qc/*`
+
+Focus:
+- duplicate dictionary rows
+- source-file conflicts
+- unmapped metadata tables
+- missing-description rates
+"""
 from __future__ import annotations
 
 import argparse

@@ -2,9 +2,16 @@
 """
 Shared DuckDB helpers for the wide-build pipeline.
 
-This module centralizes connection/bootstrap logic, build-run metadata capture,
-and common SQL export helpers so the DuckDB-backed builder, monitoring tools,
-and certification scripts share the same runtime conventions.
+Reads:
+- DuckDB path and runtime settings from caller scripts
+
+Writes:
+- DuckDB files, parquet exports, and CSV exports when requested by callers
+
+Focus:
+- connection/bootstrap logic
+- shared SQL export helpers
+- build-run metadata capture
 """
 from __future__ import annotations
 

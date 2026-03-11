@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 """
-Legacy pandas/PyArrow implementation of the wide-panel builder.
+Legacy fallback implementation of the wide-panel builder.
 
-This path is retained for parity testing against the DuckDB execution engine
-and should not be the default production build path going forward.
+Reads:
+- stitched long parquet
+- dictionary-lake metadata
+
+Writes:
+- parity-oriented wide outputs when called explicitly
+
+Focus:
+- baseline comparison against the DuckDB engine
+- not the default production build path
 """
 from __future__ import annotations
 

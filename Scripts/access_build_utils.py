@@ -1,4 +1,21 @@
 #!/usr/bin/env python3
+"""
+Shared Access-pipeline helpers used across download, extraction, dictionary,
+and harmonization stages.
+
+Reads:
+- environment configuration such as `IPEDSDB_ROOT`
+- table names, column names, and file paths passed in by stage scripts
+
+Writes:
+- no durable project artifacts directly
+
+Focus:
+- external data-root layout
+- naming normalization
+- metadata-table classification
+- small file and subprocess helpers used by multiple stages
+"""
 from __future__ import annotations
 
 import csv
@@ -296,34 +313,74 @@ def has_any_column(columns: Iterable[str], candidates: set[str]) -> bool:
     return pick_column(columns, candidates) is not None
 
 
-def classify_table_role(table_name: str, columns: Iterable[str]) -> str:
+def table_role_capabilities(table_name: str, columns: Iterable[str]) -> dict[str, bool | str]:
     col_list = list(columns)
     norm_cols = {normalize_text_key(col) for col in col_list}
     name_key = normalize_text_key(table_name)
-    has_unitid = "unitid" in norm_cols
-    has_varnumber = has_any_column(col_list, VAR_NUMBER_CANDIDATES)
-    has_varname = has_any_column(col_list, VAR_NAME_CANDIDATES)
-    has_vartitle = has_any_column(col_list, VAR_TITLE_CANDIDATES)
-    has_longdesc = has_any_column(col_list, LONG_DESC_CANDIDATES)
-    has_code = has_any_column(col_list, CODE_VALUE_CANDIDATES)
-    has_label = has_any_column(col_list, VALUE_LABEL_CANDIDATES)
-    has_imputation = "imput" in name_key or any("imput" in col for col in norm_cols)
+    return {
+        "table_name_key": name_key,
+        "has_unitid": "unitid" in norm_cols,
+        "has_varnumber": has_any_column(col_list, VAR_NUMBER_CANDIDATES),
+        "has_varname": has_any_column(col_list, VAR_NAME_CANDIDATES),
+        "has_vartitle": has_any_column(col_list, VAR_TITLE_CANDIDATES),
+        "has_longdesc": has_any_column(col_list, LONG_DESC_CANDIDATES),
+        "has_code": has_any_column(col_list, CODE_VALUE_CANDIDATES),
+        "has_label": has_any_column(col_list, VALUE_LABEL_CANDIDATES),
+        "has_imputation": "imput" in name_key or any("imput" in col for col in norm_cols),
+    }
+
+
+def can_serve_metadata_role(role: str, table_name: str, columns: Iterable[str]) -> bool:
+    caps = table_role_capabilities(table_name, columns)
+    return can_serve_metadata_role_from_capabilities(role, caps)
+
+
+def can_serve_metadata_role_from_capabilities(role: str, capabilities: dict[str, object]) -> bool:
+    has_varnumber = bool(capabilities.get("has_varnumber"))
+    has_varname = bool(capabilities.get("has_varname"))
+    has_vartitle = bool(capabilities.get("has_vartitle"))
+    has_longdesc = bool(capabilities.get("has_longdesc"))
+    has_code = bool(capabilities.get("has_code"))
+    has_label = bool(capabilities.get("has_label"))
+    has_imputation = bool(capabilities.get("has_imputation"))
+    if role == "metadata_varlist":
+        return has_varnumber and has_varname and has_vartitle
+    if role == "metadata_description":
+        return has_longdesc and (has_varname or has_varnumber)
+    if role == "metadata_codes":
+        return has_code and has_label
+    if role == "metadata_imputation":
+        return has_code and has_label and has_imputation
+    return False
+
+
+def classify_table_role(table_name: str, columns: Iterable[str]) -> str:
+    caps = table_role_capabilities(table_name, columns)
+    name_key = str(caps["table_name_key"])
+    has_unitid = bool(caps["has_unitid"])
+    has_varnumber = bool(caps["has_varnumber"])
+    has_varname = bool(caps["has_varname"])
+    has_vartitle = bool(caps["has_vartitle"])
+    has_longdesc = bool(caps["has_longdesc"])
+    has_code = bool(caps["has_code"])
+    has_label = bool(caps["has_label"])
+    has_imputation = bool(caps["has_imputation"])
 
     if has_unitid and not (has_code or has_longdesc):
         return "data"
-    if has_varname and has_varnumber and has_vartitle:
-        return "metadata_varlist"
-    if has_longdesc and (has_varname or has_varnumber):
-        return "metadata_description"
     if has_code and has_label and has_imputation:
         return "metadata_imputation"
     if has_code and has_label:
         return "metadata_codes"
+    if has_varname and has_varnumber and has_vartitle:
+        return "metadata_varlist"
+    if has_longdesc and (has_varname or has_varnumber):
+        return "metadata_description"
     if any(token in name_key for token in ("varlist", "layout", "variables")):
         return "metadata_varlist"
     if "descript" in name_key:
         return "metadata_description"
-    if any(token in name_key for token in ("frequenc", "code", "label")):
+    if any(token in name_key for token in ("valueset", "frequenc", "code", "label")):
         return "metadata_codes"
     if has_varname or has_varnumber or has_longdesc or has_code:
         return "metadata_other"

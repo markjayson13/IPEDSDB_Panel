@@ -1,4 +1,18 @@
 #!/usr/bin/env python3
+"""
+Stage 00: orchestrate the end-to-end Access-to-panel workflow.
+
+Reads:
+- `IPEDSDB_ROOT` configuration
+- stage-level inputs expected by `Scripts/01-09`
+
+Writes:
+- the staged outputs produced by any enabled pipeline step
+- final panel artifacts under `Panels/`
+- QA artifacts when `--run-qaqc` is enabled
+
+This is the main Python entrypoint behind `manual_commands.sh`.
+"""
 from __future__ import annotations
 
 import argparse

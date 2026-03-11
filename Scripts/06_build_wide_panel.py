@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 """
-Build wide institution-year panels from the stitched long Access-derived panel.
+Stage 06: build the wide institution-year analysis panel from the stitched long panel.
 
-DuckDB is the relational execution layer for target discovery, lane-split
-planning, scalar-conflict QC, discrete collapse, typed casting, partitioned
-exports, and stitched outputs. Python remains responsible for CLI parsing,
-target ordering, runtime setup, and artifact orchestration.
+Reads:
+- stitched long parquet from Stage 05
+- `Dictionary/dictionary_lake.parquet`
+
+Writes:
+- `Panels/panel_wide_analysis_*.parquet`
+- `Panels/panel_long_scalar_unique.parquet`
+- `Panels/panel_long_dim.parquet`
+- `Checks/wide_qc/*`
+- `Checks/disc_qc/*`
+
+DuckDB handles target discovery, lane-split planning, scalar-conflict QA,
+discrete collapse, typed casting, and stitched exports.
 """
 from __future__ import annotations
 

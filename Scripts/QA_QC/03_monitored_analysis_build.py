@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
 """
-Run a monitored real-data analysis-wide build with durable logs and telemetry.
+QA 03: run a monitored wide-panel build with durable logs and telemetry.
 
-The script launches `06_build_wide_panel.py`, stores logs and runtime metadata
-under `Checks/real_parity_runs/<run_id>/`, and prints a live terminal heartbeat
-so long DuckDB builds can be monitored without tailing log files separately.
+Reads:
+- stitched long parquet
+- `Dictionary/dictionary_lake.parquet`
+
+Writes:
+- `Checks/real_parity_runs/<run_id>/*`
+- temporary build outputs under the selected work root
+
+Focus:
+- long-run visibility
+- telemetry capture
+- reproducible monitored build runs for certification or parity work
 """
 from __future__ import annotations
 
@@ -130,6 +139,23 @@ def emit_terminal_status(
         f"phase={phase_text}",
         flush=True,
     )
+
+
+def refresh_task_monitor_summary(repo_root: Path, run_dir_root: str) -> None:
+    summary_script = repo_root / "Scripts" / "QA_QC" / "07_task_monitor_summary.py"
+    if not summary_script.exists():
+        return
+    res = subprocess.run(
+        [sys.executable, str(summary_script), "--run-dir-root", str(run_dir_root)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if res.returncode == 0 and res.stdout.strip():
+        print(res.stdout.strip(), flush=True)
+    elif res.returncode != 0:
+        msg = res.stderr.strip() or res.stdout.strip() or f"returncode={res.returncode}"
+        print(f"[warn] failed to refresh task-monitor summary: {msg}", flush=True)
 
 
 def main() -> None:
@@ -329,6 +355,7 @@ def main() -> None:
         "last_observed_phase": last_phase(build_log),
     }
     telemetry_path.write_text(json.dumps(telemetry, indent=2))
+    refresh_task_monitor_summary(repo_root, args.run_dir_root)
     print(json.dumps(telemetry, indent=2))
 
 

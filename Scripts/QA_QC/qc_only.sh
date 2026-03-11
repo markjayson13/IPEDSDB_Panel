@@ -13,6 +13,8 @@ Usage:
 
 Environment:
   IPEDSDB_ROOT  External data root
+
+This wrapper expects the main panel artifacts to already exist.
 EOF
 }
 
@@ -25,6 +27,9 @@ if [[ -f "$ROOT/.venv/bin/activate" ]]; then
   # shellcheck disable=SC1090
   source "$ROOT/.venv/bin/activate"
 fi
+
+echo "[ipedsdb-panel] QA root: $IPEDSDB_ROOT"
+echo "[ipedsdb-panel] checking required inputs"
 
 DICT_LAKE="$IPEDSDB_ROOT/Dictionary/dictionary_lake.parquet"
 WIDE_RAW="$IPEDSDB_ROOT/Panels/panel_wide_analysis_2004_2023.parquet"
@@ -58,6 +63,7 @@ python3 "$ROOT/Scripts/QA_QC/01_panel_qa.py" \
   --prch-qc-dir "$IPEDSDB_ROOT/Checks/prch_qc"
 
 echo ""
+echo "[ipedsdb-panel] QA complete"
 echo "QC outputs written to:"
 echo "  $IPEDSDB_ROOT/Checks/dictionary_qc"
 echo "  $IPEDSDB_ROOT/Checks/panel_qc"

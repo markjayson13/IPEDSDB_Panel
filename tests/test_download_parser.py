@@ -1,3 +1,6 @@
+"""
+Tests for NCES Access release-page parsing behavior.
+"""
 from __future__ import annotations
 
 from helpers import load_script_module

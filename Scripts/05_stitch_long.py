@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+"""
+Stage 05: stitch yearly long parquet files into one cross-year long panel.
+
+Reads:
+- `Cross_sections/panel_long_varnum_<year>.parquet`
+
+Writes:
+- `Panels/<span>/panel_long_varnum_<start>_<end>.parquet`
+"""
 from __future__ import annotations
 
 import argparse

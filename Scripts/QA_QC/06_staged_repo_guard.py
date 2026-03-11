@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 """
-Block staged large-data artifacts before commit or push.
+QA 06: block generated or oversized artifacts before commit or push.
 
-This guard rejects staged files under generated-data directories, staged parquet
-or DuckDB artifacts, oversized staged files, and other paths that should never
-enter version control in this repo.
+Reads:
+- currently staged files in the git index
+
+Writes:
+- no files; prints a terminal report and exits nonzero on failure
+
+Focus:
+- staged generated-data directories
+- staged parquet or DuckDB artifacts
+- oversized staged files and forbidden paths
 """
 from __future__ import annotations
 

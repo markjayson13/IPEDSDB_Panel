@@ -1,4 +1,15 @@
 #!/usr/bin/env python3
+"""
+Stage 01: download annual IPEDS Access database packages from NCES.
+
+Reads:
+- the NCES Access-database release page
+
+Writes:
+- `Raw_Access_Databases/<year>/downloads/*`
+- `Raw_Access_Databases/<year>/manifest.csv`
+- `Checks/download_qc/*`
+"""
 from __future__ import annotations
 
 import argparse

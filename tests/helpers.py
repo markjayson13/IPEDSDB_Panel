@@ -1,3 +1,9 @@
+"""
+Small test helpers shared across the repo test suite.
+
+Focus:
+- load script files as Python modules without requiring package installs
+"""
 from __future__ import annotations
 
 import importlib.util

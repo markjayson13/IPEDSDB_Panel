@@ -1,7 +1,11 @@
+"""
+Tests for shared Access-pipeline normalization and classification helpers.
+"""
 from __future__ import annotations
 
 from access_build_utils import (
     academic_year_to_start_year,
+    can_serve_metadata_role,
     canonical_source_file,
     classify_table_role,
     start_year_to_academic_label,
@@ -27,3 +31,26 @@ def test_table_role_classification() -> None:
     assert classify_table_role("HD_DESCRIPTION", ["varNumber", "longDescription"]) == "metadata_description"
     assert classify_table_role("HD_FREQUENCIES", ["varNumber", "codeValue", "valueLabel"]) == "metadata_codes"
     assert classify_table_role("HD_IMPUTATION", ["codeValue", "valueLabel"]) == "metadata_imputation"
+
+
+def test_early_year_combined_metadata_tables() -> None:
+    vartable_cols = [
+        "SurveyOrder",
+        "TableName",
+        "varNumber",
+        "varName",
+        "imputationvar",
+        "varTitle",
+        "longDescription",
+    ]
+    valueset_cols = [
+        "TableName",
+        "varNumber",
+        "varName",
+        "Codevalue",
+        "valueLabel",
+        "varTitle",
+    ]
+    assert classify_table_role("vartable04", vartable_cols) == "metadata_varlist"
+    assert can_serve_metadata_role("metadata_description", "vartable04", vartable_cols) is True
+    assert classify_table_role("valuesets04", valueset_cols) == "metadata_codes"

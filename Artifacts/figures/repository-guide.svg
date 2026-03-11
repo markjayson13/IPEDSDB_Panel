@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1310" viewBox="0 0 1200 1310" role="img" aria-labelledby="title desc">
+  <title id="title">IPEDSDB_Panel repository guide</title>
+  <desc id="desc">A simplified vertical repository guide showing what lives in git, what the pipeline does, and what gets written under IPEDSDB_ROOT.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f5f2ea; }
+      .title { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 40px; font-weight: 700; fill: #102a43; }
+      .subtitle { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 500; fill: #486581; }
+      .panel { fill: #ffffff; stroke: #274863; stroke-width: 2.2; }
+      .repo { fill: #eaf2ff; }
+      .flow { fill: #edf6ee; }
+      .root { fill: #fbf0db; }
+      .chip { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; fill: #486581; }
+      .panelTitle { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 700; fill: #102a43; }
+      .panelText { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 22px; font-weight: 500; fill: #243b53; }
+      .subcard { fill: #ffffff; stroke: #7b8794; stroke-width: 1.5; }
+      .subTitle { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 21px; font-weight: 700; fill: #102a43; }
+      .subText { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 19px; font-weight: 500; fill: #243b53; }
+      .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 17px; font-weight: 600; fill: #334e68; }
+      .arrow { stroke: #102a43; stroke-width: 4; fill: none; marker-end: url(#arrowhead); }
+      .note { fill: #102a43; }
+      .noteText { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 700; fill: #ffffff; }
+    </style>
+    <marker id="arrowhead" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#102a43"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="1310"/>
+  <text class="title" x="60" y="74">IPEDSDB_Panel: repository guide</text>
+  <text class="subtitle" x="60" y="114">A high-level map of tracked code, the automated build, and the external output root.</text>
+
+  <rect class="panel repo" x="100" y="170" rx="26" ry="26" width="1000" height="300"/>
+  <text class="chip" x="136" y="214">STEP 1</text>
+  <text class="panelTitle" x="136" y="270">Repository: tracked code only</text>
+  <text class="panelText" x="136" y="312">
+    <tspan x="136" dy="0">README, wrappers, scripts, tests, and small reference artifacts live here.</tspan>
+    <tspan x="136" dy="30">Large IPEDS inputs, parquet outputs, DuckDB files, and QA products do not.</tspan>
+  </text>
+
+  <rect class="subcard" x="136" y="364" rx="18" ry="18" width="286" height="70"/>
+  <text class="subTitle" x="160" y="407">README and wrappers</text>
+
+  <rect class="subcard" x="457" y="364" rx="18" ry="18" width="286" height="70"/>
+  <text class="subTitle" x="481" y="407">Scripts and QA</text>
+
+  <rect class="subcard" x="778" y="364" rx="18" ry="18" width="286" height="70"/>
+  <text class="subTitle" x="802" y="407">Tests and artifacts</text>
+
+  <line class="arrow" x1="600" y1="470" x2="600" y2="528"/>
+
+  <rect class="panel flow" x="100" y="540" rx="26" ry="26" width="1000" height="310"/>
+  <text class="chip" x="136" y="584">STEP 2</text>
+  <text class="panelTitle" x="136" y="640">Automated pipeline</text>
+  <text class="panelText" x="136" y="682">
+    <tspan x="136" dy="0">The build downloads final Access releases, extracts yearly tables, and turns them</tspan>
+    <tspan x="136" dy="30">into dictionary, long, wide, cleaned, and QA outputs under one external root.</tspan>
+  </text>
+
+  <text class="mono" x="136" y="744">manual_commands.sh -&gt; Scripts/00_run_all.py</text>
+
+  <rect class="subcard" x="136" y="766" rx="18" ry="18" width="928" height="54"/>
+  <text class="subText" x="160" y="798">Download - Extract - Dictionary - Harmonize - Stitch - Wide build - Clean - QA</text>
+
+  <line class="arrow" x1="600" y1="850" x2="600" y2="908"/>
+
+  <rect class="panel root" x="100" y="920" rx="26" ry="26" width="1000" height="280"/>
+  <text class="chip" x="136" y="964">STEP 3</text>
+  <text class="panelTitle" x="136" y="1020">IPEDSDB_ROOT: generated outputs</text>
+  <text class="mono" x="136" y="1052">/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling</text>
+
+  <rect class="subcard" x="136" y="1078" rx="18" ry="18" width="286" height="90"/>
+  <text class="subTitle" x="160" y="1112">Raw_Access_Databases/</text>
+  <text class="subText" x="160" y="1142">
+    <tspan x="160" dy="0">Downloads, extracted DBs,</tspan>
+    <tspan x="160" dy="24">CSV exports, metadata, QC.</tspan>
+  </text>
+
+  <rect class="subcard" x="457" y="1078" rx="18" ry="18" width="286" height="90"/>
+  <text class="subTitle" x="481" y="1112">Dictionary and panels</text>
+  <text class="subText" x="481" y="1142">
+    <tspan x="481" dy="0">Dictionary outputs, yearly</tspan>
+    <tspan x="481" dy="24">long files, stitched panels.</tspan>
+  </text>
+
+  <rect class="subcard" x="778" y="1078" rx="18" ry="18" width="286" height="90"/>
+  <text class="subTitle" x="802" y="1112">Checks and build/</text>
+  <text class="subText" x="802" y="1142">
+    <tspan x="802" dy="0">Readable QA summaries,</tspan>
+    <tspan x="802" dy="24">DuckDB state, spill dirs.</tspan>
+  </text>
+
+  <rect class="note" x="100" y="1240" rx="22" ry="22" width="1000" height="56"/>
+  <text class="noteText" x="128" y="1276">Use the README for exact commands, filenames, and run instructions.</text>
+</svg>

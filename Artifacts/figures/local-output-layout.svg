@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1060" viewBox="0 0 1600 1060" role="img" aria-labelledby="title desc">
+  <title id="title">IPEDSDB_Panel local output layout</title>
+  <desc id="desc">Standardized folder map showing the top-level directories written under IPEDSDB_ROOT and how to read them.</desc>
+  <defs>
+    <style>
+      .title { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 42px; font-weight: 700; fill: #102a43; }
+      .subtitle { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 21px; font-weight: 500; fill: #486581; }
+      .path { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 16px; font-weight: 600; fill: #334e68; }
+      .gridCard { fill: #ffffff; stroke: #274863; stroke-width: 2.2; }
+      .folder1 { fill: #eaf2ff; }
+      .folder2 { fill: #edf6ee; }
+      .folder3 { fill: #fbf0db; }
+      .folder4 { fill: #eee8f8; }
+      .folder5 { fill: #e6f5f4; }
+      .folder6 { fill: #f9e9ea; }
+      .sideCard { fill: #ffffff; stroke: #274863; stroke-width: 2.2; }
+      .cardTitle { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 700; fill: #102a43; }
+      .body { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 500; fill: #243b53; }
+      .monoSmall { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 15px; font-weight: 600; fill: #334e68; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="1060"/>
+  <text class="title" x="60" y="72">Local output layout under IPEDSDB_ROOT</text>
+  <text class="subtitle" x="60" y="112">A folder map instead of a raw tree, so the structure stays readable in GitHub and on high-DPI screens.</text>
+  <text class="path" x="60" y="146">IPEDSDB_ROOT = /Users/markjaysonfarol13/Projects/IPEDSDB_Paneling</text>
+
+  <rect class="gridCard folder1" x="60" y="182" rx="22" ry="22" width="480" height="220"/>
+  <text class="cardTitle" x="88" y="220">Raw_Access_Databases/</text>
+  <text class="body" x="88" y="252">
+    <tspan x="88" dy="0">Per-year raw and extracted inputs.</tspan>
+    <tspan x="88" dy="26">Examples inside each year folder:</tspan>
+    <tspan class="monoSmall" x="88" dy="30">manifest.csv</tspan>
+    <tspan class="monoSmall" x="88" dy="22">downloads/</tspan>
+    <tspan class="monoSmall" x="88" dy="22">extracted_db/, tables_csv/</tspan>
+    <tspan class="monoSmall" x="88" dy="22">metadata/, qc/</tspan>
+  </text>
+
+  <rect class="gridCard folder2" x="580" y="182" rx="22" ry="22" width="480" height="220"/>
+  <text class="cardTitle" x="608" y="220">Dictionary/</text>
+  <text class="body" x="608" y="252">
+    <tspan x="608" dy="0">Stitched metadata references used downstream.</tspan>
+    <tspan class="monoSmall" x="608" dy="30">dictionary_lake.parquet</tspan>
+    <tspan class="monoSmall" x="608" dy="22">dictionary_lake.csv</tspan>
+    <tspan class="monoSmall" x="608" dy="22">dictionary_codes.parquet</tspan>
+    <tspan class="monoSmall" x="608" dy="22">dictionary_codes.csv</tspan>
+  </text>
+
+  <rect class="gridCard folder3" x="60" y="432" rx="22" ry="22" width="480" height="220"/>
+  <text class="cardTitle" x="88" y="470">Cross_sections/</text>
+  <text class="body" x="88" y="502">
+    <tspan x="88" dy="0">Year-specific long parquet outputs from harmonization.</tspan>
+    <tspan class="monoSmall" x="88" dy="30">panel_long_varnum_2004.parquet</tspan>
+    <tspan class="monoSmall" x="88" dy="22">panel_long_varnum_2023.parquet</tspan>
+    <tspan class="monoSmall" x="88" dy="22">parts_2004/part_*.parquet</tspan>
+    <tspan class="monoSmall" x="88" dy="22">parts_2023/part_*.parquet</tspan>
+  </text>
+
+  <rect class="gridCard folder4" x="580" y="432" rx="22" ry="22" width="480" height="220"/>
+  <text class="cardTitle" x="608" y="470">Panels/</text>
+  <text class="body" x="608" y="502">
+    <tspan x="608" dy="0">Main stitched and cleaned research outputs.</tspan>
+    <tspan class="monoSmall" x="608" dy="30">2004-2023/panel_long_varnum_2004_2023.parquet</tspan>
+    <tspan class="monoSmall" x="608" dy="22">panel_wide_analysis_2004_2023.parquet</tspan>
+    <tspan class="monoSmall" x="608" dy="22">panel_clean_analysis_2004_2023.parquet</tspan>
+    <tspan class="monoSmall" x="608" dy="22">wide_analysis_parts/, custom exports</tspan>
+  </text>
+
+  <rect class="gridCard folder5" x="60" y="682" rx="22" ry="22" width="480" height="220"/>
+  <text class="cardTitle" x="88" y="720">Checks/</text>
+  <text class="body" x="88" y="752">
+    <tspan x="88" dy="0">Readable QA outputs for every major stage.</tspan>
+    <tspan class="monoSmall" x="88" dy="30">download_qc/, extract_qc/, dictionary_qc/</tspan>
+    <tspan class="monoSmall" x="88" dy="22">harmonize_qc/, release_qc/, wide_qc/</tspan>
+    <tspan class="monoSmall" x="88" dy="22">disc_qc/, prch_qc/, panel_qc/</tspan>
+    <tspan class="monoSmall" x="88" dy="22">logs/</tspan>
+  </text>
+
+  <rect class="gridCard folder6" x="580" y="682" rx="22" ry="22" width="480" height="220"/>
+  <text class="cardTitle" x="608" y="720">build/</text>
+  <text class="body" x="608" y="752">
+    <tspan x="608" dy="0">Working state for DuckDB and temp-heavy steps.</tspan>
+    <tspan class="monoSmall" x="608" dy="30">ipedsdb_build.duckdb</tspan>
+    <tspan class="monoSmall" x="608" dy="22">duckdb_tmp/</tspan>
+    <tspan class="monoSmall" x="608" dy="22">harmonize_dedupe_tmp/</tspan>
+    <tspan x="608" dy="28">These are generated artifacts, not repo files.</tspan>
+  </text>
+
+  <rect class="sideCard folder1" x="1100" y="182" rx="22" ry="22" width="430" height="130"/>
+  <text class="cardTitle" x="1128" y="220">Human-readable first</text>
+  <text class="body" x="1128" y="252">
+    <tspan x="1128" dy="0">CSV manifests, inventories, row-count reports,</tspan>
+    <tspan x="1128" dy="24">and summary tables are the first files to inspect.</tspan>
+  </text>
+
+  <rect class="sideCard folder2" x="1100" y="342" rx="22" ry="22" width="430" height="130"/>
+  <text class="cardTitle" x="1128" y="380">Analysis-scale storage</text>
+  <text class="body" x="1128" y="412">
+    <tspan x="1128" dy="0">Parquet and DuckDB are used where the full</tspan>
+    <tspan x="1128" dy="24">2004:2023 panel would be too large for CSV.</tspan>
+  </text>
+
+  <rect class="sideCard folder3" x="1100" y="502" rx="22" ry="22" width="430" height="150"/>
+  <text class="cardTitle" x="1128" y="540">What stays out of git</text>
+  <text class="body" x="1128" y="572">
+    <tspan x="1128" dy="0">Everything written under IPEDSDB_ROOT:</tspan>
+    <tspan x="1128" dy="24">raw zip files, extracted tables, parquet panels,</tspan>
+    <tspan x="1128" dy="24">QA folders, and DuckDB working state.</tspan>
+  </text>
+
+  <rect class="sideCard folder4" x="1100" y="682" rx="22" ry="22" width="430" height="220"/>
+  <text class="cardTitle" x="1128" y="720">Open these first after a run</text>
+  <text class="body" x="1128" y="752">
+    <tspan class="monoSmall" x="1128" dy="0">Checks/download_qc/release_inventory.csv</tspan>
+    <tspan class="monoSmall" x="1128" dy="24">Checks/extract_qc/table_inventory_all_years.csv</tspan>
+    <tspan class="monoSmall" x="1128" dy="24">Checks/dictionary_qc/dictionary_qaqc_summary.csv</tspan>
+    <tspan class="monoSmall" x="1128" dy="24">Checks/panel_qc/panel_qa_summary.csv</tspan>
+    <tspan class="monoSmall" x="1128" dy="24">Panels/panel_clean_analysis_2004_2023.parquet</tspan>
+  </text>
+</svg>

@@ -1,3 +1,6 @@
+"""
+Tests for synthetic dictionary rows added during metadata stitching.
+"""
 from __future__ import annotations
 
 import pandas as pd

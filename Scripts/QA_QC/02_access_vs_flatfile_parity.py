@@ -1,4 +1,20 @@
 #!/usr/bin/env python3
+"""
+QA 02: compare Access-derived outputs against the flat-file baseline project.
+
+Reads:
+- Access-derived long and wide outputs
+- baseline long and wide outputs from `IPEDS_Paneling`
+
+Writes:
+- parity summary CSV
+- parity summary markdown
+
+Focus:
+- year-level row counts
+- source-file coverage
+- shared-column content differences
+"""
 from __future__ import annotations
 
 import argparse

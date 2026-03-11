@@ -2,9 +2,19 @@
 """
 Shared parsing and planning helpers for the wide-panel builders.
 
-Both the DuckDB engine and the legacy parity engine use these utilities for
-year parsing, target ordering, numeric-target discovery, discrete-group
-planning, legacy-schema seeding, QC path defaults, and CLI normalization.
+Reads:
+- stitched long schema information
+- dictionary-lake metadata
+- CLI options from wide-build callers
+
+Writes:
+- no durable artifacts directly
+
+Focus:
+- target planning
+- CLI normalization
+- schema seeding
+- discrete-group planning
 """
 from __future__ import annotations
 

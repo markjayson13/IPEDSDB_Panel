@@ -1,3 +1,10 @@
+"""
+Pytest bootstrap for loading repo scripts as importable test modules.
+
+Focus:
+- make `Scripts/` importable during tests
+- provide a helper for loading numbered scripts by path
+"""
 from __future__ import annotations
 
 import importlib.util

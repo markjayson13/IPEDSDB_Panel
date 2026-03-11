@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
 """
-QA checks for PRCH cleaning versus the raw stitched wide panel.
+QA 01: compare the PRCH-cleaned wide panel against the raw wide panel.
 
-The script verifies year coverage, row preservation, and selected non-null
-comparisons, then writes a compact summary to `Checks/panel_qc/` for the full
-release cleaning workflow.
+Reads:
+- raw stitched wide parquet
+- cleaned stitched wide parquet
+- `Checks/prch_qc/prch_clean_columns.csv` when present
+
+Writes:
+- `Checks/panel_qc/panel_qa_summary.csv`
+
+Focus:
+- year coverage preservation
+- row preservation
+- selected non-null comparisons after PRCH cleaning
 """
 from __future__ import annotations
 

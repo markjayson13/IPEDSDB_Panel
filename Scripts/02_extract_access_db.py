@@ -1,4 +1,18 @@
 #!/usr/bin/env python3
+"""
+Stage 02: extract each yearly Access database and inventory its tables.
+
+Reads:
+- `Raw_Access_Databases/<year>/downloads/*.zip`
+- yearly `manifest.csv`
+
+Writes:
+- `Raw_Access_Databases/<year>/extracted_db/*`
+- `Raw_Access_Databases/<year>/tables_csv/*`
+- `Raw_Access_Databases/<year>/metadata/*`
+- `Raw_Access_Databases/<year>/qc/*`
+- `Checks/extract_qc/*`
+"""
 from __future__ import annotations
 
 import argparse
@@ -10,6 +24,7 @@ from pathlib import Path
 import pandas as pd
 
 from access_build_utils import (
+    can_serve_metadata_role_from_capabilities,
     canonical_source_file,
     classify_table_role,
     compute_file_metadata,
@@ -23,6 +38,7 @@ from access_build_utils import (
     require_mdb_tools,
     run_checked,
     safe_table_filename,
+    table_role_capabilities,
 )
 
 
@@ -131,6 +147,7 @@ def main() -> None:
                 header, row_count = csv_header_and_rowcount(csv_path)
                 access_row_count = maybe_access_row_count(db_path, table_name)
                 role = classify_table_role(table_name, header)
+                capabilities = table_role_capabilities(table_name, header)
                 has_unitid = any(normalize_text_key(col) == "unitid" for col in header)
                 _, csv_sha = compute_file_metadata(csv_path)
                 inventory_rows.append(
@@ -146,6 +163,13 @@ def main() -> None:
                         "column_count": len(header),
                         "csv_sha256": csv_sha,
                         "export_status": status,
+                        "has_varnumber": bool(capabilities["has_varnumber"]),
+                        "has_varname": bool(capabilities["has_varname"]),
+                        "has_vartitle": bool(capabilities["has_vartitle"]),
+                        "has_longdesc": bool(capabilities["has_longdesc"]),
+                        "has_codevalue": bool(capabilities["has_code"]),
+                        "has_valuelabel": bool(capabilities["has_label"]),
+                        "has_imputation_markers": bool(capabilities["has_imputation"]),
                     }
                 )
                 row_count_rows.append(
@@ -185,6 +209,13 @@ def main() -> None:
             "column_count",
             "csv_sha256",
             "export_status",
+            "has_varnumber",
+            "has_varname",
+            "has_vartitle",
+            "has_longdesc",
+            "has_codevalue",
+            "has_valuelabel",
+            "has_imputation_markers",
         ]
         write_csv(metadata_dir / "table_inventory.csv", inventory_rows, inventory_fields)
         write_csv(
@@ -216,7 +247,20 @@ def main() -> None:
 
         if args.fail_on_missing_metadata:
             required_roles = {"metadata_varlist", "metadata_description", "metadata_codes"}
-            found_roles = {row["table_role"] for row in inventory_rows}
+            found_roles = set()
+            for row in inventory_rows:
+                capabilities = {
+                    "has_varnumber": str(row.get("has_varnumber", "")).lower() in {"true", "1"},
+                    "has_varname": str(row.get("has_varname", "")).lower() in {"true", "1"},
+                    "has_vartitle": str(row.get("has_vartitle", "")).lower() in {"true", "1"},
+                    "has_longdesc": str(row.get("has_longdesc", "")).lower() in {"true", "1"},
+                    "has_code": str(row.get("has_codevalue", "")).lower() in {"true", "1"},
+                    "has_label": str(row.get("has_valuelabel", "")).lower() in {"true", "1"},
+                    "has_imputation": str(row.get("has_imputation_markers", "")).lower() in {"true", "1"},
+                }
+                for role in required_roles:
+                    if can_serve_metadata_role_from_capabilities(role, capabilities):
+                        found_roles.add(role)
             missing_roles = sorted(required_roles - found_roles)
             if missing_roles:
                 raise SystemExit(f"Missing required metadata table roles for year {year}: {missing_roles}")
@@ -241,6 +285,13 @@ def main() -> None:
             "column_count",
             "csv_sha256",
             "export_status",
+            "has_varnumber",
+            "has_varname",
+            "has_vartitle",
+            "has_longdesc",
+            "has_codevalue",
+            "has_valuelabel",
+            "has_imputation_markers",
         ],
     )
     write_csv(extract_qc_dir / "extract_failures.csv", global_failures, ["year", "table_name", "error"])

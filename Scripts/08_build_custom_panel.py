@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """
-Build a custom extract from a stitched wide or cleaned panel.
+Stage 08: build a custom variable subset from a raw or cleaned wide panel.
 
-`UNITID` and `year` are always retained. Users specify the remaining variables
-via `--vars` or `--vars-file`. Outputs can be written as parquet or CSV using a
-streamed Arrow path so large panel subsets remain cheap to materialize.
+Reads:
+- a stitched wide or cleaned wide parquet panel
+
+Writes:
+- a custom parquet or CSV extract
+
+`UNITID` and `year` are always retained. Users choose the remaining variables
+with `--vars` or `--vars-file`.
 """
 from __future__ import annotations
 

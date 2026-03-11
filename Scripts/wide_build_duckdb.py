@@ -1,12 +1,22 @@
 #!/usr/bin/env python3
 """
-DuckDB execution engine for `06_build_wide_panel.py`.
+Shared engine behind Stage 06: DuckDB execution for wide-panel construction.
 
-This module keeps the stitched long parquet lazy where possible, builds compact
-global planning artifacts, executes year-scoped scalar and dimension lanes,
-performs exact scalar-conflict QC with optional hash bucketing, writes
-target-lineage and seeded-schema audits, and exports partitioned plus stitched
-wide outputs.
+Reads:
+- stitched long parquet
+- dictionary-lake metadata
+- runtime planning options from `06_build_wide_panel.py`
+
+Writes:
+- wide-panel parquet outputs
+- wide-build QA artifacts
+- optional DuckDB database state
+
+Focus:
+- lazy long-panel reads where possible
+- scalar and dimension lane execution
+- scalar-conflict QA
+- stitched wide exports
 """
 from __future__ import annotations
 

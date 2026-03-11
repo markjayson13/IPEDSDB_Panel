@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1810" viewBox="0 0 1200 1810" role="img" aria-labelledby="title desc">
+  <title id="title">IPEDSDB_Panel pipeline stages</title>
+  <desc id="desc">A simplified vertical stage map for the core build, followed by optional outputs and QA tools.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f5f2ea; }
+      .title { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 40px; font-weight: 700; fill: #102a43; }
+      .subtitle { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 500; fill: #486581; }
+      .band { fill: #102a43; }
+      .bandText { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 19px; font-weight: 700; fill: #ffffff; }
+      .card { fill: #ffffff; stroke: #274863; stroke-width: 2.2; }
+      .c1 { fill: #eaf2ff; }
+      .c2 { fill: #edf6ee; }
+      .c3 { fill: #fbf0db; }
+      .c4 { fill: #eee8f8; }
+      .c5 { fill: #e6f5f4; }
+      .c6 { fill: #f9e9ea; }
+      .label { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; fill: #486581; }
+      .cardTitle { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 700; fill: #102a43; }
+      .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 16px; font-weight: 600; fill: #334e68; }
+      .cardText { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 500; fill: #243b53; }
+      .arrow { stroke: #102a43; stroke-width: 4; fill: none; marker-end: url(#arrowhead); }
+      .footer { fill: #102a43; }
+      .footerText { font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 19px; font-weight: 700; fill: #ffffff; }
+    </style>
+    <marker id="arrowhead" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#102a43"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="1810"/>
+  <text class="title" x="60" y="74">Pipeline stages and outputs</text>
+  <text class="subtitle" x="60" y="114">A clean stage map for the core build. The README holds the exact commands and output filenames.</text>
+
+  <rect class="band" x="60" y="150" rx="18" ry="18" width="1080" height="74"/>
+  <text class="bandText" x="88" y="182">
+    <tspan x="88" dy="0">Default run: manual_commands.sh -&gt; 00_run_all.py</tspan>
+    <tspan x="88" dy="24">Years: 2004:2023 | Release policy: final-only Access databases</tspan>
+  </text>
+
+  <text class="label" x="88" y="248">CORE BUILD</text>
+
+  <rect class="card c1" x="80" y="268" rx="24" ry="24" width="1040" height="128"/>
+  <text class="cardTitle" x="116" y="316">1. Download</text>
+  <text class="mono" x="116" y="346">01_download_access_databases.py</text>
+  <text class="cardText" x="116" y="376">Fetch annual final Access archives and companion documentation from NCES.</text>
+
+  <line class="arrow" x1="600" y1="396" x2="600" y2="434"/>
+
+  <rect class="card c2" x="80" y="446" rx="24" ry="24" width="1040" height="128"/>
+  <text class="cardTitle" x="116" y="494">2. Extract</text>
+  <text class="mono" x="116" y="524">02_extract_access_db.py</text>
+  <text class="cardText" x="116" y="554">Unzip yearly databases, export CSV tables, and classify data versus metadata.</text>
+
+  <line class="arrow" x1="600" y1="574" x2="600" y2="612"/>
+
+  <rect class="card c3" x="80" y="624" rx="24" ry="24" width="1040" height="128"/>
+  <text class="cardTitle" x="116" y="672">3. Dictionary ingest</text>
+  <text class="mono" x="116" y="702">03_dictionary_ingest.py</text>
+  <text class="cardText" x="116" y="732">Build stitched metadata dictionaries and code-label references from Access metadata.</text>
+
+  <line class="arrow" x1="600" y1="752" x2="600" y2="790"/>
+
+  <rect class="card c4" x="80" y="802" rx="24" ry="24" width="1040" height="128"/>
+  <text class="cardTitle" x="116" y="850">4. Harmonize</text>
+  <text class="mono" x="116" y="880">04_harmonize.py</text>
+  <text class="cardText" x="116" y="910">Convert yearly table exports into long parquet with dictionary metadata attached.</text>
+
+  <line class="arrow" x1="600" y1="930" x2="600" y2="968"/>
+
+  <rect class="card c5" x="80" y="980" rx="24" ry="24" width="1040" height="128"/>
+  <text class="cardTitle" x="116" y="1028">5. Stitch long panel</text>
+  <text class="mono" x="116" y="1058">05_stitch_long.py</text>
+  <text class="cardText" x="116" y="1088">Validate year coverage and combine yearly long parquet outputs into one panel.</text>
+
+  <line class="arrow" x1="600" y1="1108" x2="600" y2="1146"/>
+
+  <rect class="card c6" x="80" y="1158" rx="24" ry="24" width="1040" height="128"/>
+  <text class="cardTitle" x="116" y="1206">6. Wide build</text>
+  <text class="mono" x="116" y="1236">06_build_wide_panel.py</text>
+  <text class="cardText" x="116" y="1266">Use DuckDB for typed panel construction, scalar-conflict QA, and discrete handling.</text>
+
+  <line class="arrow" x1="600" y1="1286" x2="600" y2="1324"/>
+
+  <rect class="card c1" x="80" y="1336" rx="24" ry="24" width="1040" height="128"/>
+  <text class="cardTitle" x="116" y="1384">7. Clean</text>
+  <text class="mono" x="116" y="1414">07_clean_panel.py</text>
+  <text class="cardText" x="116" y="1444">Apply PRCH child-row nulling while preserving every UNITID-year observation.</text>
+
+  <text class="label" x="88" y="1512">POST-BUILD TOOLS</text>
+
+  <rect class="card c3" x="80" y="1530" rx="24" ry="24" width="500" height="160"/>
+  <text class="cardTitle" x="116" y="1578">8. Optional outputs</text>
+  <text class="mono" x="116" y="1608">
+    <tspan x="116" dy="0">08_build_custom_panel.py</tspan>
+    <tspan x="116" dy="22">09_build_panel_dictionary.py</tspan>
+  </text>
+  <text class="cardText" x="116" y="1660">
+    <tspan x="116" dy="0">Create smaller extracts and output-specific</tspan>
+    <tspan x="116" dy="24">dictionaries after the main build.</tspan>
+  </text>
+
+  <rect class="card c2" x="620" y="1530" rx="24" ry="24" width="500" height="160"/>
+  <text class="cardTitle" x="656" y="1578">9. QA and guards</text>
+  <text class="mono" x="656" y="1608">
+    <tspan x="656" dy="0">QA_QC/00, 01, 05, 06</tspan>
+    <tspan x="656" dy="22">plus supporting checks</tspan>
+  </text>
+  <text class="cardText" x="656" y="1660">
+    <tspan x="656" dy="0">Write readable QA summaries and stop generated</tspan>
+    <tspan x="656" dy="24">data from entering version control.</tspan>
+  </text>
+
+  <rect class="footer" x="60" y="1736" rx="22" ry="22" width="1080" height="60"/>
+  <text class="footerText" x="88" y="1765">
+    <tspan x="88" dy="0">Integrity gates include final-release checks, UNITID enforcement, merge-expansion failure,</tspan>
+    <tspan x="88" dy="22">duplicate-key control, and row-preserving cleaning.</tspan>
+  </text>
+</svg>

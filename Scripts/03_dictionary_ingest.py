@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+"""
+Stage 03: build stitched metadata dictionaries from extracted Access metadata.
+
+Reads:
+- yearly `metadata/table_inventory.csv`
+- exported metadata CSV tables under `Raw_Access_Databases/<year>/tables_csv/`
+
+Writes:
+- `Dictionary/dictionary_lake.parquet` and `.csv`
+- `Dictionary/dictionary_codes.parquet` and `.csv`
+- `Checks/dictionary_qc/*`
+"""
 from __future__ import annotations
 
 import argparse
@@ -19,6 +31,7 @@ from access_build_utils import (
     CODE_VALUE_CANDIDATES,
     canonical_source_file,
     clean_source_label,
+    can_serve_metadata_role_from_capabilities,
     ensure_data_layout,
     normalize_text_key,
     normalize_varnumber,
@@ -42,18 +55,32 @@ def load_manifest_year_info(year_dir: Path) -> dict[str, str]:
 
 
 def choose_candidates(inventory: pd.DataFrame, role: str) -> pd.DataFrame:
-    subset = inventory[inventory["table_role"] == role].copy()
+    def row_capabilities(row: pd.Series) -> dict[str, bool]:
+        return {
+            "has_varnumber": str(row.get("has_varnumber", "")).lower() in {"true", "1"},
+            "has_varname": str(row.get("has_varname", "")).lower() in {"true", "1"},
+            "has_vartitle": str(row.get("has_vartitle", "")).lower() in {"true", "1"},
+            "has_longdesc": str(row.get("has_longdesc", "")).lower() in {"true", "1"},
+            "has_code": str(row.get("has_codevalue", "")).lower() in {"true", "1"},
+            "has_label": str(row.get("has_valuelabel", "")).lower() in {"true", "1"},
+            "has_imputation": str(row.get("has_imputation_markers", "")).lower() in {"true", "1"},
+        }
+
+    capability_mask = inventory.apply(lambda row: can_serve_metadata_role_from_capabilities(role, row_capabilities(row)), axis=1)
+    subset = inventory[capability_mask | (inventory["table_role"] == role)].copy()
     if subset.empty:
         return subset
 
     def score_row(row: pd.Series) -> tuple[int, int, str]:
         name = normalize_text_key(row["table_name"])
         score = 0
+        if row.get("table_role") == role:
+            score += 100
         if role == "metadata_varlist" and any(tok in name for tok in ("varlist", "layout", "variable")):
             score += 20
-        if role == "metadata_description" and "descript" in name:
+        if role == "metadata_description" and any(tok in name for tok in ("descript", "vartable", "layout")):
             score += 20
-        if role == "metadata_codes" and any(tok in name for tok in ("frequenc", "code")):
+        if role == "metadata_codes" and any(tok in name for tok in ("valueset", "frequenc", "code", "label")):
             score += 20
         if role == "metadata_imputation" and "imput" in name:
             score += 20

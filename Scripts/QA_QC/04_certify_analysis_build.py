@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
 """
-Certify a completed monitored analysis-wide build against a trusted baseline.
+QA 04: certify a monitored wide-panel build against a trusted baseline.
 
-The certification pass checks run metadata, artifact completeness, whole-window
-row/spine parity, schema parity, QC artifacts, seeded-schema behavior, and
-content equality where contracts require exact matches.
+Reads:
+- a completed monitored build directory or build output root
+- trusted baseline outputs from `IPEDS_Paneling`
+
+Writes:
+- certification summary CSV
+- certification summary markdown
+- optional certification log
+
+Focus:
+- artifact completeness
+- schema and row parity
+- QC parity
+- certification status for the monitored build
 """
 from __future__ import annotations
 

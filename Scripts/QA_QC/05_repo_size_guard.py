@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """
-Fail if tracked repository files violate small-repo rules.
+QA 05: enforce small-repo rules on tracked files.
 
-This guard scans tracked files, reports the largest committed assets, blocks
-forbidden tracked basenames such as `.DS_Store`, and fails when any tracked
-file exceeds the configured size threshold.
+Reads:
+- tracked files in the git repository
+
+Writes:
+- no files; prints a terminal report and exits nonzero on failure
+
+Focus:
+- oversized tracked files
+- forbidden tracked basenames such as `.DS_Store`
 """
 from __future__ import annotations
 

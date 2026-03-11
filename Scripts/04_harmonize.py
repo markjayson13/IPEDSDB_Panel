@@ -1,9 +1,24 @@
 #!/usr/bin/env python3
+"""
+Stage 04: convert exported yearly data tables into harmonized long parquet.
+
+Reads:
+- yearly exported data CSV tables
+- `Dictionary/dictionary_lake.parquet`
+- yearly `manifest.csv` and `metadata/table_inventory.csv`
+
+Writes:
+- `Cross_sections/panel_long_varnum_<year>.parquet`
+- optional `Cross_sections/parts_<year>/part_*.parquet`
+- `Checks/harmonize_qc/*`
+- `Checks/release_qc/*`
+"""
 from __future__ import annotations
 
 import argparse
 import csv
 import pathlib
+import shutil
 import sys
 from typing import Iterable
 
@@ -49,6 +64,9 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--dedupe", action=argparse.BooleanOptionalAction, default=True)
     ap.add_argument("--final-dedupe", action=argparse.BooleanOptionalAction, default=True)
     ap.add_argument("--dedupe-priority", default="HD,IC,IC_AY,IC_PY,ADM,AL,C_A,C_B,C_C,CDEP,COST,EAP,EFA,EFA_DIST,EFB,EFC,EFCP,EFFY,EFFY_DIST,EFIA,F_F,F_FA,F_FA_F,F_FA_G,GR,GR200,GR_PELL_SSL,OM,SAL_A,SAL_A_LT,SAL_B,SAL_FACULTY,SAL_IS,S_ABD,S_CN,S_F,S_G,S_IS,S_NH,S_OC,S_SIS,SFA,SFAV")
+    ap.add_argument("--dedupe-temp-dir", default=None, help="Optional temp directory for DuckDB dedupe spill files")
+    ap.add_argument("--dedupe-max-temp-gib", type=int, default=None, help="Optional DuckDB max temp directory size in GiB")
+    ap.add_argument("--dedupe-threads", type=int, default=1, help="DuckDB threads to use during final dedupe")
     ap.add_argument("--release-strict", action=argparse.BooleanOptionalAction, default=True)
     ap.add_argument("--log-file", default=None)
     return ap.parse_args()
@@ -105,6 +123,8 @@ def select_dict_source(dict_year: pd.DataFrame, source_file: str, access_table_n
 
 
 def write_parquet_parts(out_path: pathlib.Path, frames: Iterable[pd.DataFrame], parts_dir: pathlib.Path) -> None:
+    if parts_dir.exists():
+        shutil.rmtree(parts_dir)
     parts_dir.mkdir(parents=True, exist_ok=True)
     idx = 0
     for chunk in frames:
@@ -129,9 +149,31 @@ def write_parquet_parts(out_path: pathlib.Path, frames: Iterable[pd.DataFrame], 
         tmp_out.replace(out_path)
 
 
-def dedupe_long_panel(out_path: pathlib.Path, priority_list: list[str]) -> None:
+def sql_quote(text: str) -> str:
+    return "'" + str(text).replace("'", "''") + "'"
+
+
+def dedupe_long_panel(
+    out_path: pathlib.Path,
+    priority_list: list[str],
+    *,
+    temp_dir: pathlib.Path,
+    max_temp_gib: int | None = None,
+    threads: int = 1,
+) -> None:
+    if temp_dir.exists():
+        shutil.rmtree(temp_dir)
+    temp_dir.mkdir(parents=True, exist_ok=True)
     con = duckdb.connect()
     try:
+        con.execute(f"PRAGMA temp_directory={sql_quote(str(temp_dir))}")
+        con.execute(f"SET threads={max(int(threads), 1)}")
+        con.execute("SET preserve_insertion_order=false")
+        if max_temp_gib is None:
+            free_bytes = shutil.disk_usage(temp_dir).free
+            max_temp_gib = max(1, int((free_bytes * 0.9) // (1024**3)))
+        con.execute(f"SET max_temp_directory_size='{int(max_temp_gib)}GiB'")
+
         priority_list = [src.strip().upper() for src in priority_list if src.strip()]
         case = "CASE"
         for i, src in enumerate(priority_list, start=1):
@@ -140,26 +182,70 @@ def dedupe_long_panel(out_path: pathlib.Path, priority_list: list[str]) -> None:
         case += " ELSE 999 END"
 
         tmp_path = out_path.with_suffix(out_path.suffix + ".dedupe.tmp")
-        con.execute(
-            f"""
-            COPY (
-                WITH ranked AS (
-                    SELECT *,
-                           ROW_NUMBER() OVER (
-                               PARTITION BY UNITID, year, varnumber, source_file
-                               ORDER BY {case}, access_table_name, varname
-                           ) AS _rn
-                    FROM read_parquet('{str(out_path).replace("'", "''")}')
-                )
-                SELECT * EXCLUDE (_rn)
-                FROM ranked
-                WHERE _rn = 1
-            ) TO '{str(tmp_path).replace("'", "''")}' (FORMAT PARQUET, COMPRESSION SNAPPY)
-            """
+        if tmp_path.exists():
+            tmp_path.unlink()
+        parts_dir = temp_dir / "dedupe_parts"
+        parts_dir.mkdir(parents=True, exist_ok=True)
+
+        source_files = [
+            row[0]
+            for row in con.execute(
+                f"""
+                SELECT DISTINCT COALESCE(CAST(source_file AS VARCHAR), '') AS source_file
+                FROM read_parquet({sql_quote(str(out_path))})
+                ORDER BY 1
+                """
+            ).fetchall()
+        ]
+
+        print(
+            f"[dedupe] start file={out_path.name} source_files={len(source_files)} "
+            f"temp_dir={temp_dir} max_temp={max_temp_gib}GiB threads={max(int(threads), 1)}"
         )
+        for idx, source_file in enumerate(source_files, start=1):
+            part_path = parts_dir / f"part_{idx:05d}.parquet"
+            source_sql = sql_quote(source_file)
+            con.execute(
+                f"""
+                COPY (
+                    WITH filtered AS (
+                        SELECT *
+                        FROM read_parquet({sql_quote(str(out_path))})
+                        WHERE COALESCE(CAST(source_file AS VARCHAR), '') = {source_sql}
+                    ),
+                    ranked AS (
+                        SELECT *,
+                               ROW_NUMBER() OVER (
+                                   PARTITION BY UNITID, year, varnumber, source_file
+                                   ORDER BY {case}, access_table_name, varname
+                               ) AS _rn
+                        FROM filtered
+                    )
+                    SELECT * EXCLUDE (_rn)
+                    FROM ranked
+                    WHERE _rn = 1
+                ) TO {sql_quote(str(part_path))} (FORMAT PARQUET, COMPRESSION SNAPPY)
+                """
+            )
+            if idx == 1 or idx == len(source_files) or idx % 5 == 0:
+                label = source_file or "<blank>"
+                print(f"[dedupe] processed {idx}/{len(source_files)} source_file={label}")
+
+        writer = None
+        for part in sorted(parts_dir.glob("part_*.parquet")):
+            pf = pq.ParquetFile(part)
+            for batch in pf.iter_batches():
+                if writer is None:
+                    writer = pq.ParquetWriter(tmp_path, batch.schema, compression="snappy")
+                writer.write_batch(batch)
+        if writer is None:
+            raise SystemExit(f"[fatal] dedupe produced no parquet parts for {out_path}")
+        writer.close()
         tmp_path.replace(out_path)
+        print(f"[dedupe] complete file={out_path.name}")
     finally:
         con.close()
+        shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 def main() -> None:
@@ -317,7 +403,14 @@ def main() -> None:
         if not out_path.exists():
             raise SystemExit(f"No long parquet output was created for year {year}")
         if args.dedupe and out_path.exists():
-            dedupe_long_panel(out_path, [x.strip() for x in args.dedupe_priority.split(",") if x.strip()])
+            dedupe_tmp_dir = pathlib.Path(args.dedupe_temp_dir) if args.dedupe_temp_dir else layout.build / "harmonize_dedupe_tmp" / str(year)
+            dedupe_long_panel(
+                out_path,
+                [x.strip() for x in args.dedupe_priority.split(",") if x.strip()],
+                temp_dir=dedupe_tmp_dir,
+                max_temp_gib=args.dedupe_max_temp_gib,
+                threads=args.dedupe_threads,
+            )
         if args.final_dedupe and args.dedupe and out_path.exists():
             pq.ParquetFile(out_path)
 

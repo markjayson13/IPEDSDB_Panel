@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Build a panel-specific variable dictionary from a stitched wide parquet.
+Stage 09: build a panel-specific variable dictionary for a stitched wide panel.
 
-The output is a CSV keyed to the actual columns present in a panel and combines:
-- panel column order
-- actual parquet data types
-- dictionary-lake metadata such as varTitle, longDescription, and DataType
+Reads:
+- a stitched wide or cleaned wide parquet panel
+- `Dictionary/dictionary_lake.parquet`
+
+Writes:
+- a panel-level dictionary CSV keyed to the actual output columns
 """
 from __future__ import annotations
 
