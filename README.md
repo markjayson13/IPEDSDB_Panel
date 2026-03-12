@@ -15,8 +15,9 @@ This repository is code-first and data-outside-git by design:
 | Goal | Start here |
 | --- | --- |
 | Run the whole pipeline | `bash manual_commands.sh` |
-| Test the setup without a long build | `python Scripts/00_run_all.py --years "2023:2023" --run-cleaning --run-qaqc` |
+| Test the setup without a full historical build | `python Scripts/00_run_all.py --years "2022:2023" --run-cleaning --run-qaqc` |
 | Check whether an existing build looks healthy | `bash Scripts/QA_QC/qc_only.sh` |
+| Run the final acceptance audit only | `python Scripts/QA_QC/08_acceptance_audit.py --root "$IPEDSDB_ROOT" --years "2004:2023"` |
 | Run saved inspection SQL and export results | `python Scripts/run_saved_query.py --list` |
 | Pull only a subset of variables | `python Scripts/08_build_custom_panel.py ...` |
 | Understand where a file came from | open `Checks/`, then `Dictionary/`, then `Raw_Access_Databases/<year>/metadata/` |
@@ -157,7 +158,9 @@ What to expect:
 - the largest final artifacts are parquet files in `Panels/`
 - a full `2004:2023` run is materially heavier than a one-year smoke test
 
-### Smoke test on a single year
+### Smoke test with cleaning and QA
+
+Use at least two years if you want to include Stage 07 cleaning and panel QA. The cleaner intentionally refuses single-year inputs.
 
 ```bash
 cd /Users/markjaysonfarol13/Documents/GitHub/IPEDSDB_Panel
@@ -166,9 +169,19 @@ export IPEDSDB_ROOT="/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling"
 
 python Scripts/00_run_all.py \
   --root "$IPEDSDB_ROOT" \
-  --years "2023:2023" \
+  --years "2022:2023" \
   --run-cleaning \
   --run-qaqc
+```
+
+### Single-year smoke test without cleaning
+
+If you only want to validate acquisition through wide-build on a single year, skip the cleaning layer:
+
+```bash
+python Scripts/00_run_all.py \
+  --root "$IPEDSDB_ROOT" \
+  --years "2023:2023"
 ```
 
 ### Dry run of the orchestration plan
@@ -209,6 +222,8 @@ $IPEDSDB_ROOT/Checks/download_qc/release_inventory.csv
 $IPEDSDB_ROOT/Checks/extract_qc/table_inventory_all_years.csv
 $IPEDSDB_ROOT/Checks/dictionary_qc/dictionary_qaqc_summary.csv
 $IPEDSDB_ROOT/Checks/panel_qc/panel_qa_summary.csv
+$IPEDSDB_ROOT/Checks/panel_qc/panel_qa_coverage_matrix.csv
+$IPEDSDB_ROOT/Checks/acceptance_qc/acceptance_summary.csv
 ```
 
 If you want the fastest sanity check after a run, open these first:
@@ -216,8 +231,9 @@ If you want the fastest sanity check after a run, open these first:
 1. `Checks/download_qc/release_inventory.csv`
 2. `Checks/extract_qc/table_inventory_all_years.csv`
 3. `Checks/dictionary_qc/dictionary_qaqc_summary.csv`
-4. `Checks/panel_qc/panel_qa_summary.csv`
-5. `Panels/panel_clean_analysis_2004_2023.parquet`
+4. `Checks/panel_qc/panel_qa_coverage_matrix.csv`
+5. `Checks/acceptance_qc/acceptance_summary.md`
+6. `Panels/panel_clean_analysis_2004_2023.parquet`
 
 ## DuckDB, Data Wrangler, And Saved SQL
 
@@ -287,12 +303,14 @@ Most useful QA directories:
 | --- | --- |
 | `Checks/download_qc/` | `release_inventory.csv`, `missing_years.csv`, `download_failures.csv` |
 | `Checks/extract_qc/` | `table_inventory_all_years.csv`, `extract_failures.csv` |
-| `Checks/dictionary_qc/` | `dictionary_qaqc_summary.csv`, `dictionary_duplicates.csv`, `source_file_conflicts.csv` |
+| `Checks/dictionary_qc/` | `dictionary_qaqc_summary.csv`, `unmapped_metadata_tables.csv`, `noncanonical_source_categories.csv` |
 | `Checks/harmonize_qc/` | yearly `harmonize_summary_*.csv`, dropped `UNITID` reports |
 | `Checks/release_qc/` | yearly release summaries confirming `final` |
 | `Checks/wide_qc/` | scalar-conflict and wide-build reports |
-| `Checks/prch_qc/` | `prch_clean_summary.csv`, `prch_clean_columns.csv` |
-| `Checks/panel_qc/` | `panel_qa_summary.csv` |
+| `Checks/disc_qc/` | `disc_conflicts_summary_all_years.csv` first, then year-level detail only if needed |
+| `Checks/prch_qc/` | `prch_clean_summary.csv`, `prch_clean_columns.csv`, `prch_flag_policy.csv` |
+| `Checks/panel_qc/` | `panel_qa_summary.csv`, `panel_qa_coverage_matrix.csv`, `panel_qa_by_flag_code.csv` |
+| `Checks/acceptance_qc/` | `acceptance_summary.csv`, `acceptance_summary.md` |
 | `Checks/query_results/` | saved-query outputs for inspection and Data Wrangler |
 | `Checks/real_parity_runs/summary/` | cross-run task-monitor CSV and Markdown summaries |
 
@@ -302,16 +320,66 @@ Run QA only against existing outputs:
 bash Scripts/QA_QC/qc_only.sh
 ```
 
+That wrapper now runs:
+
+- `00_dictionary_qaqc.py`
+- `01_panel_qa.py`
+- `08_acceptance_audit.py`
+
+## Acceptance Audit
+
+The acceptance audit is the top-level pass/fail check over the live generated artifacts under `IPEDSDB_ROOT`.
+
+Run it directly:
+
+```bash
+python Scripts/QA_QC/08_acceptance_audit.py \
+  --root "$IPEDSDB_ROOT" \
+  --years "2004:2023"
+```
+
+It writes:
+
+```text
+$IPEDSDB_ROOT/Checks/acceptance_qc/acceptance_summary.csv
+$IPEDSDB_ROOT/Checks/acceptance_qc/acceptance_summary.md
+```
+
+It checks:
+
+- required panel, dictionary, and QA artifacts exist
+- exact `2004:2023` year coverage
+- no duplicate `(UNITID, year)` keys in wide or clean outputs
+- long-panel key fields are non-null and non-blank
+- raw and clean row counts match
+- dictionary QA has no unresolved duplicate/conflict/unmapped rows
+- panel QA has no suspicious PRCH flags
+- discrete-conflict QA has no remaining high-signal groups
+
+## PRCH Cleaning Method
+
+The authoritative method note for parent-child cleaning is:
+
+- `METHODS_PRCH_CLEANING.md`
+
+Current repo policy is intentionally component-specific:
+
+- keep every `UNITID-year` row
+- null only the component-family columns affected by a `PRCH_*` flag
+- for Finance, clean `PRCH_F` codes `2,3,4,5`
+- retain `PRCH_F=6` as a review-only partial case because blanket nulling would erase valid reported finance values
+
 ## What A Healthy Run Looks Like
 
 | Signal | What you want to see |
 | --- | --- |
 | Release coverage | requested years exist and are marked `Final` |
 | Extraction | one Access DB per year and a non-empty `table_inventory.csv` |
-| Dictionary | low or zero duplicate/conflict counts in `dictionary_qaqc_summary.csv` |
+| Dictionary | low duplicate/conflict counts and a mostly categorized noncanonical source report |
 | Harmonization | no fatal `UNITID` issues and expected yearly summaries |
 | Wide build | `panel_wide_analysis_2004_2023.parquet` exists and QA files are written |
-| Final clean panel | `panel_clean_analysis_2004_2023.parquet` exists and `panel_qa_summary.csv` shows row preservation |
+| Final clean panel | `panel_clean_analysis_2004_2023.parquet` exists, `panel_qa_summary.csv` shows row preservation, and `panel_qa_coverage_matrix.csv` has no unexplained `suspicious` flags |
+| Acceptance audit | `Checks/acceptance_qc/acceptance_summary.csv` is all `PASS` |
 
 ## When Something Breaks
 
@@ -323,7 +391,7 @@ Check these in order:
 4. `Checks/dictionary_qc/dictionary_qaqc_summary.csv`
 5. `Checks/harmonize_qc/`
 6. `Checks/wide_qc/`
-7. `Checks/panel_qc/panel_qa_summary.csv`
+7. `Checks/panel_qc/panel_qa_coverage_matrix.csv`
 
 Common failure patterns:
 
@@ -333,7 +401,7 @@ Common failure patterns:
 | extraction failed | `mdb-tools`, malformed zip, `extract_failures.csv` |
 | missing metadata roles | yearly `metadata/table_inventory.csv` |
 | missing `UNITID` fatal error | exported CSV table in `Raw_Access_Databases/<year>/tables_csv/` |
-| weird wide-panel behavior | `Checks/wide_qc/`, `Checks/disc_qc/`, dictionary mapping |
+| weird wide-panel behavior | `Checks/wide_qc/`, `Checks/disc_qc/disc_conflicts_summary_all_years.csv`, dictionary mapping |
 
 ## Common Follow-Up Commands
 
@@ -366,8 +434,10 @@ python Scripts/QA_QC/06_staged_repo_guard.py
 ### Run tests
 
 ```bash
-python -m pytest -q
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
 ```
+
+Use that exact command in this environment. Plain `python -m pytest` can hang during plugin autoload before test collection begins.
 
 ### Run a monitored wide build and refresh task-monitor summaries
 

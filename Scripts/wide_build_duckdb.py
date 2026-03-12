@@ -43,6 +43,7 @@ from wide_build_common import (
     build_disc_groups,
     build_numeric_targets,
     find_anti_garbage_hits,
+    is_expected_disc_conflict,
     load_legacy_schema_seed_manifest,
     order_targets,
     plan_legacy_schema_seeds,
@@ -997,6 +998,7 @@ def run(args) -> None:
     qc_rows: list[dict] = []
     cast_report_frames: list[pd.DataFrame] = []
     scalar_conflict_frames: list[pd.DataFrame] = []
+    disc_conflict_summary_frames: list[pd.DataFrame] = []
     scalar_conflict_rows_written = 0
     scalar_part_paths: list[str] = []
     dim_part_paths: list[str] = []
@@ -1248,6 +1250,64 @@ def run(args) -> None:
                 """
             )
             if args.disc_qc_dir and scalar_int(con, "SELECT COUNT(*) FROM year_disc_choice WHERE n_active > 1") > 0:
+                detail_total_rows = scalar_int(
+                    con,
+                    """
+                    SELECT COUNT(*)
+                    FROM year_disc_active a
+                    INNER JOIN year_disc_choice c
+                      ON a.UNITID = c.UNITID
+                     AND a.year = c.year
+                     AND a.base = c.base
+                    WHERE c.n_active > 1
+                    """,
+                )
+                summary_df = con.execute(
+                    f"""
+                    SELECT
+                        CAST({int(year)} AS INTEGER) AS year,
+                        a.source_file,
+                        a.base AS variable_family,
+                        'multiple_active_suffixes' AS conflict_type,
+                        COUNT(*) AS row_count,
+                        COUNT(DISTINCT CAST(a.UNITID AS VARCHAR) || '|' || CAST(a.year AS VARCHAR)) AS institution_year_rows,
+                        MIN(c.n_active) AS min_n_active,
+                        MAX(c.n_active) AS max_n_active,
+                        COUNT(DISTINCT a.suffix) AS distinct_suffixes_observed,
+                        CAST({int(detail_total_rows)} AS BIGINT) AS detail_rows_total,
+                        CAST(LEAST({int(detail_total_rows)}, {int(args.disc_qc_detail_max_rows)}) AS BIGINT) AS detail_rows_written,
+                        CAST({str(int(detail_total_rows > int(args.disc_qc_detail_max_rows))).upper()} AS BOOLEAN) AS detail_truncated
+                    FROM year_disc_active a
+                    INNER JOIN year_disc_choice c
+                      ON a.UNITID = c.UNITID
+                     AND a.year = c.year
+                     AND a.base = c.base
+                    WHERE c.n_active > 1
+                    GROUP BY 1, 2, 3, 4
+                    ORDER BY row_count DESC, source_file, variable_family
+                    """
+                ).fetchdf()
+                if not summary_df.empty:
+                    summary_df["expected_pattern"] = summary_df.apply(
+                        lambda row: is_expected_disc_conflict(row["source_file"], row["variable_family"]),
+                        axis=1,
+                    )
+                    summary_df["signal_level"] = summary_df.apply(
+                        lambda row: (
+                            "expected"
+                            if bool(row["expected_pattern"])
+                            else (
+                                "high"
+                                if int(row["row_count"]) >= int(args.disc_qc_high_signal_min_rows)
+                                else "low"
+                            )
+                        ),
+                        axis=1,
+                    )
+                    summary_df["high_signal"] = summary_df["signal_level"].eq("high")
+                disc_conflict_summary_frames.append(summary_df)
+                summary_path = os.path.join(args.disc_qc_dir, f"disc_conflicts_summary_{year}.csv")
+                summary_df.to_csv(summary_path, index=False)
                 write_query_csv(
                     con,
                     f"""
@@ -1269,6 +1329,7 @@ def run(args) -> None:
                      AND a.base = c.base
                     WHERE c.n_active > 1
                     ORDER BY a.row_id
+                    LIMIT {int(args.disc_qc_detail_max_rows)}
                     """,
                     os.path.join(args.disc_qc_dir, f"disc_conflicts_{year}.csv"),
                 )
@@ -1497,6 +1558,13 @@ def run(args) -> None:
             Path(runtime.cast_report_out).parent.mkdir(parents=True, exist_ok=True)
             cast_report_df.to_csv(runtime.cast_report_out, index=False)
             print(f"[info] wrote cast report QC: {runtime.cast_report_out}", flush=True)
+
+    if disc_conflict_summary_frames and args.disc_qc_dir:
+        disc_summary_df = pd.concat(disc_conflict_summary_frames, ignore_index=True)
+        disc_summary_path = Path(args.disc_qc_dir) / "disc_conflicts_summary_all_years.csv"
+        disc_summary_df.to_csv(disc_summary_path, index=False)
+        register_df_as_table(con, "qa.disc_conflicts_summary", disc_summary_df)
+        print(f"[info] wrote disc conflict summary QC: {disc_summary_path}", flush=True)
 
     if qc_rows:
         qc_df = pd.DataFrame(qc_rows)

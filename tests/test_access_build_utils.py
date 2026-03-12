@@ -8,6 +8,7 @@ from access_build_utils import (
     can_serve_metadata_role,
     canonical_source_file,
     classify_table_role,
+    source_file_qaqc_category,
     start_year_to_academic_label,
 )
 
@@ -23,6 +24,16 @@ def test_canonical_source_file_normalization() -> None:
     assert canonical_source_file("GR200_2023") == "GR200"
     assert canonical_source_file("IC2023_AY") == "IC_AY"
     assert canonical_source_file("S2023_ABD") == "S_ABD"
+    assert canonical_source_file("SAL2010_A_LT9") == "SAL_A_LT"
+
+
+def test_noncanonical_source_file_categories() -> None:
+    assert source_file_qaqc_category("FLAGS") == "auxiliary_expected"
+    assert source_file_qaqc_category("CUSTOMCGIDS") == "derived_or_custom"
+    assert source_file_qaqc_category("SFA_P") == "canonical"
+    assert source_file_qaqc_category("SAL_NIS") == "auxiliary_expected"
+    assert source_file_qaqc_category("EFD") == "derived_or_custom"
+    assert source_file_qaqc_category("MYSTERY_SOURCE") == "needs_review"
 
 
 def test_table_role_classification() -> None:

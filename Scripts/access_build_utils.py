@@ -31,6 +31,93 @@ from typing import Iterable
 DEFAULT_IPEDSDB_ROOT = Path("/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling")
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
+CANONICAL_SOURCE_FILES = {
+    "HD",
+    "IC",
+    "IC_AY",
+    "IC_PY",
+    "IC_CAMPUSES",
+    "IC_PCCAMPUSES",
+    "ADM",
+    "AL",
+    "C_A",
+    "C_B",
+    "C_C",
+    "CDEP",
+    "COST",
+    "EAP",
+    "EFA",
+    "EFA_DIST",
+    "EFB",
+    "EFC",
+    "EFCP",
+    "EFFY",
+    "EFFY_DIST",
+    "EFIA",
+    "EFIB",
+    "EFIC",
+    "EFID",
+    "F_F",
+    "F_FA",
+    "F_FA_F",
+    "F_FA_G",
+    "GR",
+    "GR200",
+    "GR_PELL_SSL",
+    "OM",
+    "SAL_A",
+    "SAL_A_LT",
+    "SAL_B",
+    "SAL_FACULTY",
+    "SAL_IS",
+    "S_ABD",
+    "S_CN",
+    "S_F",
+    "S_G",
+    "S_IS",
+    "S_NH",
+    "S_OC",
+    "S_SIS",
+    "SFA",
+    "SFA_P",
+    "SFAV",
+    "DRVADM",
+    "DRVAL",
+    "DRVC",
+    "DRVEF",
+    "DRVEF12",
+    "DRVF",
+    "DRVGR",
+    "DRVHR",
+    "DRVIC",
+    "DRVOM",
+    "KEYS",
+}
+
+NONCANONICAL_AUXILIARY_SOURCE_FILES = {
+    "EF",
+    "EFFY_HS",
+    "FLAGS",
+    "GR_L",
+    "GR_GENDER",
+    "HD_PCUNITIDS",
+    "ICMISSION",
+    "SAL_NIS",
+}
+
+NONCANONICAL_DERIVED_OR_CUSTOM_SOURCE_FILES = {
+    "CSTEM",
+    "CUSTOMCG",
+    "CUSTOMCGIDS",
+    "DFR",
+    "EFD",
+    "EFF",
+    "EFDS",
+}
+
+NONCANONICAL_ACTIONABLE_GAP_SOURCE_FILES = {
+}
+
 NULL_LIKE_TOKENS = {"", "nan", "none", "<na>", "na", "nat"}
 VAR_NUMBER_CANDIDATES = {
     "varnumber",
@@ -268,6 +355,21 @@ def canonical_source_file(name: str) -> str:
         "DRVOM": "DRVOM",
     }
     return alias_map.get(compact, stripped)
+
+
+def source_file_qaqc_category(source_file: str) -> str:
+    source_norm = normalize_token(source_file)
+    if not source_norm:
+        return "needs_review"
+    if source_norm in CANONICAL_SOURCE_FILES:
+        return "canonical"
+    if source_norm in NONCANONICAL_AUXILIARY_SOURCE_FILES:
+        return "auxiliary_expected"
+    if source_norm in NONCANONICAL_DERIVED_OR_CUSTOM_SOURCE_FILES or source_norm.startswith("CUSTOM"):
+        return "derived_or_custom"
+    if source_norm in NONCANONICAL_ACTIONABLE_GAP_SOURCE_FILES:
+        return "actionable_canonical_gap"
+    return "needs_review"
 
 
 def compute_file_metadata(path: str | Path) -> tuple[str, str]:

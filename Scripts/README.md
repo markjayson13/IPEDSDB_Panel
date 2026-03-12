@@ -8,6 +8,7 @@ This folder contains the operational pipeline for building the Access-database I
 - `01_download_access_databases.py` to `09_build_panel_dictionary.py`: ordered pipeline stages
 - `run_saved_query.py`: analyst query runner for saved SQL and result exports
 - `QA_QC/`: validation, parity, monitoring, and repo guards
+- `QA_QC/08_acceptance_audit.py`: top-level pass/fail audit over the generated live artifacts
 
 ## Stage Files
 
@@ -24,6 +25,7 @@ This folder contains the operational pipeline for building the Access-database I
 | `08_build_custom_panel.py` | make smaller user-selected extracts |
 | `09_build_panel_dictionary.py` | build a dictionary for an actual panel output |
 | `run_saved_query.py` | run saved SQL against the build DB and standard outputs |
+| `prch_policy.py` | shared parent-child cleaning policy used by cleaning and QA |
 
 ## Shared Helpers
 
@@ -47,3 +49,13 @@ If you are tracing the code for the first time:
 6. `06_build_wide_panel.py`
 7. `07_clean_panel.py`
 8. `QA_QC/README.md`
+
+For the documented parent-child method, read `METHODS_PRCH_CLEANING.md`.
+
+For the top-level live-build acceptance check, run:
+
+```bash
+python Scripts/QA_QC/08_acceptance_audit.py \
+  --root "$IPEDSDB_ROOT" \
+  --years "2004:2023"
+```

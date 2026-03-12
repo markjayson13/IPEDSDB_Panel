@@ -220,6 +220,82 @@ def append_unitid_metadata_rows(lake: pd.DataFrame) -> tuple[pd.DataFrame, int]:
     return out, len(rows)
 
 
+def append_nearest_year_source_backfill_rows(
+    lake: pd.DataFrame,
+    *,
+    layout,
+    years: list[int],
+    source_file: str,
+    metadata_source: str,
+) -> tuple[pd.DataFrame, int]:
+    if lake.empty:
+        return lake, 0
+
+    df = lake.copy()
+    source_norm = str(source_file or "").strip().upper()
+    donor_pool = df[
+        (df["source_file"].fillna("").astype(str).str.upper() == source_norm)
+        & (~df["metadata_source"].fillna("").astype(str).str.startswith("synthetic_"))
+    ].copy()
+    if donor_pool.empty:
+        return df, 0
+
+    donor_years = sorted(pd.to_numeric(donor_pool["year"], errors="coerce").dropna().astype(int).unique().tolist())
+    if not donor_years:
+        return df, 0
+
+    rows: list[pd.DataFrame] = []
+    total_rows = 0
+    for year in years:
+        has_source_rows = not df[
+            (pd.to_numeric(df["year"], errors="coerce") == year)
+            & (df["source_file"].fillna("").astype(str).str.upper() == source_norm)
+        ].empty
+        if has_source_rows:
+            continue
+
+        year_dir = layout.raw_access / str(year)
+        inventory_path = year_dir / "metadata" / "table_inventory.csv"
+        manifest_path = year_dir / "manifest.csv"
+        if not inventory_path.exists() or not manifest_path.exists():
+            continue
+
+        inventory = pd.read_csv(inventory_path, dtype=str).fillna("")
+        data_match = inventory[
+            (inventory["table_role"].astype(str).str.lower() == "data")
+            & (inventory["normalized_table_name"].fillna("").astype(str).str.upper() == source_norm)
+        ].copy()
+        if data_match.empty:
+            continue
+        data_match["row_count_csv_num"] = pd.to_numeric(data_match["row_count_csv"], errors="coerce").fillna(0).astype(int)
+        data_match = data_match[data_match["row_count_csv_num"] > 0].copy()
+        if data_match.empty:
+            continue
+
+        donor_year = min(donor_years, key=lambda donor: (abs(donor - year), donor))
+        donor_rows = donor_pool[pd.to_numeric(donor_pool["year"], errors="coerce") == donor_year].copy()
+        if donor_rows.empty:
+            continue
+
+        manifest_info = load_manifest_year_info(year_dir)
+        access_table_name = str(data_match.sort_values(["row_count_csv_num", "table_name"], ascending=[False, True]).iloc[0]["table_name"])
+        donor_rows["year"] = year
+        donor_rows["source_file_label"] = clean_source_label(access_table_name)
+        donor_rows["access_table_name"] = access_table_name
+        donor_rows["metadata_table_name"] = metadata_source
+        donor_rows["academic_year_label"] = manifest_info["academic_year_label"]
+        donor_rows["release_type"] = manifest_info["release_type"]
+        donor_rows["metadata_source"] = metadata_source
+        rows.append(donor_rows)
+        total_rows += len(donor_rows)
+
+    if not rows:
+        return df, 0
+    out = pd.concat([df] + rows, ignore_index=True)
+    out = out.drop_duplicates(subset=["year", "source_file", "varnumber", "varname"], keep="first").reset_index(drop=True)
+    return out, total_rows
+
+
 def build_description_maps(desc_candidates: pd.DataFrame, year_dir: Path) -> dict[tuple[str, str], str]:
     desc_map: dict[tuple[str, str], str] = {}
     for rec in desc_candidates.to_dict("records"):
@@ -419,6 +495,13 @@ def main() -> None:
     lake["imputationvar"] = lake["imputationvar"].fillna("").astype(str).str.upper().str.strip()
     lake.loc[lake["imputationvar"].isin({"NAN", "NONE", "<NA>", "NAT"}), "imputationvar"] = ""
     lake = lake.drop_duplicates(subset=["year", "source_file", "varnumber", "varname"], keep="first").reset_index(drop=True)
+    lake, lt9_backfill_count = append_nearest_year_source_backfill_rows(
+        lake,
+        layout=layout,
+        years=years,
+        source_file="SAL_A_LT",
+        metadata_source="synthetic_backfill_salary_lt9",
+    )
     lake, synth_imp_count = append_synthetic_imputation_rows(lake)
     lake, unitid_count = append_unitid_metadata_rows(lake)
     lake.to_parquet(layout.dictionary / "dictionary_lake.parquet", index=False)
@@ -450,9 +533,22 @@ def main() -> None:
     codes.to_csv(layout.dictionary / "dictionary_codes.csv", index=False)
 
     with (dictionary_qc_dir / "synthetic_rows_summary.csv").open("w", newline="", encoding="utf-8") as fh:
-        writer = csv.DictWriter(fh, fieldnames=["synthetic_imputation_rows", "synthetic_unitid_rows"])
+        writer = csv.DictWriter(
+            fh,
+            fieldnames=[
+                "synthetic_salary_lt9_backfill_rows",
+                "synthetic_imputation_rows",
+                "synthetic_unitid_rows",
+            ],
+        )
         writer.writeheader()
-        writer.writerow({"synthetic_imputation_rows": synth_imp_count, "synthetic_unitid_rows": unitid_count})
+        writer.writerow(
+            {
+                "synthetic_salary_lt9_backfill_rows": lt9_backfill_count,
+                "synthetic_imputation_rows": synth_imp_count,
+                "synthetic_unitid_rows": unitid_count,
+            }
+        )
 
     print(f"Wrote dictionary lake rows={len(lake):,}")
     print(f"Wrote dictionary codes rows={len(codes):,}")

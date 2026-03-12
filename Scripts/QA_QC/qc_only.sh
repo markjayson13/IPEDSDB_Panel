@@ -53,7 +53,8 @@ check_path "Wide clean panel" "$WIDE_CLEAN"
 
 mkdir -p \
   "$IPEDSDB_ROOT/Checks/dictionary_qc" \
-  "$IPEDSDB_ROOT/Checks/panel_qc"
+  "$IPEDSDB_ROOT/Checks/panel_qc" \
+  "$IPEDSDB_ROOT/Checks/acceptance_qc"
 
 python3 "$ROOT/Scripts/QA_QC/00_dictionary_qaqc.py" --root "$IPEDSDB_ROOT"
 python3 "$ROOT/Scripts/QA_QC/01_panel_qa.py" \
@@ -61,9 +62,14 @@ python3 "$ROOT/Scripts/QA_QC/01_panel_qa.py" \
   --clean "$WIDE_CLEAN" \
   --out-dir "$IPEDSDB_ROOT/Checks/panel_qc" \
   --prch-qc-dir "$IPEDSDB_ROOT/Checks/prch_qc"
+python3 "$ROOT/Scripts/QA_QC/08_acceptance_audit.py" \
+  --root "$IPEDSDB_ROOT" \
+  --years "2004:2023" \
+  --out-dir "$IPEDSDB_ROOT/Checks/acceptance_qc"
 
 echo ""
 echo "[ipedsdb-panel] QA complete"
 echo "QC outputs written to:"
 echo "  $IPEDSDB_ROOT/Checks/dictionary_qc"
 echo "  $IPEDSDB_ROOT/Checks/panel_qc"
+echo "  $IPEDSDB_ROOT/Checks/acceptance_qc"

@@ -20,71 +20,15 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import sys
 
 import pandas as pd
 
+SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
-CANONICAL_SOURCE_FILES = {
-    "HD",
-    "IC",
-    "IC_AY",
-    "IC_PY",
-    "IC_CAMPUSES",
-    "IC_PCCAMPUSES",
-    "ADM",
-    "AL",
-    "C_A",
-    "C_B",
-    "C_C",
-    "CDEP",
-    "COST",
-    "EAP",
-    "EFA",
-    "EFA_DIST",
-    "EFB",
-    "EFC",
-    "EFCP",
-    "EFFY",
-    "EFFY_DIST",
-    "EFIA",
-    "EFIB",
-    "EFIC",
-    "EFID",
-    "F_F",
-    "F_FA",
-    "F_FA_F",
-    "F_FA_G",
-    "GR",
-    "GR200",
-    "GR_PELL_SSL",
-    "OM",
-    "SAL_A",
-    "SAL_A_LT",
-    "SAL_B",
-    "SAL_FACULTY",
-    "SAL_IS",
-    "S_ABD",
-    "S_CN",
-    "S_F",
-    "S_G",
-    "S_IS",
-    "S_NH",
-    "S_OC",
-    "S_SIS",
-    "SFA",
-    "SFAV",
-    "DRVADM",
-    "DRVAL",
-    "DRVC",
-    "DRVEF",
-    "DRVEF12",
-    "DRVF",
-    "DRVGR",
-    "DRVHR",
-    "DRVIC",
-    "DRVOM",
-    "KEYS",
-}
+from access_build_utils import CANONICAL_SOURCE_FILES, source_file_qaqc_category
 
 
 def parse_args() -> argparse.Namespace:
@@ -181,14 +125,36 @@ def main() -> None:
     collisions["varnames"] = collisions["varnames"].map("|".join)
     collisions.to_csv(checks_dir / "varnumber_varname_collisions.csv", index=False)
 
-    unmapped_rows = lake[~lake["source_file"].isin(CANONICAL_SOURCE_FILES)].copy()
+    noncanonical_rows = lake[~lake["source_file"].isin(CANONICAL_SOURCE_FILES)].copy()
+    noncanonical_rows["source_category"] = noncanonical_rows["source_file"].map(source_file_qaqc_category)
+    noncanonical_rows.to_csv(checks_dir / "noncanonical_metadata_tables.csv", index=False)
+
+    unmapped_rows = noncanonical_rows[noncanonical_rows["source_category"].isin({"actionable_canonical_gap", "needs_review"})].copy()
     unmapped_rows.to_csv(checks_dir / "unmapped_metadata_tables.csv", index=False)
+
+    auxiliary_rows = noncanonical_rows[noncanonical_rows["source_category"] == "auxiliary_expected"].copy()
+    auxiliary_rows.to_csv(checks_dir / "auxiliary_expected_metadata_tables.csv", index=False)
+
+    derived_rows = noncanonical_rows[noncanonical_rows["source_category"] == "derived_or_custom"].copy()
+    derived_rows.to_csv(checks_dir / "derived_or_custom_metadata_tables.csv", index=False)
+
+    category_counts = (
+        noncanonical_rows.groupby("source_category", as_index=False)
+        .agg(rows=("varname", "size"), source_files=("source_file", "nunique"))
+        .sort_values(["rows", "source_category"], ascending=[False, True])
+    )
+    category_counts.to_csv(checks_dir / "noncanonical_source_categories.csv", index=False)
 
     if inventory_all_path.exists():
         inventory_all = pd.read_csv(inventory_all_path, dtype=str).fillna("")
         inventory_all["normalized_table_name"] = inventory_all["normalized_table_name"].fillna("").astype(str)
         metadata_inventory = inventory_all[inventory_all["table_role"].str.startswith("metadata")].copy()
         inventory_unmapped = metadata_inventory[~metadata_inventory["normalized_table_name"].isin(CANONICAL_SOURCE_FILES)].copy()
+        inventory_unmapped["source_category"] = inventory_unmapped["normalized_table_name"].map(source_file_qaqc_category)
+        inventory_unmapped.to_csv(checks_dir / "noncanonical_inventory_metadata_tables.csv", index=False)
+        inventory_unmapped = inventory_unmapped[
+            inventory_unmapped["source_category"].isin({"actionable_canonical_gap", "needs_review"})
+        ].copy()
         inventory_unmapped.to_csv(checks_dir / "unmapped_inventory_metadata_tables.csv", index=False)
 
     if candidate_path.exists():
@@ -202,7 +168,11 @@ def main() -> None:
             "duplicate_rows": len(duplicates),
             "source_file_conflicts": len(source_conflicts),
             "varnumber_collisions": len(collisions),
+            "noncanonical_rows_total": len(noncanonical_rows),
             "unmapped_rows": len(unmapped_rows),
+            "auxiliary_expected_rows": len(auxiliary_rows),
+            "derived_or_custom_rows": len(derived_rows),
+            "needs_review_rows": int((noncanonical_rows["source_category"] == "needs_review").sum()),
         }
     ]
     if codes_path.exists():

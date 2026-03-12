@@ -132,14 +132,14 @@ def test_bootstrap_artifact_views_reads_build_db_and_outputs(tmp_path: Path) -> 
         """
         CREATE TABLE qa.cast_report (
             year INTEGER,
-            column VARCHAR,
+            "column" VARCHAR,
             non_empty_tokens BIGINT,
             parsed_numeric_tokens BIGINT,
             failed_parse_tokens BIGINT
         )
         """
     )
-    con_build.execute("INSERT INTO qa.cast_report VALUES (2023, 'FTE', 10, 9, 1)")
+    con_build.execute('INSERT INTO qa.cast_report (year, "column", non_empty_tokens, parsed_numeric_tokens, failed_parse_tokens) VALUES (2023, \'FTE\', 10, 9, 1)')
     con_build.close()
 
     con = duckdb.connect()

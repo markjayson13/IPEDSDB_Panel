@@ -30,6 +30,29 @@ import pyarrow.parquet as pq
 from access_build_utils import ensure_data_layout, normalize_varnumber, parse_years
 
 
+HARMONIZE_SUMMARY_COLUMNS = [
+    "year",
+    "table_name",
+    "source_file",
+    "selected",
+    "exclude_reason",
+    "matched_cols",
+    "output_rows",
+    "dictionary_rows",
+    "source_match_rows",
+    "access_table_match_rows",
+]
+
+MISSING_UNITID_COLUMNS = [
+    "year",
+    "file",
+    "stage",
+    "dropped_rows_missing_UNITID",
+    "rows_before",
+    "rows_after",
+]
+
+
 def setup_logging(log_path: str | None) -> None:
     if not log_path:
         return
@@ -151,6 +174,54 @@ def write_parquet_parts(out_path: pathlib.Path, frames: Iterable[pd.DataFrame], 
 
 def sql_quote(text: str) -> str:
     return "'" + str(text).replace("'", "''") + "'"
+
+
+def empty_missing_unitid_frame(rows: list[dict] | None = None) -> pd.DataFrame:
+    return pd.DataFrame(rows or [], columns=MISSING_UNITID_COLUMNS)
+
+
+def empty_harmonize_summary_frame(rows: list[dict] | None = None) -> pd.DataFrame:
+    return pd.DataFrame(rows or [], columns=HARMONIZE_SUMMARY_COLUMNS)
+
+
+def dictionary_match_counts(dict_year: pd.DataFrame, source_file: str, access_table_name: str) -> tuple[int, int]:
+    source_norm = str(source_file or "").strip().upper()
+    access_norm = str(access_table_name or "").strip().upper()
+    source_match_rows = 0
+    access_match_rows = 0
+    if source_norm:
+        source_match_rows = int(
+            (
+                dict_year["source_file"].fillna("").astype(str).str.upper() == source_norm
+            ).sum()
+        )
+    if access_norm:
+        access_match_rows = int(
+            (
+                dict_year["access_table_name"].fillna("").astype(str).str.upper() == access_norm
+            ).sum()
+        )
+    return source_match_rows, access_match_rows
+
+
+def classify_exclude_reason(
+    dict_source: pd.DataFrame,
+    source_match_rows: int,
+    access_match_rows: int,
+    *,
+    source_row_count: int = 0,
+) -> str:
+    if int(source_row_count) == 0:
+        return "source_table_has_zero_rows"
+    if not dict_source.empty:
+        return "dictionary_rows_found_no_column_overlap"
+    if access_match_rows > 0:
+        return "dictionary_rows_found_for_access_table_but_source_selection_failed"
+    if source_match_rows > 0:
+        return "dictionary_rows_found_for_source_file_but_access_table_missing"
+    if source_match_rows == 0:
+        return "missing_dictionary_rows_for_source_file"
+    return "no_dictionary_source_match"
 
 
 def dedupe_long_panel(
@@ -300,6 +371,8 @@ def main() -> None:
                 table_path = year_dir / rec["csv_path"]
                 access_table_name = str(rec["table_name"])
                 source_file = str(rec.get("normalized_table_name", "") or "")
+                source_row_count = int(pd.to_numeric(pd.Series([rec.get("row_count_csv", "0")]), errors="coerce").fillna(0).iloc[0])
+                source_match_rows, access_match_rows = dictionary_match_counts(dict_year, source_file, access_table_name)
                 dict_source = select_dict_source(dict_year, rec.get("normalized_table_name", ""), access_table_name)
                 if dict_source.empty:
                     year_summary_rows.append(
@@ -308,9 +381,17 @@ def main() -> None:
                             "table_name": access_table_name,
                             "source_file": source_file,
                             "selected": False,
-                            "exclude_reason": "no_dictionary_source_match",
+                            "exclude_reason": classify_exclude_reason(
+                                dict_source,
+                                source_match_rows,
+                                access_match_rows,
+                                source_row_count=source_row_count,
+                            ),
                             "matched_cols": 0,
                             "output_rows": 0,
+                            "dictionary_rows": 0,
+                            "source_match_rows": source_match_rows,
+                            "access_table_match_rows": access_match_rows,
                         }
                     )
                     continue
@@ -391,9 +472,21 @@ def main() -> None:
                         "table_name": access_table_name,
                         "source_file": source_file,
                         "selected": matched_any,
-                        "exclude_reason": "" if matched_any else "zero_dictionary_overlap",
+                        "exclude_reason": (
+                            ""
+                            if matched_any
+                            else classify_exclude_reason(
+                                dict_source,
+                                source_match_rows,
+                                access_match_rows,
+                                source_row_count=source_row_count,
+                            )
+                        ),
                         "matched_cols": matched_cols_count if matched_any else 0,
                         "output_rows": table_output_rows,
+                        "dictionary_rows": int(len(dict_source)),
+                        "source_match_rows": source_match_rows,
+                        "access_table_match_rows": access_match_rows,
                     }
                 )
 
@@ -414,8 +507,14 @@ def main() -> None:
         if args.final_dedupe and args.dedupe and out_path.exists():
             pq.ParquetFile(out_path)
 
-        pd.DataFrame(year_summary_rows).to_csv(layout.checks / "harmonize_qc" / f"harmonize_summary_{year}.csv", index=False)
-        pd.DataFrame(na_drop_rows).to_csv(layout.checks / "harmonize_qc" / f"dropped_missing_unitid_{year}.csv", index=False)
+        empty_harmonize_summary_frame(year_summary_rows).to_csv(
+            layout.checks / "harmonize_qc" / f"harmonize_summary_{year}.csv",
+            index=False,
+        )
+        empty_missing_unitid_frame(na_drop_rows).to_csv(
+            layout.checks / "harmonize_qc" / f"dropped_missing_unitid_{year}.csv",
+            index=False,
+        )
         print(f"[year {year}] wrote {out_path}")
 
 

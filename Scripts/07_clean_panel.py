@@ -14,6 +14,8 @@ Policy:
 - keep all `UNITID-year` rows
 - if a `PRCH_*` flag marks a child observation, null only the affected
   component-family columns
+- for Finance, treat `PRCH_F=2,3,4,5` as child rows; retain `PRCH_F=6`
+  as a partial review-only case
 """
 from __future__ import annotations
 
@@ -22,7 +24,6 @@ import os
 import sys
 import time
 from pathlib import Path
-from typing import Callable
 import pathlib
 
 import pandas as pd
@@ -30,6 +31,14 @@ import pyarrow as pa
 import pyarrow.dataset as ds
 import pyarrow.compute as pc
 import pyarrow.parquet as pq
+
+from prch_policy import (
+    classify_flag_code,
+    cleaned_child_codes,
+    policy_rows,
+    review_only_codes,
+    targets_source_file,
+)
 
 
 def setup_logging(log_path: str | None) -> None:
@@ -116,52 +125,22 @@ def main() -> None:
     all_cols = dataset.schema.names
     prch_flags = [c for c in all_cols if c.upper().startswith("PRCH")]
 
-    # Component source_file groups
-    group_sets: dict[str, set[str]] = {
-        "PRCH_ADM": {"ADM"},
-        "PRCH_AL": {"AL"},
-        "PRCH_C": {"C_A", "C_B", "C_C", "CDEP"},
-        "PRCH_COS": {"COST"},
-        "PRCH_E12": {"E12"},
-        "PRCH_EAP": {"EAP"},
-        "PRCH_EF": {"EFA", "EFA_DIST", "EFB", "EFC", "EFCP", "EFFY", "EFFY_DIST", "EFIA"},
-        "PRCH_F": {"F_F", "F_FA", "F_FA_F", "F_FA_G"},
-        "PRCH_GR": {"GR", "GR_PELL_SSL"},
-        "PRCH_GR2": {"GR200"},
-        "PRCH_HR": {"EAP", "SAL_A", "SAL_A_LT", "SAL_B", "SAL_FACULTY", "SAL_IS"},
-        "PRCH_OM": {"OM"},
-        "PRCH_S": {"S_ABD", "S_CN", "S_F", "S_G", "S_IS", "S_NH", "S_OC", "S_SIS"},
-        "PRCH_SA": {"SFA", "SFAV"},
-        "PRCH_SFA": {"SFA", "SFAV"},
-    }
-
-    # Extra predicates for fuzzy matching
-    group_pred: dict[str, Callable[[str], bool]] = {
-        "PRCH_F": lambda sf: sf.startswith("F"),
-        "PRCH_EF": lambda sf: sf.startswith("EF") or sf.startswith("EFFY"),
-        "PRCH_S": lambda sf: sf.startswith("S_"),
-    }
-
-    # Build column lists per flag
-    flag_cols: dict[str, list[str]] = {f: [] for f in group_sets}
+    # Build column lists per flag from the shared PRCH policy.
+    flag_cols: dict[str, list[str]] = {f: [] for f in prch_flags}
     for col in all_cols:
         if col in prch_flags:
             continue
         sf = var_to_source.get(col.upper(), "")
-        if not sf:
-            continue
-        for flag, sset in group_sets.items():
-            if sf in sset:
-                flag_cols[flag].append(col)
-        # predicate-based adds
-        for flag, pred in group_pred.items():
-            if pred(sf):
+        for flag in prch_flags:
+            if targets_source_file(flag, sf):
                 flag_cols[flag].append(col)
 
-    # de-duplicate columns per flag
-    flag_cols = {k: sorted(set(v)) for k, v in flag_cols.items() if v}
+    # de-duplicate columns per flag but retain zero-target flags for QA coverage.
+    flag_cols = {k: sorted(set(v)) for k, v in flag_cols.items()}
 
-    qc_counts: dict[tuple[int, str], int] = {}
+    qc_child_counts: dict[tuple[int, str], int] = {}
+    qc_review_counts: dict[tuple[int, str], int] = {}
+    qc_code_counts: dict[tuple[int, str, int], int] = {}
 
     writer = None
     batch_idx = 0
@@ -178,23 +157,34 @@ def main() -> None:
             batch_idx += 1
             rows_processed += len(df)
             year_rows += len(df)
-            for flag, cols in flag_cols.items():
+            for flag in prch_flags:
                 if flag not in df.columns:
                     continue
-                # child logic
                 flag_num = pd.to_numeric(df[flag], errors="coerce")
-                if flag == "PRCH_F":
-                    child_mask = flag_num.isin([2, 3, 5])
-                else:
-                    child_mask = flag_num.isin([2])
-                if not child_mask.any():
-                    continue
-                df.loc[child_mask, cols] = pd.NA
-                # QC counts by year
-                counts = df.loc[child_mask, "year"].value_counts()
-                for yy, cnt in counts.items():
-                    key = (int(yy), flag)
-                    qc_counts[key] = qc_counts.get(key, 0) + int(cnt)
+                valid_codes = flag_num.dropna()
+                if not valid_codes.empty:
+                    code_counts = valid_codes.astype(int).value_counts()
+                    for code, cnt in code_counts.items():
+                        key = (int(y), flag, int(code))
+                        qc_code_counts[key] = qc_code_counts.get(key, 0) + int(cnt)
+
+                child_mask = flag_num.isin(cleaned_child_codes(flag))
+                review_mask = flag_num.isin(review_only_codes(flag))
+                if child_mask.any():
+                    counts = df.loc[child_mask, "year"].value_counts()
+                    for yy, cnt in counts.items():
+                        key = (int(yy), flag)
+                        qc_child_counts[key] = qc_child_counts.get(key, 0) + int(cnt)
+
+                if review_mask.any():
+                    review_counts = df.loc[review_mask, "year"].value_counts()
+                    for yy, cnt in review_counts.items():
+                        key = (int(yy), flag)
+                        qc_review_counts[key] = qc_review_counts.get(key, 0) + int(cnt)
+
+                cols = flag_cols.get(flag, [])
+                if child_mask.any() and cols:
+                    df.loc[child_mask, cols] = pd.NA
 
             table = pa.Table.from_pandas(df, preserve_index=False)
             # Align schema to avoid mismatches across years/batches
@@ -234,10 +224,23 @@ def main() -> None:
     if args.qc_dir:
         qc_dir = Path(args.qc_dir)
         qc_dir.mkdir(parents=True, exist_ok=True)
-        rows = [
-            {"year": y, "flag": flag, "child_rows": cnt}
-            for (y, flag), cnt in sorted(qc_counts.items())
-        ]
+        policy_by_flag = {row["flag"]: row for row in policy_rows(prch_flags)}
+        rows = []
+        for y in years_sorted:
+            for flag in prch_flags:
+                policy = policy_by_flag.get(flag, {"child_codes_applied": "", "review_only_codes": ""})
+                rows.append(
+                    {
+                        "year": y,
+                        "flag": flag,
+                        "child_codes_applied": policy["child_codes_applied"],
+                        "review_only_codes": policy["review_only_codes"],
+                        "target_columns": len(flag_cols.get(flag, [])),
+                        "has_target_columns": bool(flag_cols.get(flag, [])),
+                        "child_rows_cleaned": qc_child_counts.get((y, flag), 0),
+                        "review_only_rows": qc_review_counts.get((y, flag), 0),
+                    }
+                )
         pd.DataFrame(rows).to_csv(qc_dir / "prch_clean_summary.csv", index=False)
         # also record which columns were cleaned per flag
         col_rows = []
@@ -245,6 +248,21 @@ def main() -> None:
             for c in cols:
                 col_rows.append({"flag": flag, "column": c})
         pd.DataFrame(col_rows).to_csv(qc_dir / "prch_clean_columns.csv", index=False)
+        pd.DataFrame(policy_rows(prch_flags)).to_csv(qc_dir / "prch_flag_policy.csv", index=False)
+        code_rows = []
+        for (year, flag, code), cnt in sorted(qc_code_counts.items()):
+            code_rows.append(
+                {
+                    "year": year,
+                    "flag": flag,
+                    "code": code,
+                    "policy_bucket": classify_flag_code(flag, code),
+                    "target_columns": len(flag_cols.get(flag, [])),
+                    "has_target_columns": bool(flag_cols.get(flag, [])),
+                    "rows": cnt,
+                }
+            )
+        pd.DataFrame(code_rows).to_csv(qc_dir / "prch_flag_code_counts.csv", index=False)
         print(f"QC written to {qc_dir}")
 
 

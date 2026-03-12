@@ -32,6 +32,29 @@ import pyarrow as pa
 
 
 NULL_LIKE_TOKENS = ("", ".", "nan", "none", "<na>", "na", "nat")
+EXPECTED_DISC_CONFLICT_PATTERNS = {
+    ("ADM", "ADMCON"),
+    ("FLAGS", "F_ATHEX"),
+    ("FLAGS", "F_ATHRV"),
+    ("FLAGS", "OMFLG"),
+    ("FLAGS", "SPORT"),
+    ("IC", "ACCRD"),
+    ("IC", "ADMCON"),
+    ("IC", "ASSOC"),
+    ("IC", "CONFNO"),
+    ("IC", "CREDITS"),
+    ("IC", "DSTNCED"),
+    ("IC", "LEVEL"),
+    ("IC", "LIBRES"),
+    ("IC", "NONCRDT"),
+    ("IC", "SLO"),
+    ("IC", "SPORT"),
+    ("IC", "STUSRV"),
+    ("IC", "TUITPL"),
+    ("IC", "VET"),
+    ("IC_PY", "CIPCODE"),
+    ("IC_PY", "PRGMSR"),
+}
 
 
 def default_repo_root() -> pathlib.Path:
@@ -125,6 +148,11 @@ def parse_upper_set(spec: str | None) -> set[str]:
     if not spec:
         return set()
     return {x.strip().upper() for x in str(spec).split(",") if x.strip()}
+
+
+def is_expected_disc_conflict(source_file: str, variable_family: str) -> bool:
+    key = (str(source_file or "").strip().upper(), str(variable_family or "").strip().upper())
+    return key in EXPECTED_DISC_CONFLICT_PATTERNS
 
 
 def is_dimensioned_source_file(sf: str, dim_sources: set[str], dim_prefixes: tuple[str, ...]) -> bool:
@@ -328,6 +356,8 @@ def build_arg_parser(repo_root: pathlib.Path | None = None) -> argparse.Argument
     ap.add_argument("--collapse-disc", action="store_true", help="Collapse discrete (disc) groups into a base var")
     ap.add_argument("--drop-disc-components", action="store_true", help="Drop component vars after collapse")
     ap.add_argument("--disc-qc-dir", default=None, help="Optional dir to write disc conflict reports")
+    ap.add_argument("--disc-qc-detail-max-rows", type=int, default=250000, help="Max detail rows to write per year for disc conflict QC")
+    ap.add_argument("--disc-qc-high-signal-min-rows", type=int, default=100, help="Minimum grouped conflict rows to mark a disc conflict summary row as high signal")
     ap.add_argument("--disc-exclude", default=None, help="Comma-separated base names to skip collapsing (e.g., LEVEL,ADMCON)")
     ap.add_argument("--disc-suffix", default="_CAT", help="Suffix used when base name collides with an existing variable")
     ap.add_argument("--dups-qc-dir", default=None, help="Optional dir to write duplicate key samples")
