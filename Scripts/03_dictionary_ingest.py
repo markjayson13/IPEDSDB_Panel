@@ -10,6 +10,12 @@ Writes:
 - `Dictionary/dictionary_lake.parquet` and `.csv`
 - `Dictionary/dictionary_codes.parquet` and `.csv`
 - `Checks/dictionary_qc/*`
+
+Open this file when you want to see how raw Access metadata becomes the repo's stitched dictionary rather than a year-by-year pile of table documentation.
+
+Method context:
+- `METHODS_PANEL_CONSTRUCTION.md` explains why the repo is metadata-first
+- this script is where that design becomes durable dictionary artifacts
 """
 from __future__ import annotations
 

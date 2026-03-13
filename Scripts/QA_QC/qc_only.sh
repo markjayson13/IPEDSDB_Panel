@@ -8,6 +8,8 @@ usage() {
   cat <<'EOF'
 Run dictionary and panel QA checks against existing Access-derived outputs.
 
+This is the normal "tell me whether the current generated build still looks trustworthy" wrapper.
+
 Usage:
   bash Scripts/QA_QC/qc_only.sh
 
@@ -62,6 +64,10 @@ python3 "$ROOT/Scripts/QA_QC/01_panel_qa.py" \
   --clean "$WIDE_CLEAN" \
   --out-dir "$IPEDSDB_ROOT/Checks/panel_qc" \
   --prch-qc-dir "$IPEDSDB_ROOT/Checks/prch_qc"
+python3 "$ROOT/Scripts/QA_QC/09_panel_structure_qc.py" \
+  --root "$IPEDSDB_ROOT" \
+  --years "2004:2023" \
+  --out-dir "$IPEDSDB_ROOT/Checks/panel_qc"
 python3 "$ROOT/Scripts/QA_QC/08_acceptance_audit.py" \
   --root "$IPEDSDB_ROOT" \
   --years "2004:2023" \
@@ -73,3 +79,8 @@ echo "QC outputs written to:"
 echo "  $IPEDSDB_ROOT/Checks/dictionary_qc"
 echo "  $IPEDSDB_ROOT/Checks/panel_qc"
 echo "  $IPEDSDB_ROOT/Checks/acceptance_qc"
+echo ""
+echo "Open these first:"
+echo "  $IPEDSDB_ROOT/Checks/acceptance_qc/acceptance_summary.md"
+echo "  $IPEDSDB_ROOT/Checks/panel_qc/panel_qa_summary.csv"
+echo "  $IPEDSDB_ROOT/Checks/panel_qc/panel_structure_summary.csv"

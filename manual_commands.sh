@@ -8,6 +8,8 @@ usage() {
   cat <<'EOF'
 Run the full IPEDS Access-database panel pipeline.
 
+This is the normal "do the real build" wrapper.
+
 Usage:
   bash manual_commands.sh
 
@@ -27,6 +29,9 @@ What this wrapper does:
   2. verifies mdb-tools
   3. runs the full 2004:2023 pipeline
   4. runs cleaning and QA
+
+Best use:
+  use this when you want the repo to produce or refresh the full release-style panel
 EOF
 }
 
@@ -56,6 +61,7 @@ mkdir -p "$IPEDSDB_ROOT"
 
 echo "[ipedsdb-panel] preflight passed"
 echo "[ipedsdb-panel] running full pipeline for years 2004:2023"
+echo "[ipedsdb-panel] this can take a while on a first run"
 
 python3 "$ROOT/Scripts/00_run_all.py" \
   --root "$IPEDSDB_ROOT" \
@@ -73,3 +79,5 @@ echo ""
 echo "Recommended next checks:"
 echo "  $IPEDSDB_ROOT/Checks/dictionary_qc/dictionary_qaqc_summary.csv"
 echo "  $IPEDSDB_ROOT/Checks/panel_qc/panel_qa_summary.csv"
+echo "  $IPEDSDB_ROOT/Checks/panel_qc/panel_structure_summary.csv"
+echo "  $IPEDSDB_ROOT/Checks/acceptance_qc/acceptance_summary.md"

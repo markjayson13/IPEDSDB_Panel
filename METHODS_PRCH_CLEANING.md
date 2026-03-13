@@ -2,6 +2,10 @@
 
 This note documents the parent-child (`PRCH_*`) cleaning method used in `IPEDSDB_Panel` for the cleaned wide panel.
 
+In plain terms: the repo keeps every institution-year row, but blanks the component values that clearly belong with a parent reporter instead of leaving duplicated values on the child row.
+
+If you only remember one sentence from this note, make it this: the method preserves the institution-year spine and cleans the duplicated component payload.
+
 ## Scope
 
 - Applies to the Access-database workflow in this repo for `2004:2023`.
@@ -17,6 +21,10 @@ This design is intentional:
 - component reporting can differ across IPEDS survey components
 - collapsing everything to a single parent row would hide institution-level entry, exit, closure, and merger behavior
 - a cleaned wide panel should still preserve row-level institutional history while preventing obvious double counting inside component families
+
+That is the core philosophy of the method: preserve the panel spine, clean the duplicated payload.
+
+This is meant to be practical and auditable, not magical. The method is intentionally narrow: clean what the metadata and PRCH flags clearly support, and leave the rest visible in QA rather than guessing.
 
 ## Literature And Source Support Used
 
@@ -161,3 +169,16 @@ Use the cleaned panel when you want:
 - an auditable record of what was nulled and why
 
 Do **not** interpret the cleaned panel as a universal institutional collapse to parent level. It is a row-preserving, component-aware cleaning layer designed for research use, not a full organizational consolidation.
+
+That is the safest way to talk about it in papers, memos, or handoffs: this repo produces a cleaned institution-year panel, not a single “true” consolidated institution history.
+
+## Formal References
+
+- Jaquette, O., & Parra, E. E. (2014). *Using IPEDS for Panel Analyses: Core Concepts, Data Challenges, and Empirical Applications.* In M. B. Paulsen (Ed.), *Higher Education: Handbook of Theory and Research* (Vol. 29, pp. 467-533). Springer. https://doi.org/10.1007/978-94-017-8005-6_11
+- Jaquette, O., & Parra, E. (2016). *The Problem with the Delta Cost Project Database.* *Research in Higher Education*, 57(5), 630-651. https://doi.org/10.1007/s11162-015-9399-2
+- National Center for Education Statistics. *Reporting Finance Data for Multiple Institutions.* https://nces.ed.gov/ipeds/report-your-data/data-tip-sheet-reporting-finance-data-multiple-institutions
+- National Center for Education Statistics. *IPEDS Access Databases.* https://nces.ed.gov/ipeds/use-the-data/download-access-database
+- Local supporting files under `/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling/Paneling guide/`, including:
+  - `Using IPEDS for Panel Analyses Core Concepts Data Challenges and Empirical Applications.pdf`
+  - `Conducting research with IPEDS.pdf`
+  - `IPEDS Data Collection System Glossary.pdf`

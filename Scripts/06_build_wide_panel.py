@@ -15,6 +15,12 @@ Writes:
 
 DuckDB handles target discovery, lane-split planning, scalar-conflict QA,
 discrete collapse, typed casting, and stitched exports.
+
+Open this file when you want to understand how the long panel becomes the one-row-per-`UNITID-year` analysis dataset used by the cleaner and the release QA.
+
+Method context:
+- `METHODS_PANEL_CONSTRUCTION.md` explains the high-level panel design
+- this script is the mechanical wide-build step, not the place where the unit of analysis is philosophically decided
 """
 from __future__ import annotations
 

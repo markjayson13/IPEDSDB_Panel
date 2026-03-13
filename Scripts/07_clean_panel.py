@@ -16,6 +16,8 @@ Policy:
   component-family columns
 - for Finance, treat `PRCH_F=2,3,4,5` as child rows; retain `PRCH_F=6`
   as a partial review-only case
+
+Open this file when you want to see the actual row-preserving parent/child cleaning logic used to produce the final released panel.
 """
 from __future__ import annotations
 

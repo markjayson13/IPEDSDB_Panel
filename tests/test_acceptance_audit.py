@@ -92,6 +92,15 @@ def test_collect_acceptance_rows_and_render_markdown(tmp_path: Path) -> None:
             {"flag": "PRCH_F", "status": "cleaned"},
         ],
     )
+    for name in [
+        "panel_structure_summary",
+        "entry_exit_gap_summary",
+        "identifier_linkage_summary",
+        "component_timing_reference",
+        "finance_comparability_summary",
+        "classification_stability_summary",
+    ]:
+        write_csv(root / "Checks" / "panel_qc" / f"{name}.csv", [{"stub": "ok"}])
     write_csv(
         root / "Checks" / "disc_qc" / "disc_conflicts_summary_all_years.csv",
         [
@@ -152,6 +161,15 @@ def test_collect_acceptance_rows_flags_duplicate_clean_keys(tmp_path: Path) -> N
     write_csv(root / "Checks" / "dictionary_qc" / "dictionary_qaqc_summary.csv", [{"duplicate_rows": 0, "source_file_conflicts": 0, "varnumber_collisions": 0, "unmapped_rows": 0, "needs_review_rows": 0}])
     write_csv(root / "Checks" / "panel_qc" / "panel_qa_summary.csv", [{"raw_rows": 2, "clean_rows": 2, "suspicious_flags": 0}])
     write_csv(root / "Checks" / "panel_qc" / "panel_qa_coverage_matrix.csv", [{"flag": "PRCH_F", "status": "cleaned"}])
+    for name in [
+        "panel_structure_summary",
+        "entry_exit_gap_summary",
+        "identifier_linkage_summary",
+        "component_timing_reference",
+        "finance_comparability_summary",
+        "classification_stability_summary",
+    ]:
+        write_csv(root / "Checks" / "panel_qc" / f"{name}.csv", [{"stub": "ok"}])
 
     rows = audit_mod.collect_acceptance_rows(root, years)
     dup_row = next(row for row in rows if row["check_name"] == "panel_clean:duplicate_unitid_year")

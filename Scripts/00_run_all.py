@@ -12,6 +12,7 @@ Writes:
 - QA artifacts when `--run-qaqc` is enabled
 
 This is the main Python entrypoint behind `manual_commands.sh`.
+Open this file when you want to see the real stage order or understand which skip flags bypass which parts of the pipeline.
 """
 from __future__ import annotations
 

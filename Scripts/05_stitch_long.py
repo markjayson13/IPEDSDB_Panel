@@ -7,6 +7,8 @@ Reads:
 
 Writes:
 - `Panels/<span>/panel_long_varnum_<start>_<end>.parquet`
+
+Open this file when you want to see the handoff between yearly harmonization and the cross-year panel. This stage is intentionally simple: it does not reinterpret the data, it validates and combines them.
 """
 from __future__ import annotations
 

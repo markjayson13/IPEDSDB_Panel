@@ -16,6 +16,12 @@ Focus:
 - row and key preservation
 - zero unresolved dictionary and panel QA failures
 - readable, reusable acceptance status for the live build
+
+Open this file when you want the repo's final answer to: "Is the current generated build release-ready, or did it merely run to completion?"
+
+Method context:
+- this script certifies the evidence written by the pipeline
+- it does not replace the method notes, but it is where the release claim becomes a concrete pass/fail artifact
 """
 from __future__ import annotations
 
@@ -113,6 +119,12 @@ def collect_acceptance_rows(root: Path, years: list[int]) -> list[dict[str, obje
     dict_qc_path = layout.checks / "dictionary_qc" / "dictionary_qaqc_summary.csv"
     panel_qc_path = layout.checks / "panel_qc" / "panel_qa_summary.csv"
     panel_cov_path = layout.checks / "panel_qc" / "panel_qa_coverage_matrix.csv"
+    panel_structure_path = layout.checks / "panel_qc" / "panel_structure_summary.csv"
+    entry_exit_path = layout.checks / "panel_qc" / "entry_exit_gap_summary.csv"
+    identifier_linkage_path = layout.checks / "panel_qc" / "identifier_linkage_summary.csv"
+    component_timing_path = layout.checks / "panel_qc" / "component_timing_reference.csv"
+    finance_compare_path = layout.checks / "panel_qc" / "finance_comparability_summary.csv"
+    class_stability_path = layout.checks / "panel_qc" / "classification_stability_summary.csv"
     disc_summary_path = layout.checks / "disc_qc" / "disc_conflicts_summary_all_years.csv"
     release_inventory_path = layout.checks / "download_qc" / "release_inventory.csv"
 
@@ -126,6 +138,12 @@ def collect_acceptance_rows(root: Path, years: list[int]) -> list[dict[str, obje
         "dictionary_qaqc_summary": dict_qc_path,
         "panel_qa_summary": panel_qc_path,
         "panel_qa_coverage_matrix": panel_cov_path,
+        "panel_structure_summary": panel_structure_path,
+        "entry_exit_gap_summary": entry_exit_path,
+        "identifier_linkage_summary": identifier_linkage_path,
+        "component_timing_reference": component_timing_path,
+        "finance_comparability_summary": finance_compare_path,
+        "classification_stability_summary": class_stability_path,
         "release_inventory": release_inventory_path,
     }
     for label, path in required_paths.items():
@@ -324,6 +342,27 @@ def collect_acceptance_rows(root: Path, years: list[int]) -> list[dict[str, obje
                 details="" if suspicious_cov == 0 else "Coverage matrix still has suspicious flag rows.",
             )
         )
+
+    panel_qc_reference_paths = {
+        "panel_structure_summary": panel_structure_path,
+        "entry_exit_gap_summary": entry_exit_path,
+        "identifier_linkage_summary": identifier_linkage_path,
+        "component_timing_reference": component_timing_path,
+        "finance_comparability_summary": finance_compare_path,
+        "classification_stability_summary": class_stability_path,
+    }
+    for label, path in panel_qc_reference_paths.items():
+        if path.exists():
+            frame = safe_read_csv(path)
+            rows.append(
+                build_row(
+                    f"panel_qaqc:{label}_nonempty",
+                    len(frame) > 0,
+                    value=len(frame),
+                    expected="> 0 rows",
+                    details="" if len(frame) > 0 else f"{label}.csv was present but empty.",
+                )
+            )
 
     if disc_summary_path.exists():
         disc_summary = safe_read_csv(disc_summary_path)

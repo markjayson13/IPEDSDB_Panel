@@ -9,6 +9,8 @@ Writes:
 - `Raw_Access_Databases/<year>/downloads/*`
 - `Raw_Access_Databases/<year>/manifest.csv`
 - `Checks/download_qc/*`
+
+Open this file when you want to understand how the repo decides which NCES Access releases count as in-scope and how yearly manifests get written.
 """
 from __future__ import annotations
 

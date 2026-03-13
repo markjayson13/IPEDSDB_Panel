@@ -12,6 +12,8 @@ Writes:
 - optional `Cross_sections/parts_<year>/part_*.parquet`
 - `Checks/harmonize_qc/*`
 - `Checks/release_qc/*`
+
+Open this file when you want to understand how exported yearly CSV tables become the harmonized long panel and why a table was selected or excluded.
 """
 from __future__ import annotations
 
