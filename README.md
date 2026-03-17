@@ -2,14 +2,14 @@
 
 Build a research-ready unbalanced IPEDS institution-year panel from NCES IPEDS Access databases.
 
-In plain terms, this repo takes the yearly IPEDS Access databases, turns them into one consistent institution-by-year panel, and leaves behind enough QA evidence that you can inspect what happened instead of trusting a black box.
+In plain terms, this repo turns the yearly IPEDS Access databases into one institution-by-year panel and leaves behind enough QA evidence that you can inspect the result instead of trusting a black box.
 
-If you are opening this repo cold, the shortest useful summary is:
+If you are opening this repo cold, start with this:
 
-- the repo contains the code and the explanation
-- `IPEDSDB_ROOT` contains the real downloads, outputs, and QA artifacts
-- `manual_commands.sh` is the normal full-run entrypoint
-- `bash Scripts/QA_QC/qc_only.sh` is the normal “check the current build” entrypoint
+- the repo holds the code, docs, and small tracked artifacts
+- `IPEDSDB_ROOT` holds the real downloads, outputs, and QA files
+- `bash manual_commands.sh` is the normal full build entrypoint
+- `bash Scripts/QA_QC/qc_only.sh` is the fastest way to check an existing build
 
 This repository is code-first and data-outside-git by design:
 
@@ -28,6 +28,7 @@ This repository is code-first and data-outside-git by design:
 | Check whether an existing build looks healthy | `bash Scripts/QA_QC/qc_only.sh` |
 | Run the final acceptance audit only | `python Scripts/QA_QC/08_acceptance_audit.py --root "$IPEDSDB_ROOT" --years "2004:2023"` |
 | Run saved inspection SQL and export results | `python Scripts/run_saved_query.py --list` |
+| Browse variables that actually exist in the current panel | `python Scripts/10_build_variable_browser.py ...` |
 | Pull only a subset of variables | `python Scripts/08_build_custom_panel.py ...` |
 | Understand where a file came from | open `Checks/`, then `Dictionary/`, then `Raw_Access_Databases/<year>/metadata/` |
 | Inspect what the repo is doing | `manual_commands.sh` -> `Scripts/00_run_all.py` -> stage scripts in `Scripts/01-09` |
@@ -62,49 +63,59 @@ You do not need to read every script or every CSV to work effectively here. In m
 
 ## Release Status
 
-For the current verified `2004:2023` build under `IPEDSDB_ROOT`, the paneled datasets are structurally sound and QA-clean for release.
+For the current verified `2004:2023` build under `IPEDSDB_ROOT`, the released panel is structurally sound and QA-clean.
 
-That statement is based on the generated audit artifacts, not just on the fact that the code ran:
+If you only need the headline:
 
-- `Checks/acceptance_qc/acceptance_summary.csv` and `acceptance_summary.md` pass
-- `Checks/panel_qc/panel_qa_summary.csv` shows row preservation and zero suspicious flags
-- `Checks/panel_qc/panel_structure_summary.csv` and `identifier_linkage_summary.csv` now document unbalancedness and identifier continuity explicitly
-- `Checks/panel_qc/component_timing_reference.csv`, `finance_comparability_summary.csv`, and `classification_stability_summary.csv` now back the repo's comparability cautions with durable artifacts
-- `Checks/dictionary_qc/dictionary_qaqc_summary.csv` shows zero unresolved duplicate/conflict/unmapped dictionary failures
-- `METHODS_PRCH_CLEANING.md` documents the parent-child cleaning method used in the released cleaned panel
-- `METHODS_PANEL_CONSTRUCTION.md` documents the full literature-guided panel-construction method
+- acceptance audit: `39 / 39` checks passed
+- final clean panel: `141,711` rows and `1,864` columns
+- year window: `2004` through `2023`
+- key integrity: `0` duplicate `(UNITID, year)` rows
+- cleaning preserved all institution-year rows
+- dictionary QA reports `0` unresolved duplicate, conflict, or unmapped failures
 
-This status applies to the validated build artifacts currently stored under `IPEDSDB_ROOT`, especially:
+The status applies to the validated artifacts under `IPEDSDB_ROOT`, especially:
 
 - `Panels/2004-2023/panel_long_varnum_2004_2023.parquet`
 - `Panels/panel_wide_analysis_2004_2023.parquet`
 - `Panels/panel_clean_analysis_2004_2023.parquet`
 
-### Quantitative Proof
+<details>
+<summary>See the full release evidence and metrics</summary>
 
-The current validated build has the following measured properties:
+That release status is based on generated audit artifacts, not just on the fact that the code ran:
+
+- `Checks/acceptance_qc/acceptance_summary.csv` and `acceptance_summary.md` pass
+- `Checks/panel_qc/panel_qa_summary.csv` shows row preservation and zero suspicious flags
+- `Checks/panel_qc/panel_structure_summary.csv` and `identifier_linkage_summary.csv` document unbalancedness and identifier continuity
+- `Checks/panel_qc/component_timing_reference.csv`, `finance_comparability_summary.csv`, and `classification_stability_summary.csv` cover key comparability cautions
+- `Checks/dictionary_qc/dictionary_qaqc_summary.csv` shows zero unresolved duplicate/conflict/unmapped dictionary failures
+- `METHODS_PRCH_CLEANING.md` documents the parent-child cleaning method
+- `METHODS_PANEL_CONSTRUCTION.md` documents the full panel-construction method
 
 | Metric | Current value | Why it matters |
 | --- | --- | --- |
-| Acceptance audit | `39 / 39` checks passed | top-level release gate over the live generated artifacts, now including panel-structure and comparability artifacts |
-| Repo tests | `44 passed` | code-level regression coverage over parsing, harmonization helpers, cleaning, wide-build gates, orchestration, custom outputs, acceptance checks, and synthetic smoke paths |
-| Final clean panel rows | `141,711` | confirms the delivered analysis panel size |
-| Final clean panel columns | `1,864` | confirms the delivered schema width |
-| Year coverage | `20` years, `2004` through `2023` | confirms exact requested panel window |
+| Acceptance audit | `39 / 39` checks passed | top-level release gate over the live generated artifacts |
+| Repo tests | `44 passed` | regression coverage over core build and QA paths |
+| Final clean panel rows | `141,711` | confirms delivered panel size |
+| Final clean panel columns | `1,864` | confirms delivered schema width |
+| Year coverage | `20` years, `2004` through `2023` | confirms requested panel window |
 | Distinct institutions | `10,421` `UNITID`s | confirms panel population size |
-| Always-present institutions | `4,395` | shows how many institutions are observed across the full panel window without internal gaps |
-| Intermittent-gap institutions | `146` | highlights a small but explicit subset with internal reporting gaps |
-| Possible selection-risk institutions | `4,343` | makes entry/exit and gap-related attrition risk visible instead of implicit |
-| Identifier-linkage review cases | `973` `UNITID`s with multiple observed `OPEID` values | flags continuity cases for review without changing the canonical key |
-| Raw vs clean row preservation | `141,711` raw and `141,711` clean | confirms cleaning did not drop institution-year rows |
+| Always-present institutions | `4,395` | institutions observed across the full window |
+| Intermittent-gap institutions | `146` | institutions with internal reporting gaps |
+| Possible selection-risk institutions | `4,343` | makes entry, exit, and gap-related attrition visible |
+| Identifier-linkage review cases | `973` `UNITID`s with multiple observed `OPEID` values | flags continuity cases for review |
+| Raw vs clean row preservation | `141,711` raw and `141,711` clean | confirms cleaning did not drop rows |
 | Duplicate `(UNITID, year)` keys | `0` in raw wide, `0` in clean wide | confirms one-row-per-institution-year integrity |
 | Long-panel key nulls | `0` null/blank `year`, `UNITID`, `varnumber`, or `source_file` | confirms stitched long-key integrity |
-| PRCH flags evaluated | `15` observed flags | confirms panel QA covers the full observed PRCH surface |
-| Suspicious PRCH flags | `0` | confirms no unresolved parent-child leakage is flagged by panel QA |
-| Dictionary lake rows | `66,702` | confirms full stitched metadata coverage |
-| Dictionary code-label rows | `208,339` | confirms category/code-label reference coverage |
+| PRCH flags evaluated | `15` observed flags | confirms panel QA covers the observed PRCH surface |
+| Suspicious PRCH flags | `0` | confirms no flagged parent-child leakage remains |
+| Dictionary lake rows | `66,702` | confirms stitched metadata coverage |
+| Dictionary code-label rows | `208,339` | confirms category/code-label coverage |
 | Dictionary duplicate/conflict/unmapped failures | `0` duplicate rows, `0` source-file conflicts, `0` varnumber collisions, `0` unmapped rows, `0` needs-review rows | confirms dictionary integrity |
-| Discrete-conflict QA | `254` grouped rows, `0` high-signal groups | confirms remaining discrete conflicts are classified as expected patterns, not unresolved anomalies |
+| Discrete-conflict QA | `254` grouped rows, `0` high-signal groups | confirms remaining conflicts look like expected patterns |
+
+</details>
 
 These numbers come from the current generated QA artifacts and panel files under `IPEDSDB_ROOT`. If you rebuild the pipeline, rerun:
 
@@ -116,7 +127,15 @@ and refresh the acceptance artifacts before treating the new build as release-re
 
 ## Core References
 
-These are the references that most directly shape the repo's construction logic, QA design, and interpretation cautions:
+These references shape the repo's construction logic, QA design, and interpretation cautions. Most users do not need them on a first read.
+
+If you want the repo's applied version, start with:
+
+- `METHODS_PANEL_CONSTRUCTION.md`
+- `METHODS_PRCH_CLEANING.md`
+
+<details>
+<summary>See the full reference list</summary>
 
 - Jaquette, O., & Parra, E. E. (2014). *Using IPEDS for Panel Analyses: Core Concepts, Data Challenges, and Empirical Applications.* In M. B. Paulsen (Ed.), *Higher Education: Handbook of Theory and Research* (Vol. 29, pp. 467-533). Springer. https://doi.org/10.1007/978-94-017-8005-6_11
 - Kelchen, R. (2019). *Merging Data to Facilitate Analyses.* *New Directions for Institutional Research*, 2019. https://doi.org/10.1002/ir.20298
@@ -131,10 +150,7 @@ These are the references that most directly shape the repo's construction logic,
 - NCES. *Institutional Groupings.* https://nces.ed.gov/ipeds/about-ipeds-data/institutional-groupings
 - NCES. *Reporting Finance Data for Multiple Institutions.* https://nces.ed.gov/ipeds/report-your-data/data-tip-sheet-reporting-finance-data-multiple-institutions
 
-If you only want the repo's distilled version of those references, read:
-
-- `METHODS_PANEL_CONSTRUCTION.md`
-- `METHODS_PRCH_CLEANING.md`
+</details>
 
 ## Repository Guide
 
@@ -191,6 +207,7 @@ When you come back to this repo after a while, these five places usually get you
 | `Scripts/QA_QC/` | QA, parity, and repo guards |
 | `Artifacts/` | small tracked reference files and guide figures |
 | `Customize_Panel/selectedvars.txt` | starter variable list for custom extracts |
+| `docs/` | GitHub Pages publish directory for the public variable-browser snapshot, landing page, and user guide |
 | `Queries/` | saved starter SQL for DuckDB inspection |
 | `tests/` | lightweight parser and metadata tests |
 
@@ -578,6 +595,22 @@ python Scripts/08_build_custom_panel.py \
   --vars-file "Customize_Panel/selectedvars.txt" \
   --years "2004:2023"
 ```
+
+### Build a variable browser for the current panel
+
+```bash
+python3 Scripts/10_build_variable_browser.py \
+  --input "$IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023.parquet" \
+  --dictionary "$IPEDSDB_ROOT/Dictionary/dictionary_lake.parquet" \
+  --output "Customize_Panel/variable_browser.html"
+```
+
+That writes a single static HTML file you can open locally. The browser only lists columns that actually exist in the supplied panel schema, groups them into analyst-facing semantic families using dictionary metadata plus lightweight heuristics, surfaces coverage and completeness badges, and lets you:
+
+- search and filter only real panel columns
+- inspect descriptions, coverage, and related variables
+- save, import, and reuse variable lists with validation
+- export `selectedvars.txt` and, if needed, a small manifest
 
 ### Export a panel dictionary for the cleaned panel
 

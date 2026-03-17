@@ -2,19 +2,21 @@
 
 This folder contains the operational pipeline for building the Access-database IPEDS panel.
 
-If you are opening this folder for the first time, the basic idea is:
+If you are opening this folder for the first time, the basic idea is simple:
 
 - `00_run_all.py` coordinates the run
-- `01` through `09` are the ordered stages
-- helper modules hold the shared logic
-- `QA_QC/` is where the build gets checked, summarized, and audited
+- `01` through `09` are the main ordered build stages
+- `10_build_variable_browser.py` is optional and only helps with variable selection
+- helper modules hold shared logic
+- `QA_QC/` is where the build gets checked and summarized
 
-This is the working part of the repo. If `README.md` explains the system from the outside, this folder explains it from the inside.
+If `README.md` explains the repo from the outside, this folder explains how the work actually gets done.
 
 ## Start Here
 
 - `00_run_all.py`: main Python orchestrator
 - `01_download_access_databases.py` to `09_build_panel_dictionary.py`: ordered pipeline stages
+- `10_build_variable_browser.py`: optional static HTML browser for finding real panel columns and exporting `selectedvars.txt`
 - `run_saved_query.py`: analyst query runner for saved SQL and result exports
 - `QA_QC/`: validation, parity, monitoring, and repo guards
 - `QA_QC/08_acceptance_audit.py`: top-level pass/fail audit over the generated live artifacts
@@ -48,6 +50,7 @@ This is the working part of the repo. If `README.md` explains the system from th
 | `07_clean_panel.py` | apply PRCH cleaning |
 | `08_build_custom_panel.py` | make smaller user-selected extracts |
 | `09_build_panel_dictionary.py` | build a dictionary for an actual panel output in `.csv` or formatted `.xlsx` |
+| `10_build_variable_browser.py` | build a self-contained HTML browser for panel vars with semantic grouping, card/table browsing, detail inspection, presets, group/family bulk actions, saved-set lifecycle, import diffing, and export artifacts |
 | `run_saved_query.py` | run saved SQL against the build DB and standard outputs |
 | `prch_policy.py` | shared parent-child cleaning policy used by cleaning and QA |
 

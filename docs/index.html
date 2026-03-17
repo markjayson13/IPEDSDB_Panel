@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IPEDS Variable Browser</title>
+  <meta name="description" content="Public documentation for the IPEDS variable browser snapshot, including scope, guarantees, and dependable usage notes.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230c6d68'/%3E%3Cpath d='M18 24.5L32 16l14 8.5v15L32 48l-14-8.5v-15Z' fill='%23fffaf1'/%3E%3Cpath d='M32 16v32' stroke='%230c6d68' stroke-width='4'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --panel: rgba(255, 250, 241, 0.92);
+      --panel-strong: rgba(255, 247, 233, 0.98);
+      --line: rgba(31, 42, 44, 0.12);
+      --text: #1b282c;
+      --muted: #5d6762;
+      --accent: #0c6d68;
+      --accent-strong: #114f52;
+      --accent-soft: rgba(12, 109, 104, 0.09);
+      --warn: #9d552b;
+      --warn-soft: rgba(157, 85, 43, 0.11);
+      --shadow: 0 24px 60px rgba(55, 44, 26, 0.12);
+      --heading: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      --body: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, sans-serif;
+      --mono: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: var(--body);
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(157, 85, 43, 0.12), transparent 30%),
+        radial-gradient(circle at top right, rgba(12, 109, 104, 0.11), transparent 34%),
+        linear-gradient(180deg, #f7f2e9 0%, #eee5d6 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(22, 36, 39, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22, 36, 39, 0.03) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.4), transparent 90%);
+    }
+
+    a {
+      color: var(--accent-strong);
+    }
+
+    .shell {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 28px auto 42px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero,
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      background: var(--panel);
+    }
+
+    .hero {
+      overflow: hidden;
+      position: relative;
+      padding: 28px 30px 30px;
+      display: grid;
+      gap: 18px;
+      background: linear-gradient(135deg, rgba(255, 249, 240, 0.98), rgba(243, 237, 225, 0.94));
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      right: -110px;
+      top: -120px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(12, 109, 104, 0.18), transparent 72%);
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow,
+    .nav-link,
+    .info-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    .eyebrow,
+    .info-chip {
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+    }
+
+    .nav-link {
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(17, 79, 82, 0.1);
+    }
+
+    .hero-main {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.8fr);
+      gap: 18px;
+      align-items: end;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      font-family: var(--heading);
+      letter-spacing: -0.03em;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 4vw, 4.6rem);
+      line-height: 0.94;
+      max-width: 11ch;
+    }
+
+    h2 {
+      font-size: clamp(1.5rem, 2.1vw, 2.25rem);
+      line-height: 1.02;
+    }
+
+    h3 {
+      font-size: 1.08rem;
+      line-height: 1.08;
+    }
+
+    .hero-copy,
+    .section-copy,
+    .note,
+    .table,
+    .steps,
+    .list {
+      color: var(--muted);
+      font-size: 0.99rem;
+      line-height: 1.65;
+    }
+
+    .hero-copy {
+      max-width: 72ch;
+      margin-top: 12px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-start;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(20, 38, 42, 0.12);
+    }
+
+    .button.primary {
+      color: #fffdf9;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    }
+
+    .button.secondary {
+      color: var(--accent-strong);
+      background: rgba(255, 255, 255, 0.72);
+      border-color: rgba(17, 79, 82, 0.12);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+    }
+
+    .stat {
+      min-width: 0;
+      padding: 16px 17px;
+      border-radius: 18px;
+      border: 1px solid rgba(17, 79, 82, 0.12);
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .stat-label {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.85fr);
+      gap: 18px;
+      margin-top: 18px;
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .mini-card {
+      padding: 15px 16px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+    }
+
+    .mini-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .list,
+    .steps {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .list div,
+    .steps div {
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .list div::before,
+    .steps div::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.75em;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      transform: translateY(-50%);
+    }
+
+    .warn-list div::before {
+      background: var(--warn);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .meta-card {
+      padding: 15px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(17, 79, 82, 0.1);
+      background: rgba(255, 255, 255, 0.52);
+    }
+
+    .meta-label {
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .meta-value {
+      font-weight: 700;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .code {
+      font-family: var(--mono);
+      background: rgba(17, 79, 82, 0.08);
+      padding: 2px 6px;
+      border-radius: 8px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .warn-panel {
+      background: var(--warn-soft);
+      border-color: rgba(157, 85, 43, 0.14);
+    }
+
+    .footer {
+      margin-top: 18px;
+      padding: 16px 2px 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .loading {
+      opacity: 0.82;
+    }
+
+    @media (max-width: 900px) {
+      .hero-main,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="nav">
+        <span class="eyebrow">IPEDSDB Panel · Published Snapshot</span>
+        <a class="nav-link" href="./guide.html">User Guide</a>
+        <a class="nav-link" href="./variable-browser.html">Open Browser</a>
+        <a class="nav-link" href="https://github.com/markjayson13/IPEDSDB_Panel">Repository</a>
+      </div>
+      <div class="hero-main">
+        <div>
+          <h1>IPEDS Variable Browser</h1>
+          <div class="hero-copy">
+            This site publishes a static browser for choosing variables from the cleaned IPEDS panel. It is meant to be quick to use and easy to trust.
+          </div>
+        </div>
+        <div class="hero-actions">
+          <a class="button primary" href="./variable-browser.html">Launch Browser</a>
+          <a class="button secondary" href="./guide.html">Read User Guide</a>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Published panel</div>
+          <div class="stat-value loading" id="panel-name">Loading…</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Selectable variables</div>
+          <div class="stat-value loading" id="total-vars">Loading…</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Institution-year rows</div>
+          <div class="stat-value loading" id="panel-rows">Loading…</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Year window</div>
+          <div class="stat-value loading" id="year-window">Loading…</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="stack">
+        <section class="panel">
+          <h2>What This Snapshot Does</h2>
+          <div class="section-copy">
+            The browser only lists columns that exist in the published cleaned panel snapshot. It helps you search, review, and export a usable variable list.
+          </div>
+          <div class="card-grid">
+            <div class="mini-card">
+              <strong>Discovery</strong>
+              Search, facet-filter, browse semantic families, and inspect detailed metadata without leaving the page.
+            </div>
+            <div class="mini-card">
+              <strong>Validation</strong>
+              Preview missing or duplicate imports before changing the current selection.
+            </div>
+            <div class="mini-card">
+              <strong>Export</strong>
+              Copy or download <span class="code">selectedvars.txt</span> and an optional manifest.
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Quick Start</h2>
+          <div class="steps">
+            <div>Search by concept, variable name, or component family.</div>
+            <div>Use filters to shrink the list before selecting in bulk.</div>
+            <div>Open details when you need descriptions, coverage, or related fields.</div>
+            <div>Export a plain-text variable list when you are done.</div>
+          </div>
+          <div class="note" style="margin-top: 14px;">
+            The separate <a href="./guide.html">User Guide</a> walks through the workflow in a little more detail.
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Dependability Notes</h2>
+          <div class="list">
+            <div>This browser is tied to a specific panel release, not a live backend.</div>
+            <div>Nonexistent columns are excluded because the list comes from the panel schema itself.</div>
+            <div>This landing page reads its release metadata from the published browser snapshot.</div>
+            <div>The browser stays fully static and self-contained, which keeps deployment simple on GitHub Pages.</div>
+          </div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="panel">
+          <h2>Release Snapshot</h2>
+          <div class="meta-grid">
+            <div class="meta-card">
+              <div class="meta-label">Schema hash</div>
+              <div class="meta-value loading" id="schema-hash">Loading…</div>
+            </div>
+            <div class="meta-card">
+              <div class="meta-label">Published build</div>
+              <div class="meta-value loading" id="build-date">Loading…</div>
+            </div>
+            <div class="meta-card">
+              <div class="meta-label">Component groups</div>
+              <div class="meta-value loading" id="group-count">Loading…</div>
+            </div>
+            <div class="meta-card">
+              <div class="meta-label">Release state</div>
+              <div class="meta-value">Static public snapshot</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Good To Know</h2>
+          <div class="list">
+            <div><span class="code">UNITID</span> and <span class="code">year</span> remain retained keys in the custom-panel workflow.</div>
+            <div>The public browser snapshot works without a server because it is a single committed HTML artifact.</div>
+            <div>The export format remains intentionally simple: one variable per line.</div>
+            <div>This page describes the browser snapshot. It does not replace the underlying panel QA documentation.</div>
+          </div>
+        </section>
+
+        <section class="panel warn-panel">
+          <h2>Trust Boundaries</h2>
+          <div class="list warn-list">
+            <div>This browser is a variable-selection aid. It is not the source of truth for data values and it does not edit the parquet.</div>
+            <div>If the cleaned panel schema changes, the browser snapshot should be refreshed.</div>
+            <div>If dictionary metadata changes, labels or descriptions can become stale until the next publish.</div>
+            <div>The browser helps reduce selection mistakes. It does not certify research design quality.</div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <div class="footer">
+      GitHub Pages serves this site from the repository <span class="code">docs/</span> folder. The browser artifact itself is <span class="code">docs/variable-browser.html</span>.
+    </div>
+  </main>
+
+  <script>
+    const fallbackMetadata = {
+      panelName: "panel_clean_analysis_2004_2023.parquet",
+      totalVariables: 1862,
+      panelRows: 141711,
+      panelYears: { min: 2004, max: 2023, count: 20 },
+      schemaHash: "e268143407f423463718e1d1a831728a70a4ca0747c889d84b96555d1ced0477",
+      buildDate: "2026-03-17T00:17:14Z",
+      groupNames: [
+        "Institution / Directory",
+        "Admissions",
+        "Costs / Price",
+        "Student Financial Aid",
+        "Enrollment / Student Profile",
+        "Completions",
+        "Graduation / Outcomes",
+        "Finance",
+        "Staff / Human Resources",
+        "Panel-only / custom"
+      ]
+    };
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat("en-US").format(value);
+    }
+
+    function formatYearWindow(panelYears) {
+      if (!panelYears || panelYears.min == null || panelYears.max == null) {
+        return "Unavailable";
+      }
+      return `${panelYears.min} to ${panelYears.max}`;
+    }
+
+    function formatBuildDate(value) {
+      if (!value) {
+        return "Unavailable";
+      }
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+      return `${parsed.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })} · ${parsed.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZoneName: "short" })}`;
+    }
+
+    function setText(id, value) {
+      const node = document.getElementById(id);
+      if (!node) {
+        return;
+      }
+      node.textContent = value;
+      node.classList.remove("loading");
+    }
+
+    function applyMetadata(metadata) {
+      setText("panel-name", metadata.panelName || "Unavailable");
+      setText("total-vars", typeof metadata.totalVariables === "number" ? formatNumber(metadata.totalVariables) : "Unavailable");
+      setText("panel-rows", typeof metadata.panelRows === "number" ? formatNumber(metadata.panelRows) : "Unavailable");
+      setText("year-window", formatYearWindow(metadata.panelYears));
+      setText("schema-hash", metadata.schemaHash || "Unavailable");
+      setText("build-date", formatBuildDate(metadata.buildDate));
+      setText("group-count", Array.isArray(metadata.groupNames) ? formatNumber(metadata.groupNames.length) : "Unavailable");
+    }
+
+    async function loadMetadata() {
+      try {
+        const response = await fetch("./variable-browser.html", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const htmlText = await response.text();
+        const marker = '<script id="variable-browser-data" type="application/json">';
+        const start = htmlText.indexOf(marker);
+        const end = htmlText.indexOf("<\\/script>".replace("\\/", "/"), start);
+        if (start === -1 || end === -1) {
+          throw new Error("browser payload not found");
+        }
+        const jsonText = htmlText.slice(start + marker.length, end);
+        applyMetadata(JSON.parse(jsonText));
+      } catch (error) {
+        applyMetadata(fallbackMetadata);
+      }
+    }
+
+    loadMetadata();
+  </script>
+</body>
+</html>

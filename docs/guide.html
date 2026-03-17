@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IPEDS Variable Browser Guide</title>
+  <meta name="description" content="User guide for the public IPEDS variable browser snapshot.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230c6d68'/%3E%3Cpath d='M18 24.5L32 16l14 8.5v15L32 48l-14-8.5v-15Z' fill='%23fffaf1'/%3E%3Cpath d='M32 16v32' stroke='%230c6d68' stroke-width='4'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --panel: rgba(255, 250, 241, 0.92);
+      --line: rgba(31, 42, 44, 0.12);
+      --text: #1b282c;
+      --muted: #5d6762;
+      --accent: #0c6d68;
+      --accent-strong: #114f52;
+      --accent-soft: rgba(12, 109, 104, 0.09);
+      --shadow: 0 24px 60px rgba(55, 44, 26, 0.12);
+      --heading: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      --body: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, sans-serif;
+      --mono: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: var(--body);
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(157, 85, 43, 0.12), transparent 30%),
+        radial-gradient(circle at top right, rgba(12, 109, 104, 0.11), transparent 34%),
+        linear-gradient(180deg, #f7f2e9 0%, #eee5d6 100%);
+    }
+
+    .shell {
+      width: min(980px, calc(100vw - 32px));
+      margin: 28px auto 42px;
+    }
+
+    .hero,
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      background: var(--panel);
+    }
+
+    .hero,
+    .panel {
+      padding: 26px 28px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 16px;
+      background: linear-gradient(135deg, rgba(255, 249, 240, 0.98), rgba(243, 237, 225, 0.94));
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .nav-link,
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    .eyebrow {
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+    }
+
+    .nav-link {
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(17, 79, 82, 0.1);
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      font-family: var(--heading);
+      letter-spacing: -0.03em;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4vw, 4rem);
+      line-height: 0.96;
+      max-width: 11ch;
+    }
+
+    h2 {
+      font-size: clamp(1.45rem, 2vw, 2.1rem);
+      line-height: 1.04;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      font-size: 1.02rem;
+      margin-bottom: 6px;
+    }
+
+    .hero-copy,
+    .copy,
+    .steps,
+    .note {
+      color: var(--muted);
+      line-height: 1.68;
+      font-size: 0.99rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+
+    .button.primary {
+      color: #fffdf9;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    }
+
+    .button.secondary {
+      color: var(--accent-strong);
+      background: rgba(255, 255, 255, 0.72);
+      border-color: rgba(17, 79, 82, 0.12);
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .mini-card {
+      padding: 15px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(17, 79, 82, 0.1);
+      background: rgba(255, 255, 255, 0.52);
+    }
+
+    .steps {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .step {
+      padding-left: 18px;
+      position: relative;
+    }
+
+    .step::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.78em;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      transform: translateY(-50%);
+      background: var(--accent);
+    }
+
+    .code {
+      font-family: var(--mono);
+      background: rgba(17, 79, 82, 0.08);
+      padding: 2px 6px;
+      border-radius: 8px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    @media (max-width: 700px) {
+      .hero,
+      .panel {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="nav">
+        <span class="eyebrow">Public Guide</span>
+        <a class="nav-link" href="./">Overview</a>
+        <a class="nav-link" href="./variable-browser.html">Open Browser</a>
+        <a class="nav-link" href="https://github.com/markjayson13/IPEDSDB_Panel">Repository</a>
+      </div>
+      <div>
+        <h1>Using The Browser</h1>
+        <div class="hero-copy">
+          This guide is about the workflow: how to find variables quickly and export a clean list without getting lost in the schema.
+        </div>
+      </div>
+      <div class="actions">
+        <a class="button primary" href="./variable-browser.html">Launch Browser</a>
+        <a class="button secondary" href="./">Back to Overview</a>
+      </div>
+    </section>
+
+    <div class="stack">
+      <section class="panel">
+        <h2>Recommended Workflow</h2>
+        <div class="steps">
+          <div class="step"><strong>Start broad.</strong> Search by concept first, not by prefix.</div>
+          <div class="step"><strong>Narrow the list.</strong> Use filters and component groups before selecting in bulk.</div>
+          <div class="step"><strong>Inspect when needed.</strong> Open details for descriptions, coverage, and related variables.</div>
+          <div class="step"><strong>Validate imports.</strong> Paste old lists into the import box before applying them.</div>
+          <div class="step"><strong>Export simply.</strong> Treat <span class="code">selectedvars.txt</span> as the main output.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>What The Main Controls Mean</h2>
+        <div class="grid">
+          <div class="mini-card">
+            <h3>Search and facets</h3>
+            <div class="copy">Use these to move from a vague concept to a smaller candidate set.</div>
+          </div>
+          <div class="mini-card">
+            <h3>Group and family actions</h3>
+            <div class="copy">These bulk actions work best after you narrow the catalog.</div>
+          </div>
+          <div class="mini-card">
+            <h3>Saved sets</h3>
+            <div class="copy">These are browser-local helpers for repeat work. They are useful, but exported files are still the safer handoff format.</div>
+          </div>
+          <div class="mini-card">
+            <h3>Manifest export</h3>
+            <div class="copy">This is optional metadata for reproducibility. The plain-text variable list is still the main output.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>How To Read The Metadata</h2>
+        <div class="steps">
+          <div class="step"><strong>Coverage badges</strong> summarize when a variable appears in the panel window.</div>
+          <div class="step"><strong>Completeness badges</strong> help you notice sparse variables before you export them.</div>
+          <div class="step"><strong>Source labels</strong> show the main source lineage used for grouping and context.</div>
+          <div class="step"><strong>Related variables</strong> are helpful neighbors, not guaranteed companion variables.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>What The Browser Guarantees</h2>
+        <div class="steps">
+          <div class="step">It only lists columns that exist in the published cleaned-panel snapshot.</div>
+          <div class="step">It exports a plain-text selection format that stays easy to inspect and reuse.</div>
+          <div class="step">It remains static and self-contained, which keeps the public Pages deployment simple.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>What It Does Not Guarantee</h2>
+        <div class="steps">
+          <div class="step">It does not tell you whether a variable is conceptually right for your design.</div>
+          <div class="step">It does not resolve comparability issues across survey or reporting changes.</div>
+          <div class="step">It does not replace the underlying panel QA and method documentation in the repository.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
