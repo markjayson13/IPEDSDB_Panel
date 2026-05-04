@@ -203,6 +203,28 @@ def validate_release_governance_files(rows: list[str]) -> None:
             "evidence_path",
             "mitigation",
         },
+        "contracts/transformation_ledger.csv": {
+            "transformation_id",
+            "stage",
+            "scope",
+            "status",
+            "first_release",
+            "description",
+            "evidence_path",
+            "release_policy",
+            "reviewer_note",
+        },
+        "contracts/external_benchmarks.csv": {
+            "benchmark_id",
+            "year",
+            "metric",
+            "column",
+            "expected_value",
+            "tolerance_abs",
+            "tolerance_rel",
+            "source",
+            "notes",
+        },
     }
     for rel_path, required in checks.items():
         path = REPO_ROOT / rel_path
@@ -222,6 +244,8 @@ def validate_release_governance_files(rows: list[str]) -> None:
                     fail(rows, f"{rel_path} row {idx} lacks justification")
                 if "limitation_id" in required and not row.get("limitation_id", "").strip():
                     fail(rows, f"{rel_path} row {idx} lacks limitation_id")
+                if "transformation_id" in required and not row.get("transformation_id", "").strip():
+                    fail(rows, f"{rel_path} row {idx} lacks transformation_id")
 
 
 def main() -> int:

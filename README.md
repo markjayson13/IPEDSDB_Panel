@@ -29,6 +29,8 @@ This repository is code-first and data-outside-git by design:
 | Run the final acceptance audit only | `python Scripts/QA_QC/08_acceptance_audit.py --root "$IPEDSDB_ROOT" --years "2004:2023"` |
 | Freeze public-release checksums | `python Scripts/QA_QC/12_build_release_manifest.py --root "$IPEDSDB_ROOT" --years "2004:2023"` |
 | Run the public-release gate | `bash Scripts/QA_QC/release_gate.sh` |
+| Record the build environment | `python Scripts/QA_QC/20_environment_report.py --root "$IPEDSDB_ROOT"` |
+| Build join-risk outputs | `python Scripts/QA_QC/22_build_entity_continuity_crosswalk.py --root "$IPEDSDB_ROOT"` |
 | Run saved inspection SQL and export results | `python Scripts/run_saved_query.py --list` |
 | Browse variables present in the current panel | `python Scripts/10_build_variable_browser.py ...` |
 | Pull only a subset of variables | `python Scripts/08_build_custom_panel.py ...` |
@@ -142,6 +144,8 @@ bash Scripts/QA_QC/release_gate.sh
 
 The full release gate expects a populated `IPEDSDB_ROOT`. It validates the panel contract, public-facing repository files, documentation style, acceptance audit, release manifest, checksum verification, Data Package metadata, build provenance, public bundle, repo size, staged-file policy, and tests.
 
+For archive work, set `REQUIRE_EXTERNAL_BENCHMARKS=1` after `contracts/external_benchmarks.csv` has been filled with official benchmark rows. Without that flag, the benchmark script writes a review artifact when no external benchmarks are configured.
+
 Public deposits should include:
 
 - the release bundle under `Releases/ipedsdb_panel_2004_2023/`
@@ -151,6 +155,9 @@ Public deposits should include:
 - `ro-crate-metadata.json`
 - `metadata/release_manifest.csv`
 - `metadata/release_manifest_verification.csv`
+- `metadata/environment_report.json`
+- `metadata/entity_continuity/entity_continuity_crosswalk.csv`
+- `metadata/external_benchmarks/external_benchmark_reconciliation.csv`
 
 ## License and reuse
 
@@ -246,6 +253,8 @@ For a short review, open these five files first:
 | `ACKNOWLEDGMENTS.md` | research mentor acknowledgment and profile links |
 | `LICENSE` and `DATA_LICENSE.md` | code and data reuse terms |
 | `CONTRIBUTING.md`, `SECURITY.md`, `GOVERNANCE.md`, `CHANGELOG.md` | public repository policy |
+| `Dockerfile` and `requirements-lock.txt` | cold-machine build environment |
+| `MIGRATION.md` | predecessor-to-current migration notes |
 | `manual_commands.sh` | one-command local run |
 | `requirements.txt` | Python dependencies |
 | `Scripts/` | pipeline stages and utilities |

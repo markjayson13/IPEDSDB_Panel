@@ -31,6 +31,9 @@ If you are not sure where to start, do not start with the most detailed CSV. Sta
 | `17_build_provenance.py` | write build provenance with source manifest, git, runtime, package, and output digest metadata |
 | `18_public_release_guard.py` | fail if public-release policy, ownership, citation, archive, or intake files are missing or inconsistent |
 | `19_docs_style_guard.py` | scan release-facing prose for generated-text patterns before publication |
+| `20_environment_report.py` | write Python, package, tool, lockfile, and platform metadata for the release |
+| `21_external_benchmark_reconciliation.py` | compare selected panel metrics to configured external benchmark rows |
+| `22_build_entity_continuity_crosswalk.py` | build `UNITID` join-risk and entity-continuity review outputs |
 | `07_task_monitor_summary.py` | roll monitored-build telemetry into CSV and Markdown summaries |
 | `release_gate.sh` | run the release checks, metadata builders, bundle builder, repo guards, and tests |
 
@@ -54,6 +57,8 @@ If you are not sure where to start, do not start with the most detailed CSV. Sta
 - after changing build defaults or PRCH rules: run `11_validate_panel_contract.py`
 - before archiving or sharing a public build: run `release_gate.sh`
 - before replacing an archived release: run `15_compare_release_to_baseline.py`
+- before DOI deposit: fill `contracts/external_benchmarks.csv`, set `REQUIRE_EXTERNAL_BENCHMARKS=1`, and rerun `release_gate.sh`
+- before external joins: inspect `Checks/entity_continuity/entity_continuity_crosswalk.csv`
 - after changing Stage 06 or Stage 07 lineage behavior: inspect `Checks/wide_qc/qc_column_lineage.csv` and `Checks/prch_qc/prch_lineage_summary.csv`
 - before committing: run the repo guards
 

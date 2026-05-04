@@ -24,6 +24,9 @@ being built.
 - release comparison: `Checks/release_compare/release_comparison.csv`
 - data package: `Checks/release_metadata/datapackage.json`
 - build provenance: `Checks/release_metadata/build_provenance.json`
+- environment report: `Checks/release_metadata/environment_report.json`
+- entity continuity: `Checks/entity_continuity/entity_continuity_crosswalk.csv`
+- external benchmarks: `Checks/external_benchmarks/external_benchmark_reconciliation.csv`
 
 ## Validation
 
@@ -51,6 +54,10 @@ Add or revise a contract when the empirical object changes, including:
 - PRCH cleaning policy
 - output artifact names
 - release-manifest, verification, bundle, and baseline-comparison evidence
+- runtime environment report and dependency lock
+- transformation ledger rows
+- external benchmark definitions
+- entity-continuity and join-risk outputs
 - known limitations or release-diff overrides
 
 Generated data and QA files still belong under `IPEDSDB_ROOT`, not in this

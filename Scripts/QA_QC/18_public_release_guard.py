@@ -26,6 +26,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 REQUIRED_FILES = [
     "LICENSE",
     "DATA_LICENSE.md",
+    "Dockerfile",
+    ".dockerignore",
+    "requirements-lock.txt",
     "CONTACT.md",
     "ACKNOWLEDGMENTS.md",
     "CITATION.cff",
@@ -35,6 +38,7 @@ REQUIRED_FILES = [
     "SECURITY.md",
     "GOVERNANCE.md",
     "CHANGELOG.md",
+    "MIGRATION.md",
     ".github/CODEOWNERS",
     ".github/PULL_REQUEST_TEMPLATE.md",
     ".github/dependabot.yml",

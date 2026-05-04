@@ -432,10 +432,15 @@ def main() -> int:
         if extra.exists():
             metadata_sources.append((extra, metadata_dir / extra.name))
     release_metadata_dir = layout.checks / "release_metadata"
-    for extra_name in ["datapackage.json", "build_provenance.json"]:
+    for extra_name in ["datapackage.json", "build_provenance.json", "environment_report.json"]:
         extra = release_metadata_dir / extra_name
         if extra.exists():
             metadata_sources.append((extra, metadata_dir / extra.name))
+    for rel_dir in ["external_benchmarks", "entity_continuity"]:
+        qa_dir = layout.checks / rel_dir
+        if qa_dir.exists():
+            for extra in sorted(path for path in qa_dir.rglob("*") if path.is_file()):
+                metadata_sources.append((extra, metadata_dir / rel_dir / extra.relative_to(qa_dir)))
     release_compare_dir = layout.checks / "release_compare"
     for extra_name in ["release_comparison.csv", "release_comparison_summary.csv", "release_comparison.md"]:
         extra = release_compare_dir / extra_name

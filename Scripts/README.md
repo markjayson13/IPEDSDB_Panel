@@ -28,6 +28,9 @@ If `README.md` describes the repo from the outside, this folder describes the bu
 - `QA_QC/17_build_provenance.py`: provenance metadata builder
 - `QA_QC/18_public_release_guard.py`: public-release file and ownership guard
 - `QA_QC/19_docs_style_guard.py`: release-facing prose guard
+- `QA_QC/20_environment_report.py`: runtime and dependency report
+- `QA_QC/21_external_benchmark_reconciliation.py`: configured external benchmark reconciliation
+- `QA_QC/22_build_entity_continuity_crosswalk.py`: `UNITID` continuity and join-risk outputs
 - `QA_QC/release_gate.sh`: release gate wrapper
 
 ## File lookup
