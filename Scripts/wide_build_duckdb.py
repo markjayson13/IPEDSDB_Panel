@@ -493,6 +493,101 @@ def register_df_as_table(con, table_name: str, df: pd.DataFrame) -> None:
     con.unregister(temp_name)
 
 
+def write_dataframe(path: str | None, df: pd.DataFrame) -> None:
+    if not path:
+        return
+    out_path = Path(path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    if out_path.suffix.lower() == ".parquet":
+        df.to_parquet(out_path, index=False)
+    else:
+        df.to_csv(out_path, index=False)
+
+
+def joined_sorted(values: set[str]) -> str:
+    return "|".join(sorted(v for v in values if v))
+
+
+def build_column_lineage_df(
+    *,
+    source_df: pd.DataFrame,
+    legacy_seed_plan_df: pd.DataFrame,
+    seeded_legacy_names: set[str],
+    final_targets: list[str],
+    var_to_group: dict[str, tuple[str, str]],
+    disc_name_map: dict[str, str],
+) -> pd.DataFrame:
+    source_lookup: dict[str, dict[str, object]] = {}
+    for varname, grp in source_df.groupby("varname", dropna=False):
+        source_files = {str(x).strip().upper() for x in grp["source_file"].fillna("").tolist() if str(x).strip()}
+        varnumbers = {str(x).strip() for x in grp["varnumber"].fillna("").tolist() if str(x).strip()}
+        source_lookup[str(varname)] = {
+            "source_files": source_files,
+            "varnumbers": varnumbers,
+            "source_rows": int(pd.to_numeric(grp["source_rows"], errors="coerce").fillna(0).sum()),
+            "source_non_empty_rows": int(pd.to_numeric(grp["source_non_empty_rows"], errors="coerce").fillna(0).sum()),
+        }
+
+    legacy_seed_meta = {
+        str(row["column_name"]): {
+            "seed_reason": str(row.get("seed_reason", "")),
+            "dtype": str(row.get("dtype", "")),
+            "source_contract": str(row.get("source_contract", "")),
+        }
+        for row in legacy_seed_plan_df.to_dict("records")
+    }
+
+    disc_components_by_output: dict[str, set[str]] = {}
+    for component, (base, _) in var_to_group.items():
+        output_name = disc_name_map.get(base, base)
+        disc_components_by_output.setdefault(output_name, set()).add(component)
+
+    rows: list[dict[str, object]] = []
+    for rank, column in enumerate(final_targets, start=1):
+        lineage_kind = "direct_scalar"
+        source_vars = {column}
+        seed_info = legacy_seed_meta.get(column, {})
+        if column in disc_components_by_output:
+            lineage_kind = "disc_collapsed"
+            source_vars = set(disc_components_by_output[column])
+        elif column in seeded_legacy_names or (column in legacy_seed_meta and column not in source_lookup):
+            lineage_kind = "legacy_seed"
+
+        source_files: set[str] = set()
+        varnumbers: set[str] = set()
+        source_rows = 0
+        source_non_empty_rows = 0
+        for varname in source_vars:
+            info = source_lookup.get(varname, {})
+            source_files.update(info.get("source_files", set()))
+            varnumbers.update(info.get("varnumbers", set()))
+            source_rows += int(info.get("source_rows", 0))
+            source_non_empty_rows += int(info.get("source_non_empty_rows", 0))
+
+        rows.append(
+            {
+                "output_column": column,
+                "final_target_rank": rank,
+                "lineage_kind": lineage_kind,
+                "source_varnames": joined_sorted(source_vars),
+                "source_varname_count": len(source_vars),
+                "primary_source_file": sorted(source_files)[0] if len(source_files) == 1 else "",
+                "source_files": joined_sorted(source_files),
+                "source_file_count": len(source_files),
+                "source_varnumbers": joined_sorted(varnumbers),
+                "varnumber_count": len(varnumbers),
+                "source_rows": source_rows,
+                "source_non_empty_rows": source_non_empty_rows,
+                "lineage_ambiguous": len(source_files) > 1,
+                "seeded_for_legacy_schema": column in seeded_legacy_names,
+                "legacy_seed_reason": seed_info.get("seed_reason", ""),
+                "legacy_seed_dtype": seed_info.get("dtype", ""),
+                "legacy_seed_source_contract": seed_info.get("source_contract", ""),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
 def build_target_lineage_df(
     *,
     stage_df: pd.DataFrame,
@@ -872,6 +967,20 @@ def run(args) -> None:
         ORDER BY 1
         """
     ).fetchdf()
+    column_source_df = con.execute(
+        f"""
+        SELECT
+            varname,
+            source_file,
+            varnumber,
+            COUNT(*) AS source_rows,
+            COUNT(*) FILTER (WHERE value_norm IS NOT NULL) AS source_non_empty_rows
+        FROM stage.long_selected
+        {build_where_sql(target_scan_clauses)}
+        GROUP BY 1, 2, 3
+        ORDER BY 1, 2, 3
+        """
+    ).fetchdf()
     targets = target_df["varname"].tolist()
     discovered_targets = len(targets)
     targets_with_data = set(target_df.loc[target_df["non_empty_rows"] > 0, "varname"].tolist())
@@ -981,6 +1090,19 @@ def run(args) -> None:
         Path(runtime.target_lineage_out).parent.mkdir(parents=True, exist_ok=True)
         lineage_df.to_csv(runtime.target_lineage_out, index=False)
     log_phase("target lineage build end", rows=len(lineage_df), output=runtime.target_lineage_out or "")
+
+    log_phase("column lineage build start")
+    column_lineage_df = build_column_lineage_df(
+        source_df=column_source_df,
+        legacy_seed_plan_df=legacy_seed_plan_df,
+        seeded_legacy_names=seeded_legacy_names,
+        final_targets=all_targets,
+        var_to_group=var_to_group,
+        disc_name_map=disc_name_map,
+    )
+    register_df_as_table(con, "qa.column_lineage", column_lineage_df)
+    write_dataframe(runtime.column_lineage_out, column_lineage_df)
+    log_phase("column lineage build end", rows=len(column_lineage_df), output=runtime.column_lineage_out or "")
     if args.lineage_only:
         log_phase("lineage-only exit")
         return
@@ -1122,7 +1244,7 @@ def run(args) -> None:
                          AND s.year = k.year
                          AND s.varnumber = k.varnumber
                          AND s.source_file = k.source_file
-                        ORDER BY year, UNITID, varnumber, source_file, row_id
+                        ORDER BY s.year, s.UNITID, s.varnumber, s.source_file, s.row_id
                         LIMIT {remaining}
                         """
                     ).fetchdf()

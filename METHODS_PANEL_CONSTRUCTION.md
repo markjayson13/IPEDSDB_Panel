@@ -1,10 +1,10 @@
-# Panel Construction Method
+# Panel construction method
 
 This note documents the full panel-construction method used in `IPEDSDB_Panel`, not just the PRCH cleaning layer.
 
-In plain terms: the repo builds a research-facing unbalanced `UNITID`-by-`year` panel from annual IPEDS Access databases, keeps the panel spine at the campus/institution-record level used by IPEDS, and uses QA artifacts to make the data decisions inspectable instead of hidden.
+The repo builds an unbalanced `UNITID`-by-`year` panel from annual IPEDS Access databases, keeps the panel spine at the campus/institution-record level used by IPEDS, and writes QA artifacts for the main data decisions.
 
-## What The Canonical Product Is
+## Canonical product
 
 The canonical released product in this repo is:
 
@@ -14,9 +14,9 @@ The canonical released product in this repo is:
 - restricted to `Final` Access releases for `2004:2023`
 - cleaned for documented parent-child duplication without collapsing the panel to a single parent-level institution history
 
-The panel year is the **collection-year start**. That means `2023` corresponds to the `2023-24` collection cycle label when used in the metadata, release inventory, and Access database inputs.
+The panel year is the collection-year start. That means `2023` corresponds to the `2023-24` collection cycle label when used in the metadata, release inventory, and Access database inputs.
 
-## Literature And Why It Matters Here
+## Literature and use in this repo
 
 ### Jaquette & Parra (2014)
 
@@ -37,7 +37,7 @@ Why it matters:
 
 ### NCES Access / Methodology / DLDT / Institutional Groupings Documentation
 
-These materials are the repo's operational reference for how the data are structured.
+These materials define how the source data are structured.
 
 How they are used:
 
@@ -53,7 +53,7 @@ Why they matter:
 - some describe fiscal-year reporting
 - some describe older entering cohorts
 
-That timing heterogeneity is why the repo now emits `component_timing_reference.csv` and classification-stability diagnostics.
+The repo records this timing variation in `component_timing_reference.csv` and the classification-stability diagnostics.
 
 ### Kelchen (2019)
 
@@ -71,7 +71,7 @@ Why it matters:
 - `OPEID` can be useful for understanding parent-child or chain structure
 - automatic conversion of the whole panel to an `OPEID` unit of analysis would change the research object, not just the identifier
 
-### Delta Cost Project Documentation And Cheslock & Jaquette (2016)
+### Delta Cost Project documentation and Cheslock & Jaquette (2016)
 
 These are used as a cautionary reference, not as a build template.
 
@@ -88,7 +88,7 @@ Why they matter:
 
 ### Wooldridge / Baltagi / NISS
 
-These references guide how the repo thinks about unbalancedness.
+These references inform the unbalanced-panel diagnostics.
 
 How they are used:
 
@@ -102,33 +102,34 @@ Why they matter:
 - attrition and intermittent reporting can create interpretation risk even when estimation remains possible
 - the right response for this repo is transparent diagnostics first, not automatic sample restriction
 
-## How The Repo Uses These Ideas In Practice
+## Implementation policy
 
-### 1. Inputs And Release Policy
+### 1. Inputs and release policy
 
 - only `Final` Access releases are used in the canonical build
 - yearly manifests and release inventories make that choice explicit
 - provisional releases are intentionally excluded from the release-ready panel
 
-This follows the repo's “document the source state first” rule and keeps the build tied to stable NCES revisions.
+This keeps the build tied to stable NCES revisions and documents the source state before harmonization.
 
-### 2. Unit Of Analysis
+### 2. Unit of analysis
 
 - the canonical panel key is `UNITID`, `year`
 - one row per `UNITID-year` is enforced in the wide and clean outputs
 - parent-level linkage fields such as `OPEID` are diagnostic-only in the current release line
 
-This keeps the released panel close to the observed IPEDS reporting unit while still allowing identifier-linkage review.
+This keeps the released panel close to the observed IPEDS reporting unit and still allows identifier-linkage review.
 
-### 3. Metadata-First Harmonization
+### 3. Metadata-first harmonization
 
 - the Access metadata tables drive variable titles, long descriptions, code labels, data types, and source-family mapping
-- harmonization fails loudly when key metadata conditions are broken
+- harmonization fails when key metadata conditions are broken
+- ambiguous dictionary mappings fail unless a versioned override documents the selected metadata row and rationale
 - the dictionary lake is part of the integrity surface, not just a convenience file
 
-This is how the repo converts many annual Access tables into one coherent panel without relying on undocumented manual merges.
+This rule lets the repo convert annual Access tables into one panel without undocumented manual merges.
 
-### 4. Component-Specific Parent-Child Cleaning
+### 4. Component-specific parent-child cleaning
 
 - the repo keeps every `UNITID-year` row
 - PRCH cleaning blanks affected component-family values rather than dropping the row
@@ -136,7 +137,7 @@ This is how the repo converts many annual Access tables into one coherent panel 
 
 The detailed method is in `METHODS_PRCH_CLEANING.md`.
 
-### 5. Unbalancedness And Selection-Risk Diagnostics
+### 5. Unbalancedness and selection-risk diagnostics
 
 The repo now emits:
 
@@ -148,7 +149,7 @@ The repo now emits:
 
 These artifacts do not change the canonical panel. They explain the structure of the canonical panel.
 
-### 6. Timing And Comparability Diagnostics
+### 6. Timing and comparability diagnostics
 
 The repo now emits:
 
@@ -157,30 +158,30 @@ The repo now emits:
 
 These are there because a panel can be structurally clean and still require interpretation caution.
 
-## What The Repo Intentionally Does Not Do
+## Exclusions
 
-- It does **not** automatically convert the canonical panel to `OPEID` or parent-institution level.
-- It does **not** automatically build a balanced panel as the default release product.
-- It does **not** treat classification variables as fixed across all years.
-- It does **not** apply undocumented finance harmonization across accounting-standard changes.
-- It does **not** claim to produce a universal merger-adjusted institutional history.
+- It does not automatically convert the canonical panel to `OPEID` or parent-institution level.
+- It does not automatically build a balanced panel as the default release product.
+- It does not treat classification variables as fixed across all years.
+- It does not apply undocumented finance harmonization across accounting-standard changes.
+- It does not claim to produce a universal merger-adjusted institutional history.
 
 Those may all be useful for specific research projects, but they are downstream design choices, not default release behavior.
 
-## How To Describe The Dataset Correctly
+## Dataset description
 
-The safest short description is:
+A concise description is:
 
 > `IPEDSDB_Panel` provides a cleaned, research-facing, unbalanced `UNITID`-by-`year` panel built from final IPEDS Access databases, with component-specific parent-child handling and explicit QA diagnostics for panel structure, identifier linkage, timing, and comparability.
 
-That phrasing is more accurate than calling it:
+Do not describe it as:
 
 - a fully parent-collapsed institution panel
 - a balanced longitudinal database
 - a universal institutional-merger history
 - a fully harmonized finance-comparability dataset
 
-## Practical Implication
+## Practical implication
 
 Use the canonical panel when you want:
 
@@ -195,9 +196,9 @@ Build a custom derived panel when you need:
 - special finance harmonization
 - analysis-specific sample restrictions
 
-That separation is intentional. The repo's job is to produce a defensible base panel and the evidence needed to understand it, not to guess every downstream research design choice in advance.
+That separation leaves design choices such as aggregation, balancing, and sample restriction to downstream projects.
 
-## Formal References
+## References
 
 - Jaquette, O., & Parra, E. E. (2014). *Using IPEDS for Panel Analyses: Core Concepts, Data Challenges, and Empirical Applications.* In M. B. Paulsen (Ed.), *Higher Education: Handbook of Theory and Research* (Vol. 29, pp. 467-533). Springer. https://doi.org/10.1007/978-94-017-8005-6_11
 - Kelchen, R. (2019). *Merging Data to Facilitate Analyses.* *New Directions for Institutional Research*, 2019. https://doi.org/10.1002/ir.20298

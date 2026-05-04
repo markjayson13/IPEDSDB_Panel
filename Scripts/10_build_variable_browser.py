@@ -21,6 +21,8 @@ from pathlib import Path
 import pandas as pd
 import pyarrow.parquet as pq
 
+from access_build_utils import DEFAULT_IPEDSDB_ROOT
+
 
 GROUP_ORDER = [
     "Institution / Directory",
@@ -2900,7 +2902,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 def parse_args() -> argparse.Namespace:
     repo_root = Path(__file__).resolve().parents[1]
-    data_root = Path(os.environ.get("IPEDSDB_ROOT", "/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling"))
+    data_root = Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
     parser = argparse.ArgumentParser(
         description="Build a static HTML variable browser for a panel parquet."
     )

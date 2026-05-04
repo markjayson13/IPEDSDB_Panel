@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "Cite this dataset using the metadata below."
+title: "IPEDSDB_Panel"
+type: dataset
+authors:
+  - family-names: "Farol"
+    given-names: "Mark Jayson"
+    website: "https://markjayson.com"
+version: "ipedsdb-panel-2004-2023-access-final-v1"
+date-released: 2026-05-04
+url: "https://github.com/markjayson13/IPEDSDB_Panel"
+license: "CC-BY-4.0"
+abstract: "An unbalanced IPEDS institution-year panel built from final NCES IPEDS Access databases for 2004-2023."

@@ -2,7 +2,8 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export IPEDSDB_ROOT="${IPEDSDB_ROOT:-/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling}"
+DEFAULT_IPEDSDB_ROOT="$(dirname "$ROOT")/IPEDSDB_ROOT"
+export IPEDSDB_ROOT="${IPEDSDB_ROOT:-$DEFAULT_IPEDSDB_ROOT}"
 
 usage() {
   cat <<'EOF'
@@ -14,7 +15,7 @@ Usage:
   bash manual_commands.sh
 
 Environment:
-  IPEDSDB_ROOT  External data root (default: /Users/markjaysonfarol13/Projects/IPEDSDB_Paneling)
+  IPEDSDB_ROOT  External data root (default: sibling IPEDSDB_ROOT folder)
 
 System dependency:
   mdb-tables, mdb-schema, mdb-export

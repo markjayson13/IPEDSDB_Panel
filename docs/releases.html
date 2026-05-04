@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IPEDSDB_Panel releases</title>
+  <meta name="description" content="Release metadata for IPEDSDB_Panel.">
+  <style>
+    :root {
+      --text: #1b282c;
+      --muted: #5d6762;
+      --accent: #114f52;
+      --line: rgba(31, 42, 44, 0.14);
+      --panel: rgba(255, 250, 241, 0.94);
+      --body: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, sans-serif;
+      --mono: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--body);
+      color: var(--text);
+      background: linear-gradient(180deg, #f7f2e9 0%, #eee5d6 100%);
+    }
+
+    main {
+      width: min(980px, calc(100vw - 32px));
+      margin: 28px auto 44px;
+    }
+
+    .panel {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: 0 20px 46px rgba(55, 44, 26, 0.1);
+    }
+
+    .stack { display: grid; gap: 16px; }
+    .nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+    a { color: var(--accent); font-weight: 700; text-decoration: none; }
+    h1, h2 { margin: 0 0 10px; letter-spacing: 0; }
+    h1 { font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1; }
+    h2 { font-size: 1.25rem; }
+    p, li { color: var(--muted); line-height: 1.65; }
+    code { font-family: var(--mono); overflow-wrap: anywhere; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border-top: 1px solid var(--line); padding: 10px 8px; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <main class="stack">
+    <nav class="nav">
+      <a href="./">Overview</a>
+      <a href="./guide.html">Guide</a>
+      <a href="./variable-browser.html">Variable browser</a>
+      <a href="https://github.com/markjayson13/IPEDSDB_Panel">Repository</a>
+    </nav>
+
+    <section class="panel">
+      <h1>IPEDSDB_Panel releases</h1>
+      <p>This page lists release metadata and verification files for public deposits.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Current release line</h2>
+      <table>
+        <tbody>
+          <tr><th>Contract</th><td><code>ipedsdb-panel-2004-2023-access-final-v1</code></td></tr>
+          <tr><th>Years</th><td><code>2004:2023</code></td></tr>
+          <tr><th>Unit</th><td><code>UNITID-year</code></td></tr>
+          <tr><th>Policy</th><td>Final IPEDS Access releases only.</td></tr>
+          <tr><th>Owner</th><td><a href="https://markjayson.com">Mark Jayson Farol</a></td></tr>
+          <tr><th>Research mentor</th><td><a href="https://www.unlv.edu/people/djeto-assane">Djeto Assane, Ph.D.</a>, University of Nevada, Las Vegas</td></tr>
+          <tr><th>Code license</th><td>MIT</td></tr>
+          <tr><th>Data license</th><td>CC BY 4.0 for derived release data and metadata.</td></tr>
+          <tr><th>Bundle</th><td><code>Releases/ipedsdb_panel_2004_2023/</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>Release files</h2>
+      <ul>
+        <li><code>Checks/release_manifest/release_manifest.csv</code></li>
+        <li><code>Checks/release_manifest/release_manifest_verification.csv</code></li>
+        <li><code>Checks/release_metadata/datapackage.json</code></li>
+        <li><code>Checks/release_metadata/build_provenance.json</code></li>
+        <li><code>Checks/release_compare/release_comparison.csv</code></li>
+        <li><code>LICENSE</code></li>
+        <li><code>DATA_LICENSE.md</code></li>
+        <li><code>ACKNOWLEDGMENTS.md</code></li>
+        <li><code>GOVERNANCE.md</code></li>
+        <li><code>contracts/known_limitations.csv</code></li>
+        <li><code>contracts/release_diff_overrides.csv</code></li>
+        <li><code>Releases/ipedsdb_panel_2004_2023/SHA256SUMS.txt</code></li>
+        <li><code>Releases/ipedsdb_panel_2004_2023/CITATION.cff</code></li>
+        <li><code>Releases/ipedsdb_panel_2004_2023/datacite.json</code></li>
+        <li><code>Releases/ipedsdb_panel_2004_2023/ro-crate-metadata.json</code></li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

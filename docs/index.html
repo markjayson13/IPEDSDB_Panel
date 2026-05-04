@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>IPEDS Variable Browser</title>
-  <meta name="description" content="Public documentation for the IPEDS variable browser snapshot, including scope, guarantees, and dependable usage notes.">
+  <meta name="description" content="Public documentation for the IPEDS variable browser snapshot, including scope, guarantees, and usage notes.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230c6d68'/%3E%3Cpath d='M18 24.5L32 16l14 8.5v15L32 48l-14-8.5v-15Z' fill='%23fffaf1'/%3E%3Cpath d='M32 16v32' stroke='%230c6d68' stroke-width='4'/%3E%3C/svg%3E">
   <style>
     :root {
@@ -378,20 +378,21 @@
     <section class="hero">
       <div class="nav">
         <span class="eyebrow">IPEDSDB Panel · Published Snapshot</span>
-        <a class="nav-link" href="./guide.html">User Guide</a>
-        <a class="nav-link" href="./variable-browser.html">Open Browser</a>
+        <a class="nav-link" href="./guide.html">Guide</a>
+        <a class="nav-link" href="./releases.html">Releases</a>
+        <a class="nav-link" href="./variable-browser.html">Open browser</a>
         <a class="nav-link" href="https://github.com/markjayson13/IPEDSDB_Panel">Repository</a>
       </div>
       <div class="hero-main">
         <div>
-          <h1>IPEDS Variable Browser</h1>
+          <h1>IPEDS variable browser</h1>
           <div class="hero-copy">
-            This site publishes a static browser for choosing variables from the cleaned IPEDS panel. It is meant to be quick to use and easy to trust.
+            This site publishes a static browser for choosing variables from the cleaned IPEDS panel. It supports schema lookup, selection review, and plain-text exports.
           </div>
         </div>
         <div class="hero-actions">
-          <a class="button primary" href="./variable-browser.html">Launch Browser</a>
-          <a class="button secondary" href="./guide.html">Read User Guide</a>
+          <a class="button primary" href="./variable-browser.html">Launch browser</a>
+          <a class="button secondary" href="./guide.html">Read guide</a>
         </div>
       </div>
       <div class="stats">
@@ -417,14 +418,14 @@
     <section class="layout">
       <div class="stack">
         <section class="panel">
-          <h2>What This Snapshot Does</h2>
+          <h2>Snapshot scope</h2>
           <div class="section-copy">
             The browser only lists columns that exist in the published cleaned panel snapshot. It helps you search, review, and export a usable variable list.
           </div>
           <div class="card-grid">
             <div class="mini-card">
               <strong>Discovery</strong>
-              Search, facet-filter, browse semantic families, and inspect detailed metadata without leaving the page.
+              Search, filter, browse semantic families, and inspect detailed metadata without leaving the page.
             </div>
             <div class="mini-card">
               <strong>Validation</strong>
@@ -438,7 +439,7 @@
         </section>
 
         <section class="panel">
-          <h2>Quick Start</h2>
+          <h2>Quick start</h2>
           <div class="steps">
             <div>Search by concept, variable name, or component family.</div>
             <div>Use filters to shrink the list before selecting in bulk.</div>
@@ -446,12 +447,12 @@
             <div>Export a plain-text variable list when you are done.</div>
           </div>
           <div class="note" style="margin-top: 14px;">
-            The separate <a href="./guide.html">User Guide</a> walks through the workflow in a little more detail.
+            The separate <a href="./guide.html">guide</a> walks through the workflow in more detail.
           </div>
         </section>
 
         <section class="panel">
-          <h2>Dependability Notes</h2>
+          <h2>Dependability notes</h2>
           <div class="list">
             <div>This browser is tied to a specific panel release, not a live backend.</div>
             <div>Nonexistent columns are excluded because the list comes from the panel schema itself.</div>
@@ -463,7 +464,7 @@
 
       <div class="stack">
         <section class="panel">
-          <h2>Release Snapshot</h2>
+          <h2>Release snapshot</h2>
           <div class="meta-grid">
             <div class="meta-card">
               <div class="meta-label">Schema hash</div>
@@ -485,7 +486,7 @@
         </section>
 
         <section class="panel">
-          <h2>Good To Know</h2>
+          <h2>Good to know</h2>
           <div class="list">
             <div><span class="code">UNITID</span> and <span class="code">year</span> remain retained keys in the custom-panel workflow.</div>
             <div>The public browser snapshot works without a server because it is a single committed HTML artifact.</div>
@@ -495,7 +496,7 @@
         </section>
 
         <section class="panel warn-panel">
-          <h2>Trust Boundaries</h2>
+          <h2>Scope boundaries</h2>
           <div class="list warn-list">
             <div>This browser is a variable-selection aid. It is not the source of truth for data values and it does not edit the parquet.</div>
             <div>If the cleaned panel schema changes, the browser snapshot should be refreshed.</div>

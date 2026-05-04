@@ -28,13 +28,19 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+
+from access_build_utils import DEFAULT_IPEDSDB_ROOT
+
 
 def default_code_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
 def default_data_root() -> Path:
-    return Path(os.environ.get("IPEDSDB_ROOT", "/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling"))
+    return Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
 
 
 def parse_args() -> argparse.Namespace:

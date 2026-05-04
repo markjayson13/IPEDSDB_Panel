@@ -29,7 +29,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from access_build_utils import ensure_data_layout, normalize_varnumber, parse_years
+from access_build_utils import ensure_data_layout, normalize_varnumber, parse_years, repo_root
 
 
 HARMONIZE_SUMMARY_COLUMNS = [
@@ -43,6 +43,17 @@ HARMONIZE_SUMMARY_COLUMNS = [
     "dictionary_rows",
     "source_match_rows",
     "access_table_match_rows",
+]
+
+AMBIGUITY_OVERRIDE_COLUMNS = [
+    "year",
+    "source_file",
+    "access_table_name",
+    "varname",
+    "selected_varnumber",
+    "selected_metadata_source",
+    "selected_metadata_table_name",
+    "justification",
 ]
 
 MISSING_UNITID_COLUMNS = [
@@ -93,6 +104,11 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--dedupe-max-temp-gib", type=int, default=None, help="Optional DuckDB max temp directory size in GiB")
     ap.add_argument("--dedupe-threads", type=int, default=1, help="DuckDB threads to use during final dedupe")
     ap.add_argument("--release-strict", action=argparse.BooleanOptionalAction, default=True)
+    ap.add_argument(
+        "--dictionary-ambiguity-overrides",
+        default=str(repo_root() / "contracts" / "dictionary_ambiguity_overrides.csv"),
+        help="CSV of documented dictionary ambiguity overrides",
+    )
     ap.add_argument("--log-file", default=None)
     return ap.parse_args()
 
@@ -131,9 +147,164 @@ def chunk_cols(cols: list[str], size: int) -> Iterable[list[str]]:
         yield cols[i : i + size]
 
 
-def select_dict_source(dict_year: pd.DataFrame, source_file: str, access_table_name: str) -> pd.DataFrame:
+def normalize_key(value: object) -> str:
+    if value is None:
+        return ""
+    return str(value).strip().upper()
+
+
+def ensure_dict_columns(df: pd.DataFrame) -> pd.DataFrame:
+    out = df.copy()
+    for col in ["year", "source_file", "access_table_name", "varname", "varnumber", "metadata_source", "metadata_table_name"]:
+        if col not in out.columns:
+            out[col] = ""
+    return out
+
+
+def empty_ambiguity_overrides() -> pd.DataFrame:
+    return pd.DataFrame(columns=AMBIGUITY_OVERRIDE_COLUMNS)
+
+
+def load_dictionary_ambiguity_overrides(path: pathlib.Path | None) -> pd.DataFrame:
+    if path is None or not path.exists():
+        return empty_ambiguity_overrides()
+    overrides = pd.read_csv(path, dtype=str).fillna("")
+    missing = set(AMBIGUITY_OVERRIDE_COLUMNS) - set(overrides.columns)
+    if missing:
+        raise SystemExit(f"Dictionary ambiguity override file is missing columns: {', '.join(sorted(missing))}")
+    overrides = overrides[AMBIGUITY_OVERRIDE_COLUMNS].copy()
+    overrides["year"] = overrides["year"].astype(str).str.strip()
+    overrides["source_file"] = overrides["source_file"].map(normalize_key)
+    overrides["access_table_name"] = overrides["access_table_name"].map(normalize_key)
+    overrides["varname"] = overrides["varname"].map(normalize_key)
+    overrides["selected_varnumber"] = overrides["selected_varnumber"].map(normalize_varnumber)
+    overrides["selected_metadata_source"] = overrides["selected_metadata_source"].fillna("").astype(str).str.strip()
+    overrides["selected_metadata_table_name"] = overrides["selected_metadata_table_name"].fillna("").astype(str).str.strip()
+    overrides["justification"] = overrides["justification"].fillna("").astype(str).str.strip()
+
+    nonempty = overrides[overrides["varname"] != ""]
+    bad_rows = nonempty[
+        ((nonempty["source_file"] == "") & (nonempty["access_table_name"] == ""))
+        | (
+            (nonempty["selected_varnumber"] == "")
+            & (nonempty["selected_metadata_source"] == "")
+            & (nonempty["selected_metadata_table_name"] == "")
+        )
+        | (nonempty["justification"] == "")
+    ]
+    if not bad_rows.empty:
+        raise SystemExit(
+            "Dictionary ambiguity overrides must include source_file or access_table_name, "
+            "at least one selected_* field, and a justification."
+        )
+    return overrides
+
+
+def matching_override_rows(
+    overrides: pd.DataFrame,
+    *,
+    year: int | None,
+    source_norm: str,
+    access_norm: str,
+    varname: str,
+) -> pd.DataFrame:
+    if overrides.empty:
+        return overrides
+    rows = overrides[overrides["varname"] == varname].copy()
+    if year is not None:
+        rows = rows[(rows["year"] == "") | (pd.to_numeric(rows["year"], errors="coerce") == int(year))]
+    if source_norm:
+        rows = rows[(rows["source_file"] == "") | (rows["source_file"] == source_norm)]
+    else:
+        rows = rows[rows["source_file"] == ""]
+    if access_norm:
+        rows = rows[(rows["access_table_name"] == "") | (rows["access_table_name"] == access_norm)]
+    else:
+        rows = rows[rows["access_table_name"] == ""]
+    return rows
+
+
+def apply_dictionary_override(group: pd.DataFrame, override: pd.Series) -> pd.DataFrame:
+    candidates = group.copy()
+    if str(override.get("selected_varnumber", "")).strip():
+        candidates = candidates[candidates["varnumber"].map(normalize_varnumber) == str(override["selected_varnumber"])]
+    if str(override.get("selected_metadata_source", "")).strip():
+        candidates = candidates[candidates["metadata_source"].fillna("").astype(str) == str(override["selected_metadata_source"])]
+    if str(override.get("selected_metadata_table_name", "")).strip():
+        candidates = candidates[candidates["metadata_table_name"].fillna("").astype(str) == str(override["selected_metadata_table_name"])]
+    if len(candidates) != 1:
+        varname = str(group["varname"].iloc[0])
+        raise SystemExit(
+            f"[fatal] dictionary ambiguity override for varname={varname} matched {len(candidates)} rows; expected exactly 1"
+        )
+    return candidates
+
+
+def describe_dictionary_ambiguity(group: pd.DataFrame) -> str:
+    cols = ["year", "source_file", "access_table_name", "varname", "varnumber", "metadata_source", "metadata_table_name"]
+    present = [col for col in cols if col in group.columns]
+    rows = group[present].drop_duplicates().head(10).to_dict("records")
+    return "; ".join(str(row) for row in rows)
+
+
+def enforce_unambiguous_dict_source(
+    subset: pd.DataFrame,
+    *,
+    source_norm: str,
+    access_norm: str,
+    overrides: pd.DataFrame,
+) -> pd.DataFrame:
+    if subset.empty:
+        return subset
+    subset = ensure_dict_columns(subset)
+    subset["metadata_source"] = subset["metadata_source"].fillna("").astype(str)
+    subset["metadata_table_name"] = subset["metadata_table_name"].fillna("").astype(str)
+    subset = subset.sort_values(["varname", "metadata_source", "metadata_table_name", "varnumber"])
+    year_value = pd.to_numeric(subset["year"], errors="coerce").dropna()
+    year = int(year_value.iloc[0]) if not year_value.empty else None
+
+    selected_groups: list[pd.DataFrame] = []
+    for varname, group in subset.groupby("varname", sort=True, dropna=False):
+        unique_group = group.drop_duplicates(
+            ["year", "source_file", "access_table_name", "varname", "varnumber", "metadata_source", "metadata_table_name"]
+        )
+        if len(unique_group) <= 1:
+            selected_groups.append(group.head(1))
+            continue
+        override_rows = matching_override_rows(
+            overrides,
+            year=year,
+            source_norm=source_norm,
+            access_norm=access_norm,
+            varname=str(varname),
+        )
+        if override_rows.empty:
+            raise SystemExit(
+                "[fatal] ambiguous dictionary mapping for "
+                f"year={year or ''} source_file={source_norm} access_table_name={access_norm} varname={varname}. "
+                "Add a documented row to contracts/dictionary_ambiguity_overrides.csv. "
+                f"Candidates: {describe_dictionary_ambiguity(unique_group)}"
+            )
+        if len(override_rows) > 1:
+            raise SystemExit(
+                "[fatal] multiple dictionary ambiguity overrides match "
+                f"year={year or ''} source_file={source_norm} access_table_name={access_norm} varname={varname}"
+            )
+        selected_groups.append(apply_dictionary_override(unique_group, override_rows.iloc[0]))
+    if not selected_groups:
+        return subset.iloc[0:0].copy()
+    return pd.concat(selected_groups, ignore_index=True)
+
+
+def select_dict_source(
+    dict_year: pd.DataFrame,
+    source_file: str,
+    access_table_name: str,
+    overrides: pd.DataFrame | None = None,
+) -> pd.DataFrame:
     source_norm = str(source_file or "").strip().upper()
     access_norm = str(access_table_name or "").strip().upper()
+    dict_year = ensure_dict_columns(dict_year)
     subset = dict_year[
         (dict_year["source_file"].fillna("").astype(str).str.upper() == source_norm)
         | (dict_year["access_table_name"].fillna("").astype(str).str.upper() == access_norm)
@@ -142,9 +313,12 @@ def select_dict_source(dict_year: pd.DataFrame, source_file: str, access_table_n
         subset = dict_year[dict_year["source_file"].fillna("").astype(str).str.upper() == source_norm].copy()
     if subset.empty:
         return subset
-    subset["metadata_source"] = subset["metadata_source"].fillna("").astype(str)
-    subset = subset.sort_values(["varname", "metadata_source", "metadata_table_name", "varnumber"]).drop_duplicates(["varname"], keep="first")
-    return subset
+    return enforce_unambiguous_dict_source(
+        subset,
+        source_norm=source_norm,
+        access_norm=access_norm,
+        overrides=overrides if overrides is not None else empty_ambiguity_overrides(),
+    )
 
 
 def write_parquet_parts(out_path: pathlib.Path, frames: Iterable[pd.DataFrame], parts_dir: pathlib.Path) -> None:
@@ -340,6 +514,9 @@ def main() -> None:
     dict_df["varname"] = dict_df["varname"].fillna("").astype(str).str.upper().str.strip()
     dict_df["imputationvar"] = dict_df["imputationvar"].fillna("").astype(str).str.upper().str.strip()
     dict_df.loc[dict_df["imputationvar"].isin({"NAN", "NONE", "<NA>", "NAT"}), "imputationvar"] = ""
+    ambiguity_overrides = load_dictionary_ambiguity_overrides(
+        pathlib.Path(args.dictionary_ambiguity_overrides) if args.dictionary_ambiguity_overrides else None
+    )
 
     for year in years:
         year_dir = layout.raw_access / str(year)
@@ -375,7 +552,12 @@ def main() -> None:
                 source_file = str(rec.get("normalized_table_name", "") or "")
                 source_row_count = int(pd.to_numeric(pd.Series([rec.get("row_count_csv", "0")]), errors="coerce").fillna(0).iloc[0])
                 source_match_rows, access_match_rows = dictionary_match_counts(dict_year, source_file, access_table_name)
-                dict_source = select_dict_source(dict_year, rec.get("normalized_table_name", ""), access_table_name)
+                dict_source = select_dict_source(
+                    dict_year,
+                    rec.get("normalized_table_name", ""),
+                    access_table_name,
+                    ambiguity_overrides,
+                )
                 if dict_source.empty:
                     year_summary_rows.append(
                         {

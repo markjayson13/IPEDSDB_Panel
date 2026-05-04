@@ -28,11 +28,11 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from access_build_utils import CANONICAL_SOURCE_FILES, source_file_qaqc_category
+from access_build_utils import CANONICAL_SOURCE_FILES, DEFAULT_IPEDSDB_ROOT, source_file_qaqc_category
 
 
 def parse_args() -> argparse.Namespace:
-    default_root = Path("/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling")
+    default_root = DEFAULT_IPEDSDB_ROOT
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--root", default=str(default_root), help="External IPEDSDB_ROOT")
     return ap.parse_args()

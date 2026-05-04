@@ -1,0 +1,42 @@
+{
+  "title": "IPEDSDB_Panel",
+  "upload_type": "software",
+  "description": "Code, contracts, and release metadata for building an unbalanced IPEDS institution-year panel from final NCES IPEDS Access databases for 2004-2023.",
+  "creators": [
+    {
+      "name": "Farol, Mark Jayson"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Assane, Djeto",
+      "type": "Supervisor",
+      "affiliation": "University of Nevada, Las Vegas"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://markjayson.com",
+      "relation": "isDocumentedBy",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://www.unlv.edu/people/djeto-assane",
+      "relation": "isDocumentedBy",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://scholar.google.com/citations?user=VJYYWTIAAAAJ",
+      "relation": "isDocumentedBy",
+      "scheme": "url"
+    }
+  ],
+  "license": "mit",
+  "keywords": [
+    "IPEDS",
+    "higher education",
+    "panel data",
+    "research data infrastructure"
+  ],
+  "access_right": "open"
+}

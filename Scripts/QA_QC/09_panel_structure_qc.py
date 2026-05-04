@@ -40,7 +40,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from access_build_utils import ensure_data_layout, parse_years
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, ensure_data_layout, parse_years
 from panel_structure_utils import (
     CLASSIFICATION_COLUMNS,
     build_classification_stability_summary,
@@ -54,7 +54,7 @@ from panel_structure_utils import (
 
 
 def parse_args() -> argparse.Namespace:
-    data_root = Path(os.environ.get("IPEDSDB_ROOT", "/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling"))
+    data_root = Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
     checks_root = data_root / "Checks"
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", default=str(data_root), help="External IPEDSDB_ROOT")

@@ -18,17 +18,25 @@ Focus:
 from __future__ import annotations
 
 import argparse
+import os
+import sys
 from pathlib import Path
 
 import duckdb
 import pandas as pd
 import pyarrow.parquet as pq
 
+SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, DEFAULT_LEGACY_PANELING_ROOT
+
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--access-root", default="/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling")
-    ap.add_argument("--flatfile-root", default="/Users/markjaysonfarol13/Documents/GitHub/IPEDS_Paneling")
+    ap.add_argument("--access-root", default=os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
+    ap.add_argument("--flatfile-root", default=os.environ.get("IPEDS_BASELINE_ROOT", str(DEFAULT_LEGACY_PANELING_ROOT)))
     ap.add_argument("--years", default="2004,2014,2023")
     ap.add_argument("--access-long", default=None)
     ap.add_argument("--flat-long", default=None)

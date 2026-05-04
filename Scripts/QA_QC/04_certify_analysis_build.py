@@ -32,16 +32,17 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, DEFAULT_LEGACY_PANELING_ROOT
 from duckdb_build_utils import quote_ident, sql_quote
 from wide_build_common import setup_logging
 
 
 def default_repo_root() -> Path:
-    return Path(os.environ.get("IPEDSDB_ROOT", "/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling"))
+    return Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
 
 
 def default_baseline_root() -> Path:
-    return Path(os.environ.get("IPEDS_BASELINE_ROOT", "/Users/markjaysonfarol13/Documents/GitHub/IPEDS_Paneling"))
+    return Path(os.environ.get("IPEDS_BASELINE_ROOT", str(DEFAULT_LEGACY_PANELING_ROOT)))
 
 
 def parse_years_spec(spec: str) -> list[int]:

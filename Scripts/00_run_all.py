@@ -26,7 +26,7 @@ import pyarrow.compute as pc
 import pyarrow.dataset as ds
 import pyarrow.parquet as pq
 
-from access_build_utils import ensure_data_layout, parse_years, repo_root
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, ensure_data_layout, parse_years, repo_root
 
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
@@ -43,7 +43,7 @@ def run(cmd: list[str], dry_run: bool) -> None:
 
 def main() -> None:
     repo = repo_root()
-    default_root = os.environ.get("IPEDSDB_ROOT", "/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling")
+    default_root = os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT))
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--root", default=default_root, help="External IPEDSDB_ROOT")
     ap.add_argument("--years", default="2004:2023", help='Year span, e.g. "2004:2023"')
@@ -69,6 +69,8 @@ def main() -> None:
     wide_out = layout.panels / f"panel_wide_analysis_{years[0]}_{years[-1]}.parquet"
     clean_out = layout.panels / f"panel_clean_analysis_{years[0]}_{years[-1]}.parquet"
     dict_lake = layout.dictionary / "dictionary_lake.parquet"
+    column_lineage = layout.checks / "wide_qc" / "qc_column_lineage.csv"
+    ambiguity_overrides = repo / "contracts" / "dictionary_ambiguity_overrides.csv"
 
     if not args.skip_download:
         run(
@@ -122,6 +124,8 @@ def main() -> None:
                 str(layout.cross_sections),
                 "--parts-dir-base",
                 str(layout.cross_sections),
+                "--dictionary-ambiguity-overrides",
+                str(ambiguity_overrides),
             ],
             args.dry_run,
         )
@@ -173,6 +177,8 @@ def main() -> None:
                 "--drop-disc-components",
                 "--qc-dir",
                 str(layout.checks / "wide_qc"),
+                "--column-lineage-out",
+                str(column_lineage),
                 "--disc-qc-dir",
                 str(layout.checks / "disc_qc"),
                 "--duckdb-path",
@@ -195,6 +201,8 @@ def main() -> None:
                 str(clean_out),
                 "--dictionary",
                 str(dict_lake),
+                "--column-lineage",
+                str(column_lineage),
                 "--qc-dir",
                 str(layout.checks / "prch_qc"),
             ],

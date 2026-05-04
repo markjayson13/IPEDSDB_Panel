@@ -27,16 +27,32 @@ def write_dictionary(path: Path) -> None:
     )
 
 
+def write_column_lineage(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(
+        [
+            {"output_column": "PRCH_F", "source_files": "FLAGS", "primary_source_file": "FLAGS"},
+            {"output_column": "PRCH_C", "source_files": "FLAGS", "primary_source_file": "FLAGS"},
+            {"output_column": "PRCH_OM", "source_files": "FLAGS", "primary_source_file": "FLAGS"},
+            {"output_column": "FINVAL", "source_files": "F_F", "primary_source_file": "F_F"},
+            {"output_column": "COMPDRV", "source_files": "DRVC", "primary_source_file": "DRVC"},
+            {"output_column": "OTHER", "source_files": "HD", "primary_source_file": "HD"},
+        ]
+    ).to_csv(path, index=False)
+
+
 def test_clean_panel_preserves_rows_and_applies_prch_policy(tmp_path: Path) -> None:
     root = tmp_path / "data_root"
     panels = root / "Panels"
     checks = root / "Checks" / "prch_qc"
     dictionary = root / "Dictionary" / "dictionary_lake.parquet"
+    lineage = root / "Checks" / "wide_qc" / "qc_column_lineage.csv"
     input_path = panels / "panel_wide_analysis_2022_2023.parquet"
     output_path = panels / "panel_clean_analysis_2022_2023.parquet"
     log_path = root / "Checks" / "logs" / "07_clean_panel_test.log"
 
     write_dictionary(dictionary)
+    write_column_lineage(lineage)
     write_parquet(
         input_path,
         [
@@ -71,6 +87,8 @@ def test_clean_panel_preserves_rows_and_applies_prch_policy(tmp_path: Path) -> N
         output_path,
         "--dictionary",
         dictionary,
+        "--column-lineage",
+        lineage,
         "--qc-dir",
         checks,
         "--log-file",
@@ -98,6 +116,7 @@ def test_clean_panel_preserves_rows_and_applies_prch_policy(tmp_path: Path) -> N
     finance_2022 = summary[(summary["year"] == 2022) & (summary["flag"] == "PRCH_F")].iloc[0]
     assert finance_2022["child_rows_cleaned"] == 1
     assert bool(finance_2022["has_target_columns"]) is True
+    assert finance_2022["lineage_source"] == "column_lineage"
 
     code_counts = pd.read_csv(checks / "prch_flag_code_counts.csv")
     om_counts = code_counts[(code_counts["year"] == 2022) & (code_counts["flag"] == "PRCH_OM")].iloc[0]
@@ -109,6 +128,10 @@ def test_clean_panel_preserves_rows_and_applies_prch_policy(tmp_path: Path) -> N
         (code_counts["year"] == 2023) & (code_counts["flag"] == "PRCH_F") & (code_counts["code"] == 6)
     ].iloc[0]
     assert finance_review["policy_bucket"] == "review_only"
+
+    columns_qc = pd.read_csv(checks / "prch_clean_columns.csv")
+    fin_col = columns_qc[(columns_qc["flag"] == "PRCH_F") & (columns_qc["column"] == "FINVAL")].iloc[0]
+    assert fin_col["source_files"] == "F_F"
 
 
 def test_clean_panel_refuses_single_year_input(tmp_path: Path) -> None:
