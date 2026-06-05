@@ -65,6 +65,25 @@ MISSING_UNITID_COLUMNS = [
     "rows_after",
 ]
 
+LONG_PANEL_COLUMNS = [
+    "year",
+    "UNITID",
+    "varname",
+    "varnumber",
+    "value",
+    "varTitle",
+    "longDescription",
+    "DataType",
+    "format",
+    "Fieldwidth",
+    "imputationvar",
+    "imputation_value",
+    "source_file",
+    "access_table_name",
+]
+
+LONG_PANEL_KEY_COLUMNS = ["year", "UNITID", "varnumber", "source_file"]
+
 
 def setup_logging(log_path: str | None) -> None:
     if not log_path:
@@ -352,6 +371,31 @@ def sql_quote(text: str) -> str:
     return "'" + str(text).replace("'", "''") + "'"
 
 
+def all_blank_long_row_sql() -> str:
+    return " AND ".join(
+        f"({col} IS NULL OR NULLIF(TRIM(CAST({col} AS VARCHAR)), '') IS NULL)"
+        for col in LONG_PANEL_COLUMNS
+    )
+
+
+def long_key_null_counts_sql(path: pathlib.Path) -> dict[str, int]:
+    con = duckdb.connect()
+    try:
+        row = con.execute(
+            f"""
+            SELECT
+                SUM(CASE WHEN year IS NULL THEN 1 ELSE 0 END) AS year,
+                SUM(CASE WHEN UNITID IS NULL THEN 1 ELSE 0 END) AS UNITID,
+                SUM(CASE WHEN varnumber IS NULL OR TRIM(CAST(varnumber AS VARCHAR)) = '' THEN 1 ELSE 0 END) AS varnumber,
+                SUM(CASE WHEN source_file IS NULL OR TRIM(CAST(source_file AS VARCHAR)) = '' THEN 1 ELSE 0 END) AS source_file
+            FROM read_parquet({sql_quote(str(path))})
+            """
+        ).fetchone()
+    finally:
+        con.close()
+    return {col: int(row[idx] or 0) for idx, col in enumerate(LONG_PANEL_KEY_COLUMNS)}
+
+
 def empty_missing_unitid_frame(rows: list[dict] | None = None) -> pd.DataFrame:
     return pd.DataFrame(rows or [], columns=MISSING_UNITID_COLUMNS)
 
@@ -427,6 +471,7 @@ def dedupe_long_panel(
             src_esc = src.replace("'", "''")
             case += f" WHEN UPPER(source_file) = '{src_esc}' THEN {i}"
         case += " ELSE 999 END"
+        nonblank_row_filter = f"NOT ({all_blank_long_row_sql()})"
 
         tmp_path = out_path.with_suffix(out_path.suffix + ".dedupe.tmp")
         if tmp_path.exists():
@@ -440,6 +485,7 @@ def dedupe_long_panel(
                 f"""
                 SELECT DISTINCT COALESCE(CAST(source_file AS VARCHAR), '') AS source_file
                 FROM read_parquet({sql_quote(str(out_path))})
+                WHERE {nonblank_row_filter}
                 ORDER BY 1
                 """
             ).fetchall()
@@ -459,6 +505,7 @@ def dedupe_long_panel(
                         SELECT *
                         FROM read_parquet({sql_quote(str(out_path))})
                         WHERE COALESCE(CAST(source_file AS VARCHAR), '') = {source_sql}
+                          AND {nonblank_row_filter}
                     ),
                     ranked AS (
                         SELECT *,
@@ -488,6 +535,9 @@ def dedupe_long_panel(
         if writer is None:
             raise SystemExit(f"[fatal] dedupe produced no parquet parts for {out_path}")
         writer.close()
+        null_counts = long_key_null_counts_sql(tmp_path)
+        if any(null_counts[col] > 0 for col in null_counts):
+            raise SystemExit(f"[fatal] deduped long panel contains null/blank key fields: {null_counts}")
         tmp_path.replace(out_path)
         print(f"[dedupe] complete file={out_path.name}")
     finally:

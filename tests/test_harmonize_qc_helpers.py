@@ -8,7 +8,7 @@ from io import StringIO
 import pandas as pd
 import pytest
 
-from helpers import load_script_module
+from helpers import load_script_module, write_parquet
 
 
 harmonize_mod = load_script_module("harmonize_stage", "Scripts/04_harmonize.py")
@@ -94,3 +94,28 @@ def test_select_dict_source_uses_documented_ambiguity_override() -> None:
     assert len(selected) == 1
     assert selected.iloc[0]["varnumber"] == "00000002"
     assert selected.iloc[0]["metadata_source"] == "source_b"
+
+
+def test_dedupe_long_panel_drops_all_blank_placeholder_rows(tmp_path) -> None:
+    out_path = tmp_path / "panel_long_varnum_2010.parquet"
+    valid_row = {col: None for col in harmonize_mod.LONG_PANEL_COLUMNS}
+    valid_row.update(
+        {
+            "year": 2010,
+            "UNITID": 100654,
+            "varname": "INSTNM",
+            "varnumber": "00000001",
+            "value": "Example University",
+            "source_file": "HD",
+            "access_table_name": "HD2010",
+        }
+    )
+    blank_row = {col: None for col in harmonize_mod.LONG_PANEL_COLUMNS}
+    write_parquet(out_path, [valid_row, blank_row])
+
+    harmonize_mod.dedupe_long_panel(out_path, ["HD"], temp_dir=tmp_path / "dedupe_tmp")
+
+    deduped = pd.read_parquet(out_path)
+    assert len(deduped) == 1
+    assert deduped.loc[0, "UNITID"] == 100654
+    assert deduped[["year", "UNITID", "varnumber", "source_file"]].notna().all().all()

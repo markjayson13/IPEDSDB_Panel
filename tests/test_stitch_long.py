@@ -154,3 +154,4 @@ def test_stitch_long_fails_on_blank_key_fields(tmp_path: Path) -> None:
 
     assert result.returncode != 0
     assert "Stitched panel contains null/blank key fields" in result.stdout
+    assert not output.exists()
