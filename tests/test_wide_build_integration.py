@@ -83,6 +83,13 @@ def test_wide_build_scalar_conflict_gate_fails_and_writes_qc(tmp_path: Path) -> 
     assert set(qc["value"]) == {"Example A", "Example B"}
     assert set(qc["distinct_values"]) == {2}
 
+    lineage_path = root / "Checks" / "wide_qc" / "qc_column_lineage.csv"
+    assert lineage_path.exists()
+    lineage = pd.read_csv(lineage_path, dtype=str)
+    instnm = lineage[lineage["output_column"] == "INSTNM"].iloc[0]
+    assert instnm["source_files"] == "HD"
+    assert instnm["source_varnumbers"] == "00000001"
+
 
 def test_wide_build_anti_garbage_gate_fails_and_writes_qc(tmp_path: Path) -> None:
     root = tmp_path / "data_root"

@@ -5,6 +5,7 @@ Stage 07: apply PRCH parent/child cleaning to the stitched wide panel.
 Reads:
 - `Panels/panel_wide_analysis_*.parquet`
 - `Dictionary/dictionary_lake.parquet`
+- `Checks/wide_qc/qc_column_lineage.csv` when provided
 
 Writes:
 - `Panels/panel_clean_analysis_*.parquet`
@@ -41,6 +42,7 @@ from prch_policy import (
     review_only_codes,
     targets_source_file,
 )
+from access_build_utils import DEFAULT_IPEDSDB_ROOT
 
 
 def setup_logging(log_path: str | None) -> None:
@@ -71,29 +73,81 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--input", required=True, help="Input stitched wide parquet")
     p.add_argument("--output", required=True, help="Output cleaned parquet")
     p.add_argument("--dictionary", required=True, help="dictionary_lake.parquet")
+    p.add_argument("--column-lineage", default=None, help="Stage 06 column lineage CSV/parquet. Preferred over dictionary fallback.")
     p.add_argument("--qc-dir", default=None, help="Write QC summaries here")
     p.add_argument("--batch-rows", type=int, default=100_000, help="Batch size for streaming")
     p.add_argument("--log-every", type=int, default=50, help="Log progress every N batches")
     p.add_argument("--drop-imputation-flags", action=argparse.BooleanOptionalAction, default=False, help="Drop X* imputation columns")
-    data_root = pathlib.Path(os.environ.get("IPEDSDB_ROOT", "/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling"))
+    data_root = pathlib.Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
     logs_root = data_root / "Checks" / "logs"
     p.add_argument("--log-file", default=str(logs_root / "07_clean_panel.log"), help="Optional log file path")
     return p.parse_args()
 
 
-def mode(series: pd.Series) -> str:
-    s = series.dropna()
-    if s.empty:
-        return ""
-    return s.mode().iat[0]
+def parse_source_files(value: object) -> set[str]:
+    if value is None:
+        return set()
+    try:
+        if bool(pd.isna(value)):
+            return set()
+    except (TypeError, ValueError):
+        pass
+    text = str(value).strip()
+    if not text:
+        return set()
+    parts: list[str] = []
+    for chunk in text.replace(",", "|").split("|"):
+        source = chunk.strip().upper()
+        if source:
+            parts.append(source)
+    return set(parts)
 
 
-def build_var_source_map(dictionary_path: Path) -> dict[str, str]:
+def build_source_map_from_dictionary(dictionary_path: Path) -> dict[str, set[str]]:
     df = pd.read_parquet(dictionary_path, columns=["varname", "source_file"])
     df["varname"] = df["varname"].fillna("").astype(str).str.strip().str.upper()
-    df["source_file"] = df["source_file"].fillna("").astype(str).str.strip()
+    df["source_file"] = df["source_file"].fillna("").astype(str).str.strip().str.upper()
     df = df[df["varname"] != ""]
-    return df.groupby("varname")["source_file"].agg(mode).to_dict()
+    return df.groupby("varname")["source_file"].agg(lambda values: {v for v in values if v}).to_dict()
+
+
+def read_lineage(path: Path) -> pd.DataFrame:
+    if not path.exists():
+        raise SystemExit(f"Column lineage file does not exist: {path}")
+    if path.suffix.lower() == ".parquet":
+        return pd.read_parquet(path)
+    return pd.read_csv(path)
+
+
+def build_source_map_from_column_lineage(lineage_path: Path, panel_columns: list[str]) -> dict[str, set[str]]:
+    df = read_lineage(lineage_path)
+    required = {"output_column", "source_files"}
+    missing_required = required - set(df.columns)
+    if missing_required:
+        raise SystemExit(f"Column lineage is missing required columns: {', '.join(sorted(missing_required))}")
+    df["output_column"] = df["output_column"].fillna("").astype(str).str.strip().str.upper()
+    df["source_files"] = df["source_files"].fillna("").astype(str)
+    if "primary_source_file" in df.columns:
+        df["primary_source_file"] = df["primary_source_file"].fillna("").astype(str)
+    else:
+        df["primary_source_file"] = ""
+
+    out: dict[str, set[str]] = {}
+    for row in df.to_dict("records"):
+        col = str(row.get("output_column", "")).strip().upper()
+        if not col:
+            continue
+        sources = parse_source_files(row.get("source_files")) | parse_source_files(row.get("primary_source_file"))
+        out.setdefault(col, set()).update(sources)
+
+    panel_lookup = {c.upper(): c for c in panel_columns}
+    exempt = {"YEAR", "UNITID"}
+    missing = sorted(original for upper, original in panel_lookup.items() if upper not in exempt and upper not in out)
+    if missing:
+        preview = ", ".join(missing[:20])
+        suffix = " ..." if len(missing) > 20 else ""
+        raise SystemExit(f"Column lineage is missing {len(missing)} input panel columns: {preview}{suffix}")
+    return out
 
 
 def main() -> None:
@@ -102,8 +156,6 @@ def main() -> None:
     in_path = Path(args.input)
     out_path = Path(args.output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-
-    var_to_source = build_var_source_map(Path(args.dictionary))
 
     dataset = ds.dataset(str(in_path), format="parquet")
     if "year" not in dataset.schema.names:
@@ -127,14 +179,22 @@ def main() -> None:
     all_cols = dataset.schema.names
     prch_flags = [c for c in all_cols if c.upper().startswith("PRCH")]
 
+    if args.column_lineage:
+        column_sources = build_source_map_from_column_lineage(Path(args.column_lineage), all_cols)
+        lineage_source = "column_lineage"
+    else:
+        column_sources = build_source_map_from_dictionary(Path(args.dictionary))
+        lineage_source = "dictionary_source_set_fallback"
+        print("[warn] --column-lineage not provided; falling back to dictionary source sets for PRCH target selection.")
+
     # Build column lists per flag from the shared PRCH policy.
     flag_cols: dict[str, list[str]] = {f: [] for f in prch_flags}
     for col in all_cols:
         if col in prch_flags:
             continue
-        sf = var_to_source.get(col.upper(), "")
+        source_files = column_sources.get(col.upper(), set())
         for flag in prch_flags:
-            if targets_source_file(flag, sf):
+            if any(targets_source_file(flag, sf) for sf in source_files):
                 flag_cols[flag].append(col)
 
     # de-duplicate columns per flag but retain zero-target flags for QA coverage.
@@ -239,6 +299,7 @@ def main() -> None:
                         "review_only_codes": policy["review_only_codes"],
                         "target_columns": len(flag_cols.get(flag, [])),
                         "has_target_columns": bool(flag_cols.get(flag, [])),
+                        "lineage_source": lineage_source,
                         "child_rows_cleaned": qc_child_counts.get((y, flag), 0),
                         "review_only_rows": qc_review_counts.get((y, flag), 0),
                     }
@@ -248,8 +309,24 @@ def main() -> None:
         col_rows = []
         for flag, cols in flag_cols.items():
             for c in cols:
-                col_rows.append({"flag": flag, "column": c})
+                col_rows.append(
+                    {
+                        "flag": flag,
+                        "column": c,
+                        "source_files": "|".join(sorted(column_sources.get(c.upper(), set()))),
+                        "lineage_source": lineage_source,
+                    }
+                )
         pd.DataFrame(col_rows).to_csv(qc_dir / "prch_clean_columns.csv", index=False)
+        lineage_rows = [
+            {
+                "lineage_source": lineage_source,
+                "panel_columns": len(all_cols),
+                "panel_columns_with_lineage": sum(1 for c in all_cols if c.upper() in column_sources),
+                "prch_flags": len(prch_flags),
+            }
+        ]
+        pd.DataFrame(lineage_rows).to_csv(qc_dir / "prch_lineage_summary.csv", index=False)
         pd.DataFrame(policy_rows(prch_flags)).to_csv(qc_dir / "prch_flag_policy.csv", index=False)
         code_rows = []
         for (year, flag, code), cnt in sorted(qc_code_counts.items()):

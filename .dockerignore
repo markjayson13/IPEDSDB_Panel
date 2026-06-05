@@ -1,0 +1,14 @@
+.git
+.venv
+__pycache__
+.pytest_cache
+Raw_Access_Databases
+Dictionary
+Cross_sections
+Panels
+Checks
+build
+Releases
+*.parquet
+*.duckdb
+*.duckdb.wal

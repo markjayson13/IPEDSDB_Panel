@@ -67,7 +67,7 @@
   <rect class="panel root" x="100" y="920" rx="26" ry="26" width="1000" height="280"/>
   <text class="chip" x="136" y="964">STEP 3</text>
   <text class="panelTitle" x="136" y="1020">IPEDSDB_ROOT: generated outputs</text>
-  <text class="mono" x="136" y="1052">/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling</text>
+  <text class="mono" x="136" y="1052">$IPEDSDB_ROOT</text>
 
   <rect class="subcard" x="136" y="1078" rx="18" ry="18" width="286" height="90"/>
   <text class="subTitle" x="160" y="1112">Raw_Access_Databases/</text>

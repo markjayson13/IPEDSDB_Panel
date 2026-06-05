@@ -28,8 +28,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
-DEFAULT_IPEDSDB_ROOT = Path("/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling")
 REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_IPEDSDB_ROOT = REPO_ROOT.parent / "IPEDSDB_ROOT"
+DEFAULT_LEGACY_PANELING_ROOT = REPO_ROOT.parent / "IPEDS_Paneling"
 
 CANONICAL_SOURCE_FILES = {
     "HD",

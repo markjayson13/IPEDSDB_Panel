@@ -1,0 +1,38 @@
+name: Data bug
+description: Report a panel value, row, year, table, or QA result that appears wrong.
+title: "[data] "
+labels: ["data"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Release version or commit
+      placeholder: ipedsdb-panel-2004-2023-access-final-v1
+    validations:
+      required: true
+  - type: input
+    id: scope
+    attributes:
+      label: Affected scope
+      placeholder: Years, UNITIDs, source tables, variables
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Include paths to QA files, manifest rows, query output, or source records.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed result
+    validations:
+      required: true

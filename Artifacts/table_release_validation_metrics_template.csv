@@ -1,0 +1,22 @@
+section,metric,value,units,source,notes
+1. Release-stage validation,Years included,,years,Checks/download_qc/release_inventory.csv,Canonical release window
+1. Release-stage validation,Final releases included,,releases,Checks/download_qc/release_inventory.csv,Final-only default
+2. Access extraction,Access tables exported,,tables,Checks/extract_qc/table_inventory_all_years.csv,All extracted tables across years
+2. Access extraction,Tables with UNITID,,tables,Checks/extract_qc/table_inventory_all_years.csv,Tables eligible for harmonization
+3. Dictionary coverage,Dictionary rows,,rows,Dictionary/dictionary_lake.parquet,Variable-year metadata rows
+3. Dictionary coverage,Dictionary code-label rows,,rows,Dictionary/dictionary_codes.parquet,Code-label rows
+3. Dictionary coverage,Dictionary duplicate/conflict/unmapped failures,,failures,Checks/dictionary_qc/dictionary_qaqc_summary.csv,Should be zero for release
+4. Long-panel integrity,Long-panel rows,,rows,Panels/2004-2023/panel_long_varnum_2004_2023.parquet,Stitched long panel
+4. Long-panel integrity,Long key nulls,,rows,Checks/acceptance_qc/acceptance_summary.csv,Null year/UNITID/varnumber/source_file
+5. Wide-build contract,Wide-panel rows,,rows,Panels/panel_wide_analysis_2004_2023.parquet,One row per UNITID-year
+5. Wide-build contract,Wide-panel columns,,columns,Panels/panel_wide_analysis_2004_2023.parquet,Analysis schema width
+5. Wide-build contract,Scalar conflict rows,,rows,Checks/wide_qc/qc_scalar_conflicts.csv,Should be zero or documented
+5. Wide-build contract,Target lineage rows,,rows,Checks/wide_qc/qc_target_lineage.csv,Column-level transformation evidence
+5. Wide-build contract,Column lineage rows,,rows,Checks/wide_qc/qc_column_lineage.csv,Source lineage consumed by PRCH cleaning
+6. PRCH cleaning,Raw vs clean row delta,,rows,Panels/panel_wide_analysis_2004_2023.parquet; Panels/panel_clean_analysis_2004_2023.parquet,Should be zero
+6. PRCH cleaning,Child rows cleaned,,rows,Checks/prch_qc/prch_clean_summary.csv,Sum across observed PRCH flags
+7. Panel structure,Distinct institutions,,UNITIDs,Checks/panel_qc/panel_structure_summary.csv,Panel population size
+7. Panel structure,Always-present institutions,,UNITIDs,Checks/panel_qc/panel_structure_summary.csv,Observed every year
+7. Panel structure,Identifier-linkage review cases,,UNITIDs,Checks/panel_qc/identifier_linkage_summary.csv,Multiple observed OPEID values or related flags
+8. Release reproducibility,Acceptance checks passed,,checks,Checks/acceptance_qc/acceptance_summary.csv,Final release gate
+8. Release reproducibility,Final clean panel SHA-256,,hash,release manifest,Populate during public archive deposit

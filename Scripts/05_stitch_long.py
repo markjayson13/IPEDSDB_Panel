@@ -32,6 +32,24 @@ def parse_args() -> argparse.Namespace:
     return ap.parse_args()
 
 
+def validate_stitched_panel(path: Path, expected_years: list[int]) -> list[int]:
+    dataset = ds.dataset(str(path), format="parquet")
+    years_seen = sorted(int(v) for v in pc.unique(dataset.to_table(columns=["year"]).column(0)).to_pylist() if v is not None)
+    if years_seen != expected_years:
+        raise SystemExit(f"Stitched panel year coverage mismatch. expected={expected_years} actual={years_seen}")
+    null_counts = {"year": 0, "UNITID": 0, "varnumber": 0, "source_file": 0}
+    for batch in dataset.to_batches(columns=list(null_counts), batch_size=200_000):
+        schema_names = list(batch.schema.names)
+        for col in null_counts:
+            arr = batch.column(schema_names.index(col))
+            null_counts[col] += arr.null_count
+            if pa.types.is_string(arr.type) or pa.types.is_large_string(arr.type):
+                null_counts[col] += int(pc.sum(pc.equal(pc.utf8_trim_whitespace(arr), "")).as_py() or 0)
+    if any(null_counts[col] > 0 for col in null_counts):
+        raise SystemExit(f"Stitched panel contains null/blank key fields: {null_counts}")
+    return years_seen
+
+
 def main() -> None:
     args = parse_args()
     layout = ensure_data_layout(args.root)
@@ -56,22 +74,8 @@ def main() -> None:
     if writer is None:
         raise SystemExit("No per-year long parquet files were stitched.")
     writer.close()
+    years_seen = validate_stitched_panel(tmp_output, years)
     tmp_output.replace(output)
-
-    dataset = ds.dataset(str(output), format="parquet")
-    years_seen = sorted(int(v) for v in pc.unique(dataset.to_table(columns=["year"]).column(0)).to_pylist() if v is not None)
-    if years_seen != years:
-        raise SystemExit(f"Stitched panel year coverage mismatch. expected={years} actual={years_seen}")
-    null_counts = {"year": 0, "UNITID": 0, "varnumber": 0, "source_file": 0}
-    for batch in dataset.to_batches(columns=list(null_counts), batch_size=200_000):
-        schema_names = list(batch.schema.names)
-        for col in null_counts:
-            arr = batch.column(schema_names.index(col))
-            null_counts[col] += arr.null_count
-            if pa.types.is_string(arr.type) or pa.types.is_large_string(arr.type):
-                null_counts[col] += int(pc.sum(pc.equal(pc.utf8_trim_whitespace(arr), "")).as_py() or 0)
-    if any(null_counts[col] > 0 for col in null_counts):
-        raise SystemExit(f"Stitched panel contains null/blank key fields: {null_counts}")
 
     summary_path = layout.checks / "harmonize_qc" / "stitch_summary.csv"
     summary_path.parent.mkdir(parents=True, exist_ok=True)

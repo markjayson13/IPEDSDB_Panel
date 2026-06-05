@@ -1,0 +1,31 @@
+name: Variable mapping
+description: Report a dictionary, varnumber, source file, or Access table mapping concern.
+title: "[mapping] "
+labels: ["dictionary", "mapping"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Release version or commit
+    validations:
+      required: true
+  - type: input
+    id: mapping_key
+    attributes:
+      label: Mapping key
+      placeholder: year, source_file/access_table_name, varname, varnumber
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Point to dictionary rows, harmonize QC, Access metadata, or override files.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_resolution
+    attributes:
+      label: Proposed resolution
+    validations:
+      required: false

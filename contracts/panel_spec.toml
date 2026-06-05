@@ -1,0 +1,166 @@
+schema_version = "1.0"
+contract_id = "ipedsdb-panel-2004-2023-access-final-v1"
+status = "release-candidate"
+
+[dataset]
+name = "IPEDSDB_Panel"
+canonical_output = "Panels/panel_clean_analysis_2004_2023.parquet"
+unit_of_analysis = "UNITID-year"
+panel_key = ["UNITID", "year"]
+panel_type = "unbalanced"
+year_semantics = "IPEDS collection-year start"
+
+[release]
+start_year = 2004
+end_year = 2023
+source = "NCES IPEDS Access databases"
+access_page_url = "https://nces.ed.gov/ipeds/use-the-data/download-access-database"
+final_only = true
+include_provisional = false
+default_year_spec = "2004:2023"
+
+[inputs]
+raw_access_dir = "Raw_Access_Databases"
+dictionary_lake = "Dictionary/dictionary_lake.parquet"
+dictionary_codes = "Dictionary/dictionary_codes.parquet"
+dictionary_ambiguity_overrides = "contracts/dictionary_ambiguity_overrides.csv"
+
+[outputs]
+long_panel = "Panels/2004-2023/panel_long_varnum_2004_2023.parquet"
+scalar_long = "Panels/panel_long_scalar_unique.parquet"
+dimensioned_long = "Panels/panel_long_dim.parquet"
+wide_panel = "Panels/panel_wide_analysis_2004_2023.parquet"
+column_lineage = "Checks/wide_qc/qc_column_lineage.csv"
+clean_panel = "Panels/panel_clean_analysis_2004_2023.parquet"
+duckdb_build = "build/ipedsdb_build.duckdb"
+
+[wide_build]
+lane_split = true
+dim_sources = ["IC_CAMPUSES", "IC_PCCAMPUSES", "F_FA_F", "F_FA_G"]
+dim_prefixes = ["C_", "EF", "GR", "GR200", "SAL", "S_", "OM", "DRV"]
+exclude_vars = []
+typed_output = true
+drop_empty_cols = true
+collapse_disc = true
+drop_disc_components = true
+disc_suffix = "_CAT"
+legacy_analysis_schema = true
+legacy_schema_seed_manifest = "Artifacts/legacy_analysis_schema_seed.csv"
+drop_globally_null_post = true
+scalar_conflict_buckets = 16
+scalar_conflict_bucket_min_year = 2008
+fail_on_scalar_conflicts = true
+anti_garbage_ids = ["CIPCODE", "LINE", "FORMID", "FUNCTCD", "MAJORNUM"]
+drop_anti_garbage_cols = true
+fail_on_anti_garbage = true
+
+[cleaning]
+stage = "07_clean_panel.py"
+row_preserving = true
+drop_imputation_flags = false
+policy_module = "Scripts/prch_policy.py"
+lineage_source_current = "Checks/wide_qc/qc_column_lineage.csv"
+lineage_source_fallback = "Dictionary/dictionary_lake.parquet"
+
+[[prch_policy]]
+flag = "PRCH_ADM"
+cleaned_child_codes = [2]
+target_source_files = ["ADM"]
+
+[[prch_policy]]
+flag = "PRCH_AL"
+cleaned_child_codes = [2]
+target_source_files = ["AL"]
+
+[[prch_policy]]
+flag = "PRCH_C"
+cleaned_child_codes = [2]
+target_source_files = ["C_A", "C_B", "C_C", "CDEP", "DRVC"]
+
+[[prch_policy]]
+flag = "PRCH_COS"
+cleaned_child_codes = [2]
+target_source_files = ["COST"]
+
+[[prch_policy]]
+flag = "PRCH_E12"
+cleaned_child_codes = [2]
+target_source_files = ["E12"]
+
+[[prch_policy]]
+flag = "PRCH_EAP"
+cleaned_child_codes = [2]
+target_source_files = ["EAP"]
+
+[[prch_policy]]
+flag = "PRCH_EF"
+cleaned_child_codes = [2]
+target_source_files = ["EFA", "EFA_DIST", "EFB", "EFC", "EFCP", "EFFY", "EFFY_DIST", "EFIA"]
+target_source_prefixes = ["EF", "EFFY"]
+
+[[prch_policy]]
+flag = "PRCH_F"
+cleaned_child_codes = [2, 3, 4, 5]
+review_only_codes = [6]
+target_source_files = ["F_F", "F_FA", "F_FA_F", "F_FA_G"]
+
+[[prch_policy]]
+flag = "PRCH_GR"
+cleaned_child_codes = [2]
+target_source_files = ["GR", "GR_PELL_SSL"]
+
+[[prch_policy]]
+flag = "PRCH_GR2"
+cleaned_child_codes = [2]
+target_source_files = ["GR200"]
+
+[[prch_policy]]
+flag = "PRCH_HR"
+cleaned_child_codes = [2]
+target_source_files = ["EAP", "SAL_A", "SAL_A_LT", "SAL_B", "SAL_FACULTY", "SAL_IS"]
+
+[[prch_policy]]
+flag = "PRCH_OM"
+cleaned_child_codes = [2]
+target_source_files = ["OM"]
+
+[[prch_policy]]
+flag = "PRCH_S"
+cleaned_child_codes = [2]
+target_source_files = ["S_ABD", "S_CN", "S_F", "S_G", "S_IS", "S_NH", "S_OC", "S_SIS"]
+target_source_prefixes = ["S_"]
+
+[[prch_policy]]
+flag = "PRCH_SA"
+cleaned_child_codes = [2]
+target_source_files = ["SFA", "SFA_P", "SFAV"]
+
+[[prch_policy]]
+flag = "PRCH_SFA"
+cleaned_child_codes = [2]
+target_source_files = ["SFA", "SFA_P", "SFAV"]
+
+[[prch_policy]]
+flag = "PRCHTP_F"
+cleaned_child_codes = [2]
+target_source_files = []
+rationale = "Track in QA coverage but do not null panel values directly from this flag."
+
+[qa]
+dictionary_qc = "Checks/dictionary_qc/dictionary_qaqc_summary.csv"
+panel_qc = "Checks/panel_qc/panel_qa_summary.csv"
+panel_structure_qc = "Checks/panel_qc/panel_structure_summary.csv"
+acceptance_summary = "Checks/acceptance_qc/acceptance_summary.csv"
+release_metrics = "Checks/release_metrics/table_release_validation_metrics_filled.csv"
+release_manifest = "Checks/release_manifest/release_manifest.csv"
+release_manifest_verification = "Checks/release_manifest/release_manifest_verification.csv"
+release_bundle_manifest = "Releases/ipedsdb_panel_2004_2023/bundle_manifest.csv"
+release_comparison = "Checks/release_compare/release_comparison.csv"
+datapackage = "Checks/release_metadata/datapackage.json"
+build_provenance = "Checks/release_metadata/build_provenance.json"
+
+[governance]
+versioning = "semantic data-release versioning"
+public_archive_required = true
+generated_data_committed_to_git = false
+breaking_change_requires_new_contract = true

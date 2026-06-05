@@ -1,4 +1,4 @@
-# Saved Queries
+# Saved queries
 
 This folder holds starter SQL for inspecting the persisted DuckDB build and the standard panel outputs.
 

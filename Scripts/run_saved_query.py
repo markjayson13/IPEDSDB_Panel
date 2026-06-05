@@ -30,7 +30,7 @@ from pathlib import Path
 
 import duckdb
 
-from access_build_utils import ensure_data_layout, parse_years, repo_root
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, ensure_data_layout, parse_years, repo_root
 from duckdb_build_utils import copy_query_to_parquet, sql_quote, write_query_csv
 
 
@@ -277,7 +277,7 @@ def build_preview_text(con: duckdb.DuckDBPyConnection, query: str, preview_rows:
 
 
 def parse_args() -> argparse.Namespace:
-    default_root = os.environ.get("IPEDSDB_ROOT", "/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling")
+    default_root = os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT))
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("query", nargs="?", help="Saved query name or path. Example: 01_clean_panel_rows_by_year")
     ap.add_argument("--root", default=default_root, help="External IPEDSDB_ROOT")

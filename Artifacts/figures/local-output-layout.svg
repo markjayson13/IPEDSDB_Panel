@@ -24,7 +24,7 @@
   <rect class="bg" x="0" y="0" width="1600" height="1060"/>
   <text class="title" x="60" y="72">Local output layout under IPEDSDB_ROOT</text>
   <text class="subtitle" x="60" y="112">A folder map instead of a raw tree, so the structure stays readable in GitHub and on high-DPI screens.</text>
-  <text class="path" x="60" y="146">IPEDSDB_ROOT = /Users/markjaysonfarol13/Projects/IPEDSDB_Paneling</text>
+  <text class="path" x="60" y="146">IPEDSDB_ROOT = external data root</text>
 
   <rect class="gridCard folder1" x="60" y="182" rx="22" ry="22" width="480" height="220"/>
   <text class="cardTitle" x="88" y="220">Raw_Access_Databases/</text>

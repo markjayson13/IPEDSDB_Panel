@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-export IPEDSDB_ROOT="${IPEDSDB_ROOT:-/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling}"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+ROOT="$REPO_ROOT"
+DEFAULT_IPEDSDB_ROOT="$(dirname "$REPO_ROOT")/IPEDSDB_ROOT"
+export IPEDSDB_ROOT="${IPEDSDB_ROOT:-$DEFAULT_IPEDSDB_ROOT}"
 
 usage() {
   cat <<'EOF'

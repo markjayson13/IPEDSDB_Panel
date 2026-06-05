@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Maintainer contact
+    url: https://markjayson.com
+    about: Current public contact information for Mark Jayson Farol.
+  - name: Security concern
+    url: https://github.com/markjayson13/IPEDSDB_Panel/security/advisories/new
+    about: Report secrets, private records, or executable-file concerns privately.

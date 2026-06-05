@@ -32,6 +32,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+from access_build_utils import DEFAULT_IPEDSDB_ROOT
 from prch_policy import classify_flag_code, cleaned_child_codes, get_policy, review_only_codes
 
 
@@ -94,7 +95,7 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--raw", required=True, help="Raw stitched wide parquet")
     p.add_argument("--clean", required=True, help="PRCH cleaned wide parquet")
-    data_root = Path(os.environ.get("IPEDSDB_ROOT", "/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling"))
+    data_root = Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
     checks_root = data_root / "Checks"
     p.add_argument("--out-dir", default=str(checks_root / "panel_qc"), help="QA output directory")
     p.add_argument("--prch-qc-dir", default=str(checks_root / "prch_qc"), help="PRCH QC dir (for prch_clean_columns.csv)")

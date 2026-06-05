@@ -23,6 +23,8 @@ import pyarrow.csv as pcsv
 import pyarrow.dataset as ds
 import pyarrow.parquet as pq
 
+from access_build_utils import DEFAULT_IPEDSDB_ROOT
+
 
 def setup_logging(log_path: str | None) -> None:
     if not log_path:
@@ -89,7 +91,7 @@ def main() -> None:
     ap.add_argument("--format", choices=["parquet", "csv"], default="parquet", help="Output format")
     ap.add_argument("--batch-rows", type=int, default=100_000, help="Batch size for streaming output")
     ap.add_argument("--strict", action="store_true", help="Fail if any requested varname is missing")
-    data_root = Path(os.environ.get("IPEDSDB_ROOT", "/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling"))
+    data_root = Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
     ap.add_argument("--log-file", default=str(data_root / "Checks" / "logs" / "08_build_custom_panel.log"), help="Optional log file path")
     args = ap.parse_args()
     setup_logging(args.log_file)

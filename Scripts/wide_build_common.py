@@ -30,6 +30,8 @@ from typing import Iterable
 import pandas as pd
 import pyarrow as pa
 
+from access_build_utils import DEFAULT_IPEDSDB_ROOT
+
 
 NULL_LIKE_TOKENS = ("", ".", "nan", "none", "<na>", "na", "nat")
 EXPECTED_DISC_CONFLICT_PATTERNS = {
@@ -58,7 +60,7 @@ EXPECTED_DISC_CONFLICT_PATTERNS = {
 
 
 def default_repo_root() -> pathlib.Path:
-    return pathlib.Path(os.environ.get("IPEDSDB_ROOT", "/Users/markjaysonfarol13/Projects/IPEDSDB_Paneling"))
+    return pathlib.Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
 
 
 def setup_logging(log_path: str | None) -> None:
@@ -316,6 +318,7 @@ class WideBuildRuntime:
     anti_garbage_out: str | None
     cast_report_out: str | None
     target_lineage_out: str | None
+    column_lineage_out: str | None
     seeded_legacy_out: str | None
     dim_sources: set[str]
     dim_prefixes: tuple[str, ...]
@@ -367,6 +370,7 @@ def build_arg_parser(repo_root: pathlib.Path | None = None) -> argparse.Argument
     ap.add_argument("--scalar-conflicts-out", default=None, help="QC CSV path for scalar conflict keys")
     ap.add_argument("--cast-report-out", default=None, help="QC CSV path for typed-cast parse report")
     ap.add_argument("--target-lineage-out", default=None, help="QC CSV path for target-lineage audit output")
+    ap.add_argument("--column-lineage-out", default=None, help="QC CSV/parquet path for final column-to-source lineage output")
     ap.add_argument("--seeded-legacy-out", default=None, help="QC CSV path for legacy compatibility columns seeded into the wide schema")
     ap.add_argument("--legacy-analysis-schema", action=argparse.BooleanOptionalAction, default=True, help="Seed legacy-compatible analysis-wide placeholder columns")
     ap.add_argument("--legacy-schema-seed-manifest", default=str(code_root / "Artifacts" / "legacy_analysis_schema_seed.csv"), help="CSV manifest for legacy compatibility seed columns")
@@ -411,6 +415,7 @@ def prepare_runtime(args: argparse.Namespace) -> WideBuildRuntime:
     anti_garbage_out = args.anti_garbage_out or (os.path.join(args.qc_dir, "qc_anti_garbage_failures.csv") if args.qc_dir else None)
     cast_report_out = args.cast_report_out or (os.path.join(args.qc_dir, "qc_cast_report.csv") if args.qc_dir else None)
     target_lineage_out = args.target_lineage_out or (os.path.join(args.qc_dir, "qc_target_lineage.csv") if args.qc_dir else None)
+    column_lineage_out = args.column_lineage_out or (os.path.join(args.qc_dir, "qc_column_lineage.csv") if args.qc_dir else None)
     seeded_legacy_out = args.seeded_legacy_out or (os.path.join(args.qc_dir, "qc_seeded_legacy_columns.csv") if args.qc_dir else None)
 
     return WideBuildRuntime(
@@ -420,6 +425,7 @@ def prepare_runtime(args: argparse.Namespace) -> WideBuildRuntime:
         anti_garbage_out=anti_garbage_out,
         cast_report_out=cast_report_out,
         target_lineage_out=target_lineage_out,
+        column_lineage_out=column_lineage_out,
         seeded_legacy_out=seeded_legacy_out,
         dim_sources=parse_upper_set(args.dim_sources),
         dim_prefixes=tuple([x.strip().upper() for x in str(args.dim_prefixes).split(",") if x.strip()]),

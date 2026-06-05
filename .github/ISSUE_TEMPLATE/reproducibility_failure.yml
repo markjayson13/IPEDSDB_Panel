@@ -1,0 +1,32 @@
+name: Reproducibility failure
+description: Report a failed build, failed release gate, or checksum mismatch.
+title: "[repro] "
+labels: ["reproducibility"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Release version or commit
+    validations:
+      required: true
+  - type: input
+    id: command
+    attributes:
+      label: Command
+      placeholder: bash Scripts/QA_QC/release_gate.sh
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include Python version, OS, mdb-tools version, and IPEDSDB_ROOT layout.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Failure output
+      render: text
+    validations:
+      required: true
