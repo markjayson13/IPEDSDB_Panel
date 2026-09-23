@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add metadata companions to Stage 08 extracts and embedded Parquet labels.
+- Add labeled Stata datasets and Excel workbooks with dictionaries, code labels, and export issues.
+- Preserve year/source-specific definitions, original types and codes, with checks for ambiguous labels and format limits.
 - Add public-release governance files for sole-maintainer ownership.
 - Add code and data license files.
 - Add issue templates, code ownership, and pull request intake.

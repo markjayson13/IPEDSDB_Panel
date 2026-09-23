@@ -61,7 +61,7 @@ If `README.md` describes the repo from the outside, this folder describes the bu
 | `05_stitch_long.py` | combine yearly long outputs |
 | `06_build_wide_panel.py` | build the wide analysis panel |
 | `07_clean_panel.py` | apply PRCH cleaning |
-| `08_build_custom_panel.py` | make smaller user-selected extracts |
+| `08_build_custom_panel.py` | make labeled user-selected Parquet, CSV, Stata, or Excel extracts with metadata companions |
 | `09_build_panel_dictionary.py` | build a dictionary for an actual panel output in `.csv` or formatted `.xlsx` |
 | `10_build_variable_browser.py` | build a self-contained HTML browser for panel vars with semantic grouping, card/table browsing, detail inspection, presets, group/family bulk actions, saved-set lifecycle, import diffing, and export artifacts |
 | `run_saved_query.py` | run saved SQL against the build DB and standard outputs |
@@ -76,6 +76,8 @@ If `README.md` describes the repo from the outside, this folder describes the bu
 | `wide_build_duckdb.py` | main DuckDB execution engine |
 | `wide_build_legacy.py` | legacy parity-oriented wide builder |
 | `duckdb_build_utils.py` | shared DuckDB connection and export helpers |
+| `export_metadata.py` | year- and source-scoped definitions, code labels, lineage, and metadata diagnostics for extracts |
+| `panel_export.py` | labeled Parquet/Stata, Excel workbook, and CSV writers with metadata companions and format checks |
 
 ## Reading order
 

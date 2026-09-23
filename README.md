@@ -500,7 +500,7 @@ Repeatable inspection order:
 | Stitch | `Scripts/05_stitch_long.py` | Combines yearly long outputs into one stitched panel | `Panels/2004-2023/panel_long_varnum_2004_2023.parquet` |
 | Wide build | `Scripts/06_build_wide_panel.py` | Uses DuckDB to build the wide analysis panel and related QC | `Panels/panel_wide_analysis_2004_2023.parquet`, `Checks/wide_qc/`, `Checks/disc_qc/` |
 | Clean | `Scripts/07_clean_panel.py` | Applies PRCH child-row cleaning while preserving all `UNITID-year` rows | `Panels/panel_clean_analysis_2004_2023.parquet`, `Checks/prch_qc/` |
-| Custom extract | `Scripts/08_build_custom_panel.py` | Creates a smaller panel with selected columns | custom `.parquet` or `.csv` |
+| Custom extract | `Scripts/08_build_custom_panel.py` | Creates a smaller panel with selected columns, labels, and metadata | `.parquet`, `.csv`, `.dta`, or `.xlsx` plus companions |
 | Panel dictionary | `Scripts/09_build_panel_dictionary.py` | Builds a dictionary tied to actual wide-panel columns | panel-level dictionary `.csv` or `.xlsx` |
 
 ## Human-readable QA/QC
@@ -650,6 +650,72 @@ python Scripts/08_build_custom_panel.py \
   --vars-file "Customize_Panel/selectedvars.txt" \
   --years "2004:2023"
 ```
+
+Stage 08 writes metadata companions for every extract and embeds labels in
+Parquet. It finds the dictionary, category codes, and column lineage in the
+input's data root, then in `IPEDSDB_ROOT`. Category codes are loaded beside the
+selected dictionary unless supplied explicitly. A labeled Parquet extract
+reuses its embedded definitions unless external metadata is explicitly supplied.
+Missing or conflicting definitions
+are recorded in the export metadata. Use `--require-metadata` when an extract
+must pass the metadata coverage check before it is written.
+
+For a labeled Stata dataset:
+
+```bash
+python Scripts/08_build_custom_panel.py \
+  --input "$IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023.parquet" \
+  --dictionary "$IPEDSDB_ROOT/Dictionary/dictionary_lake.parquet" \
+  --codes "$IPEDSDB_ROOT/Dictionary/dictionary_codes.parquet" \
+  --column-lineage "$IPEDSDB_ROOT/Checks/wide_qc/qc_column_lineage.csv" \
+  --output "$IPEDSDB_ROOT/Panels/custom_panel.dta" \
+  --vars-file "Customize_Panel/selectedvars.txt" \
+  --years "2004:2023" \
+  --require-metadata
+```
+
+Change the output extension to `.xlsx`, `.csv`, or `.parquet` for another
+format. The extension determines the format unless `--format` is supplied;
+the two must agree. `UNITID` and `year` are retained automatically. Stata
+exports load the selected extract into memory; Parquet, CSV, and Excel use
+batches. Select the variables and years needed for the analysis.
+
+| Output | Labels and metadata |
+| --- | --- |
+| Stata `.dta` | Native variable labels and unambiguous integer value labels; full definitions and original-to-Stata name mappings in companions |
+| Excel `.xlsx` | `data`, `dictionary`, `value_labels`, `about`, and `issues` sheets; original codes remain in the data sheet |
+| CSV `.csv` | UTF-8 data with a header; labels and types travel in companion files |
+| Parquet `.parquet` | Original types, field labels, and JSON metadata embedded in the Arrow schema, plus companions |
+
+Keep each data file with its four companions, for example
+`custom_panel.dta.metadata.json`, `custom_panel.dta.dictionary.csv`,
+`custom_panel.dta.value_labels.csv`, and `custom_panel.dta.README.txt`.
+The JSON preserves source definitions and category labels by year and survey
+source, lineage, available source units, actual export years, null counts,
+source paths, format adjustments, and the output checksum. Units, price
+bases, missing-value reasons, and cross-year comparability are not inferred.
+Metadata completeness is separate from panel QA or release certification.
+
+Stata variable labels are shortened when needed, with the full text retained
+in the companions. Invalid or long Stata variable names receive stable aliases.
+String categories remain strings; their labels are in the companions. Numeric
+nulls become Stata system missing, and string nulls become empty strings. Excel
+has blank cells for nulls and cannot reliably distinguish an empty string from
+a missing string. Negative codes and imputation flags are not recoded. An export
+fails if the chosen format would silently lose integer precision, truncate cell
+text, or exceed worksheet limits. Existing output files are left intact when
+validation or writing fails.
+
+For CSV, import using the recorded types instead of relying on type inference.
+The generated README explains Arrow CSV options that distinguish unquoted null
+fields from quoted empty strings and preserve literal `NA` and leading zeros.
+Open the `.xlsx` export for spreadsheet use. See the
+[pandas Stata writer](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_stata.html)
+and [Excel limits](https://support.microsoft.com/en-us/excel/excel-specifications-and-limits)
+for format constraints.
+
+The external data drive is needed to validate actual label coverage and produce
+the full extracts. Fixture tests exercise the export code without that drive.
 
 ### Build a variable browser for the current panel
 
