@@ -656,9 +656,13 @@ Parquet. It finds the dictionary, category codes, and column lineage in the
 input's data root, then in `IPEDSDB_ROOT`. Category codes are loaded beside the
 selected dictionary unless supplied explicitly. A labeled Parquet extract
 reuses its embedded definitions unless external metadata is explicitly supplied.
-Missing or conflicting definitions
-are recorded in the export metadata. Use `--require-metadata` when an extract
-must pass the metadata coverage check before it is written.
+Missing or conflicting definitions are recorded in the export metadata.
+Use `--require-ready` (also available as `--require-metadata`) to require both
+metadata coverage and observation checks before publication. This checks
+institution-year uniqueness, nonmissing valid `UNITID`, and observed category
+codes against their year-specific domains. Continuous measures with special-code
+labels retain their open numeric domain. Malformed dictionaries and codebooks,
+ambiguous variable-number matches, and uncovered lineage components fail the gate.
 
 For a labeled Stata dataset:
 
@@ -671,7 +675,7 @@ python Scripts/08_build_custom_panel.py \
   --output "$IPEDSDB_ROOT/Panels/custom_panel.dta" \
   --vars-file "Customize_Panel/selectedvars.txt" \
   --years "2004:2023" \
-  --require-metadata
+  --require-ready
 ```
 
 Change the output extension to `.xlsx`, `.csv`, or `.parquet` for another
@@ -692,9 +696,15 @@ Keep each data file with its four companions, for example
 `custom_panel.dta.value_labels.csv`, and `custom_panel.dta.README.txt`.
 The JSON preserves source definitions and category labels by year and survey
 source, lineage, available source units, actual export years, null counts,
-source paths, format adjustments, and the output checksum. Units, price
-bases, missing-value reasons, and cross-year comparability are not inferred.
-Metadata completeness is separate from panel QA or release certification.
+source paths, format adjustments, and input/output checksums. Supplied units,
+currency, price basis, and reference-period conventions are checked for conflicts.
+Absent measurement facts remain explicitly unknown; export readiness does not
+establish cross-year comparability or infer missing-value reasons. The pipeline
+runner requires strict readiness for custom extracts by default; the explicit
+`--custom-allow-incomplete-metadata` option retains diagnostic issues in outputs.
+Stage 09 uses the same year-scoped definitions and codebooks. SQL panel exports
+also use this gate; aliases and computed expressions need explicit metadata and
+never acquire labels simply because their names resemble source variables.
 
 Stata variable labels are shortened when needed, with the full text retained
 in the companions. Invalid or long Stata variable names receive stable aliases.
@@ -704,7 +714,11 @@ has blank cells for nulls and cannot reliably distinguish an empty string from
 a missing string. Negative codes and imputation flags are not recoded. An export
 fails if the chosen format would silently lose integer precision, truncate cell
 text, or exceed worksheet limits. Existing output files are left intact when
-validation or writing fails.
+validation or writing fails. A failed file replacement restores the prior data
+and companions. This rollback does not provide crash-atomic visibility across
+multiple files to concurrent readers; publish a completed versioned directory
+when that guarantee is needed. Source content is rechecked before publication,
+including all files in a partitioned Parquet dataset.
 
 For CSV, import using the recorded types instead of relying on type inference.
 The generated README explains Arrow CSV options that distinguish unquoted null
@@ -716,6 +730,12 @@ for format constraints.
 
 The external data drive is needed to validate actual label coverage and produce
 the full extracts. Fixture tests exercise the export code without that drive.
+The [2023 SFA correction record](contracts/source_metadata_corrections/2023-sfa-v1.json)
+resolves individually verified table-reference errors while retaining original
+metadata. Its [complete source audit](contracts/source_metadata_corrections/2023-sfa-v1.audit.csv)
+also records consistent and absent variables. Stage 03 verifies the exact source
+release and extracted inputs before applying it; Stage 04 requires physical
+table/variable matches instead of using a shared canonical source family.
 
 ### Build a variable browser for the current panel
 

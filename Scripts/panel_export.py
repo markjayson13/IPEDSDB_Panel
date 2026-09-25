@@ -160,8 +160,11 @@ def write_stata(table: pa.Table, path: Path, metadata: dict) -> None:
     # Treat unexpected pandas conversion warnings as errors, not silent data loss.
     with warnings.catch_warnings():
         warnings.simplefilter("error")
+        data_label = ("IPEDS diagnostic query result; see companion metadata"
+                      if metadata.get("artifact_kind") == "query_diagnostic"
+                      else "IPEDS institution-year extract; see companion metadata")
         frame.to_stata(path, write_index=False, version=118 if len(frame.columns) <= 32767 else 119,
-                       data_label="IPEDS institution-year extract; see companion metadata",
+                       data_label=data_label,
                        variable_labels=labels, value_labels=values)
 
 
@@ -194,14 +197,29 @@ def append_sheet(wb, name: str, headers: list[str], rows) -> None:
 def dictionary_rows(metadata: dict) -> tuple[list[str], list[list]]:
     headers = ["column_order", "name", "export_name", "label", "description", "storage_type",
                "metadata_status", "null_count", "source_files", "years"]
+    semantic_fields = ("units", "currency", "price_basis", "reference_period")
+    headers += ["comparability_status"]
+    headers += [column for field in semantic_fields for column in (field, field + "_status")]
+    headers += ["metadata_correction_ids", "original_source_tables", "resolved_source_tables"]
     rows = []
     for i, var in enumerate(metadata["variables"], 1):
         records = var["source_metadata"]
         sources = sorted({str(r["source_file"]) for r in records if r.get("source_file")})
         years = sorted({str(r["year"]) for r in records if r.get("year") is not None})
-        rows.append([i, var["name"], var["export_name"], var["label"], var["description"],
-                     var["storage_type"], var["metadata_status"], var.get("null_count", ""),
-                     ";".join(sources), ";".join(years)])
+        row = [i, var["name"], var["export_name"], var["label"], var["description"],
+               var["storage_type"], var["metadata_status"], var.get("null_count", ""),
+               ";".join(sources), ";".join(years), var.get("comparability_status", "unknown")]
+        for field in semantic_fields:
+            detail = var.get("semantic_metadata", {}).get(field, {})
+            row.extend([detail.get("value") if detail.get("value") is not None else "", detail.get("status", "unknown")])
+        corrections = sorted({str(record["metadata_correction_id"]) for record in records if record.get("metadata_correction_id")})
+        original_tables = sorted({str(value) for record in records if
+                                  (value := record.get("original_access_table_name") or record.get("access_table_name") or record.get("source_table"))})
+        resolved_tables = sorted({str(value) for record in records if
+                                  (value := record.get("resolved_physical_table") or record.get("access_table_name_resolved")
+                                   or record.get("source_table") or record.get("access_table_name"))})
+        row.extend([";".join(corrections), ";".join(original_tables), ";".join(resolved_tables)])
+        rows.append(row)
     return headers, rows
 
 
@@ -239,6 +257,7 @@ def write_excel(dataset, columns: list[str], filt, batch_rows: int, path: Path, 
             ["source_panel", metadata["source_panel"]], ["created_utc", metadata["created_utc"]],
             ["years", ", ".join(map(str, metadata["years"]))], ["rows", metadata["row_count"]],
             ["metadata_status", metadata["metadata_status"]],
+            ["readiness_status", metadata.get("readiness_status", "not_assessed")],
             ["missing_values", metadata["missing_values"]],
             ["full_metadata", path.name + ".metadata.json"],
             ["note", "Codes remain codes. Definitions and code labels are on the accompanying sheets."],
@@ -269,9 +288,11 @@ def write_sidecars(path: Path, metadata: dict) -> None:
             writer.writerows(rows)
     metadata["data_sha256"] = sha256_file(path)
     Path(str(path) + ".metadata.json").write_text(json.dumps(metadata, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    title = {"query_diagnostic": "IPEDS diagnostic query result", "panel_dictionary": "IPEDS panel dictionary"}.get(metadata.get("artifact_kind"), "IPEDS analyst extract")
     Path(str(path) + ".README.txt").write_text(
-        f"IPEDS analyst extract: {path.name}\n"
+        f"{title}: {path.name}\n"
         f"Rows: {metadata['row_count']}; metadata status: {metadata['metadata_status']}\n"
+        f"Analysis readiness: {metadata.get('readiness_status', 'not_assessed')}\n"
         "Keep this data file together with its .metadata.json, .dictionary.csv and .value_labels.csv files.\n"
         "The JSON includes original definitions, year/source-specific labels, source paths, issues, null counts and the data SHA-256.\n"
         "Missing values: " + metadata["missing_values"] + "\n"
@@ -284,5 +305,9 @@ def write_sidecars(path: Path, metadata: dict) -> None:
         "quoted_strings_can_be_null=False, null_values=['']). This preserves literal NA and leading-zero strings.\n"
         "Negative codes and imputation flags are preserved, not recoded. No units or inflation basis are inferred. "
         "Null reasons cannot be reconstructed from a cleaned input without its cleaning QA artifacts.\n"
+        "Source checksums, exporter code hashes, and observation checks are recorded when available. "
+        "Ordinary package replacement errors trigger rollback to the prior files. Multi-file publication is not crash-atomic; "
+        "a machine/process crash can require recovery from .ipeds-export-backup-* in the output directory. "
+        "Wait for successful completion before reading a package, and verify its data checksum.\n"
         "Review metadata issues before analysis. Export validation does not certify the underlying panel or cross-year comparability.\n",
         encoding="utf-8")

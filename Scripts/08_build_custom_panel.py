@@ -24,8 +24,11 @@ import pyarrow as pa
 import pyarrow.dataset as ds
 
 from access_build_utils import DEFAULT_IPEDSDB_ROOT
-from export_metadata import build_export_metadata
-from panel_export import prepare_format_metadata, sha256_file, write_excel, write_sidecars, write_stata, write_stream
+from export_metadata import build_export_metadata, discover_export_metadata as discover_metadata
+from export_integrity import (apply_observation_validation, assert_source_unchanged,
+                              export_code_provenance, promote_package, require_export_ready,
+                              scan_panel, source_fingerprint, validate_observed_codes)
+from panel_export import prepare_format_metadata, write_excel, write_sidecars, write_stata, write_stream
 
 
 def setup_logging(log_path: str | None) -> None:
@@ -60,20 +63,6 @@ def parse_years(spec: str) -> list[int]:
     if not years:
         raise ValueError("Year filter must contain at least one year in ascending range order.")
     return years
-
-
-def discover_metadata(explicit: str | None, relative: str, input_path: Path, root: Path) -> Path | None:
-    if explicit:
-        path = Path(explicit)
-        if not path.is_file():
-            raise ValueError(f"Metadata file does not exist: {path}")
-        return path
-    # Prefer the input's own data root over an unrelated IPEDSDB_ROOT.
-    for base in (input_path.parent.parent, root):
-        candidate = base / relative
-        if candidate.is_file():
-            return candidate
-    return None
 
 
 def load_vars(vars_arg: str | None, vars_file: str | None) -> list[str]:
@@ -112,7 +101,8 @@ def main() -> None:
     ap.add_argument("--dictionary", help="dictionary_lake.parquet; auto-discovered beside the input data root")
     ap.add_argument("--codes", help="dictionary_codes.parquet; auto-discovered beside the dictionary")
     ap.add_argument("--column-lineage", help="Stage 06 qc_column_lineage.csv/parquet for collapsed/aliased columns")
-    ap.add_argument("--require-metadata", action="store_true", help="Fail if source definitions or code metadata are missing/ambiguous")
+    ap.add_argument("--require-metadata", "--require-ready", dest="require_metadata", action="store_true",
+                    help="Require complete definitions, valid unique panel keys, and known categorical codes")
     ap.add_argument("--batch-rows", type=int, default=100_000, help="Batch size for streaming output")
     ap.add_argument("--strict", action="store_true", help="Fail if any requested varname is missing")
     data_root = Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
@@ -136,6 +126,7 @@ def main() -> None:
     if not vars_requested:
         raise SystemExit("Provide --vars or --vars-file with at least one variable.")
 
+    source_identity = source_fingerprint(input_path)
     dataset = ds.dataset(args.input, format="parquet")
     schema = dataset.schema
     if len({name.upper() for name in schema.names}) != len(schema.names):
@@ -196,40 +187,36 @@ def main() -> None:
     if any(p and p.resolve() == out_path.resolve() for p in (dictionary, codes, lineage)):
         raise ValueError("Output cannot overwrite source metadata.")
     selected_schema = pa.schema([schema.field(c) for c in cols], metadata=schema.metadata)
-    actual_years = set()
-    null_counts = {c: 0 for c in cols}
-    row_count = 0
-    # Bounded memory pass supplies actual coverage and missingness, including empty extracts.
-    for batch in dataset.to_batches(columns=cols, filter=filt, batch_size=args.batch_rows):
-        row_count += batch.num_rows
-        for c, values in zip(cols, batch.columns):
-            null_counts[c] += values.null_count
-        for value in batch.column(cols.index(year_col)).to_pylist():
-            if value is None or isinstance(value, bool) or int(value) != value:
-                raise ValueError("The reporting year must be a nonmissing integer.")
-            actual_years.add(int(value))
-    metadata = build_export_metadata(selected_schema, sorted(actual_years), dictionary, codes, lineage)
+    metadata_identities = {k: source_fingerprint(p) for k, p in
+                           (("dictionary", dictionary), ("codes", codes), ("lineage", lineage)) if p}
+    scan = scan_panel(dataset, cols, filt, args.batch_rows, (unitid_col, year_col))
+    row_count = scan["row_count"]
+    metadata = build_export_metadata(selected_schema, scan["years"], dictionary, codes, lineage)
+    code_check = validate_observed_codes(dataset, metadata, filt, args.batch_rows, year_col)
+    apply_observation_validation(metadata, scan, code_check)
     metadata["metadata_source_modes"] = metadata.get("metadata_sources", {})
     metadata.update({
         "schema_version": "1.0", "created_utc": datetime.now(timezone.utc).isoformat(),
         "source_panel": str(input_path.resolve()), "format": fmt, "row_count": row_count,
+        "source_fingerprint": source_identity, "source_panel_sha256": source_identity["sha256"],
+        "exporter_provenance": export_code_provenance(), "artifact_kind": "panel_extract",
+        "package_promotion": "Exception rollback with backups; not crash-atomic across the five files. Consume only after successful completion and verify the data checksum.",
         "column_count": len(cols), "panel_keys": [unitid_col, year_col],
         "requested_years": parse_years(args.years) if args.years else None,
         "missing_requested_variables": missing,
         "metadata_sources": {k: str(p.resolve()) if p else None for k, p in
                              (("dictionary", dictionary), ("codes", codes), ("lineage", lineage))},
-        "metadata_source_sha256": {k: sha256_file(p) if p else None for k, p in
+        "metadata_source_sha256": {k: metadata_identities[k]["sha256"] if p else None for k, p in
                                   (("dictionary", dictionary), ("codes", codes), ("lineage", lineage))},
         "missing_values": "Input nulls remain missing. Observed negative/special codes remain unchanged. "
                           "Stata uses numeric system missing and empty strings; CSV uses unquoted empty fields; "
                           "Excel uses blank cells. No missing-reason codes are invented.",
     })
     for var in metadata["variables"]:
-        var["null_count"] = null_counts[var["name"]]
+        var["null_count"] = scan["null_counts"][var["name"]]
     prepare_format_metadata(metadata, selected_schema, fmt)
-    if args.require_metadata and metadata["metadata_status"] != "complete":
-        detail = "; ".join(issue["message"] for issue in metadata["issues"][:8])
-        raise ValueError(f"Metadata is incomplete: {detail}")
+    if args.require_metadata:
+        require_export_ready(metadata)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     # Validate/write a whole package before replacing any existing destination files.
     with tempfile.TemporaryDirectory(prefix=".ipeds-export-", dir=out_path.parent) as staging:
@@ -244,12 +231,13 @@ def main() -> None:
             rows = table.num_rows
         if rows != row_count:
             raise ValueError("Source row count changed during export; rerun against a stable input.")
+        assert_source_unchanged(input_path, source_identity)
+        for kind, path in (("dictionary", dictionary), ("codes", codes), ("lineage", lineage)):
+            if path:
+                assert_source_unchanged(path, metadata_identities[kind])
         write_sidecars(temp_path, metadata)
-        for sidecar in sorted(Path(staging).iterdir()):
-            if sidecar != temp_path:
-                os.replace(sidecar, out_path.parent / sidecar.name)
-        os.replace(temp_path, out_path)
-    print(f"Wrote {out_path} rows={rows:,} cols={len(cols)} metadata={metadata['metadata_status']}")
+        promote_package(temp_path, out_path)
+    print(f"Wrote {out_path} rows={rows:,} cols={len(cols)} metadata={metadata['metadata_status']} readiness={metadata['readiness_status']}")
     if metadata["issues"]:
         print(f"[warn] {len(metadata['issues'])} metadata/format issues recorded in {out_path.name}.metadata.json")
 

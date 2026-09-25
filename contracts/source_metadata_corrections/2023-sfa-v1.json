@@ -1,0 +1,3514 @@
+{
+  "schema_version": 1,
+  "version": "2023-sfa-v1",
+  "evidence_path": "contracts/source_metadata_corrections/2023-sfa-v1.evidence.json",
+  "archive": {
+    "url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2023-24_Final.zip",
+    "sha256": "5a29f4b8d0fbdd5e091015e286dbddcecdf8d423926521a8af560967cd376629"
+  },
+  "database": {
+    "name": "IPEDS202324.accdb",
+    "sha256": "95983414e996ffce605f3de728b86eb572500353164da98dc818b055df3c9026"
+  },
+  "pipeline_inputs": [
+    {
+      "path": "Raw_Access_Databases/2023/downloads/IPEDS_2023-24_Final.zip",
+      "sha256": "5a29f4b8d0fbdd5e091015e286dbddcecdf8d423926521a8af560967cd376629"
+    },
+    {
+      "path": "Raw_Access_Databases/2023/tables_csv/SFAV2223.csv",
+      "sha256": "edcc7b3638b8ffe3e4e152d9a60cf2349bf4eda86a066cf5d86ca624ef7e5b7c"
+    },
+    {
+      "path": "Raw_Access_Databases/2023/tables_csv/sfa2223_p1.csv",
+      "sha256": "b615dab10732b9e1a49310c5a78e657387e052560841020804f18ca2d89638a9"
+    },
+    {
+      "path": "Raw_Access_Databases/2023/tables_csv/sfa2223_p2.csv",
+      "sha256": "f4e8ed588d511e1066db2b55694e3ad187b0d50fc881af56c1a9c43d413b9305"
+    },
+    {
+      "path": "Raw_Access_Databases/2023/tables_csv/varTable23.csv",
+      "sha256": "b3cc7423348ea0f954a03f024dd3dde2f13e2a6847ac28a7c7856d23ba82fb86"
+    },
+    {
+      "path": "Raw_Access_Databases/2023/tables_csv/valueSets23.csv",
+      "sha256": "c3cf45aaff95ef10c4fd706a8fb3801cefec7afb023ec21d648ddffe7e8cc2d9"
+    },
+    {
+      "path": "Raw_Access_Databases/2023/tables_csv/Tables23.csv",
+      "sha256": "21b736cbdc4449a9fee8c118742dc2a90abd2c46cf86d95504c629fa8052e3d4"
+    }
+  ],
+  "physical_tables": {
+    "SFAV2223": {
+      "sha256": "edcc7b3638b8ffe3e4e152d9a60cf2349bf4eda86a066cf5d86ca624ef7e5b7c",
+      "columns": [
+        "UNITID",
+        "UGPO9_N",
+        "UGPO9_T",
+        "UGPO9_A",
+        "GPO9_N",
+        "GPO9_T",
+        "GPO9_A",
+        "PO9_N",
+        "PO9_T",
+        "PO9_A",
+        "UGDOD_N",
+        "UGDOD_T",
+        "UGDOD_A",
+        "GDOD_N",
+        "GDOD_T",
+        "GDOD_A",
+        "DOD_N",
+        "DOD_T",
+        "DOD_A"
+      ]
+    },
+    "SFA2223_P1": {
+      "sha256": "b615dab10732b9e1a49310c5a78e657387e052560841020804f18ca2d89638a9",
+      "columns": [
+        "UNITID",
+        "SCUGRAD",
+        "SCUGDGSK",
+        "SCUGNDGS",
+        "SCUGFFN",
+        "SCFA2",
+        "SCFA2DG",
+        "SCFA1N",
+        "SCFA1P",
+        "SCFA11N",
+        "SCFA11P",
+        "SCFA12N",
+        "SCFA12P",
+        "SCFA13N",
+        "SCFA13P",
+        "SCFA14N",
+        "SCFA14P",
+        "SCFY2",
+        "SCFY2DG",
+        "SCFY2ND",
+        "SCFY1N",
+        "SCFY1P",
+        "UAGRNTN",
+        "UAGRNTP",
+        "UAGRNTT",
+        "UAGRNTA",
+        "UDGAGRNTN",
+        "UDGAGRNTP",
+        "UDGAGRNTT",
+        "UDGAGRNTA",
+        "UNDAGRNTN",
+        "UNDAGRNTP",
+        "UNDAGRNTT",
+        "UNDAGRNTA",
+        "UPGRNTN",
+        "UPGRNTP",
+        "UPGRNTT",
+        "UPGRNTA",
+        "UDGPGRNTN",
+        "UDGPGRNTP",
+        "UDGPGRNTT",
+        "UDGPGRNTA",
+        "UNDPGRNTN",
+        "UNDPGRNTP",
+        "UNDPGRNTT",
+        "UNDPGRNTA",
+        "UFLOANN",
+        "UFLOANP",
+        "UFLOANT",
+        "UFLOANA",
+        "UDGFLOANN",
+        "UDGFLOANP",
+        "UDGFLOANT",
+        "UDGFLOANA",
+        "UNDFLOANN",
+        "UNDFLOANP",
+        "UNDFLOANT",
+        "UNDFLOANA",
+        "ANYAIDN",
+        "ANYAIDP",
+        "AIDFSIN",
+        "AIDFSIP",
+        "AGRNT_N",
+        "AGRNT_P",
+        "AGRNT_T",
+        "AGRNT_A",
+        "FGRNT_N",
+        "FGRNT_P",
+        "FGRNT_T",
+        "FGRNT_A",
+        "PGRNT_N",
+        "PGRNT_P",
+        "PGRNT_T",
+        "PGRNT_A",
+        "OFGRT_N",
+        "OFGRT_P",
+        "OFGRT_T",
+        "OFGRT_A",
+        "SGRNT_N",
+        "SGRNT_P",
+        "SGRNT_T",
+        "SGRNT_A",
+        "IGRNT_N",
+        "IGRNT_P",
+        "IGRNT_T",
+        "IGRNT_A",
+        "LOAN_N",
+        "LOAN_P",
+        "LOAN_T",
+        "LOAN_A",
+        "FLOAN_N",
+        "FLOAN_P",
+        "FLOAN_T",
+        "FLOAN_A",
+        "OLOAN_N",
+        "OLOAN_P",
+        "OLOAN_T",
+        "OLOAN_A"
+      ]
+    },
+    "SFA2223_P2": {
+      "sha256": "f4e8ed588d511e1066db2b55694e3ad187b0d50fc881af56c1a9c43d413b9305",
+      "columns": [
+        "UNITID",
+        "NPIST2",
+        "NPIST1",
+        "NPIST0",
+        "NPIS412",
+        "NPIS422",
+        "NPIS432",
+        "NPIS442",
+        "NPIS452",
+        "NPIS411",
+        "NPIS421",
+        "NPIS431",
+        "NPIS441",
+        "NPIS451",
+        "NPIS410",
+        "NPIS420",
+        "NPIS430",
+        "NPIS440",
+        "NPIS450",
+        "NPGRN2",
+        "NPGRN1",
+        "NPGRN0",
+        "NPT412",
+        "NPT422",
+        "NPT432",
+        "NPT442",
+        "NPT452",
+        "NPT411",
+        "NPT421",
+        "NPT431",
+        "NPT441",
+        "NPT451",
+        "NPT410",
+        "NPT420",
+        "NPT430",
+        "NPT440",
+        "NPT450",
+        "GISTN2",
+        "GISTON2",
+        "GISTWF2",
+        "GISTOF2",
+        "GISTUN2",
+        "GISTT2",
+        "GISTA2",
+        "GISTN1",
+        "GISTON1",
+        "GISTWF1",
+        "GISTOF1",
+        "GISTUN1",
+        "GISTT1",
+        "GISTA1",
+        "GISTN0",
+        "GISTON0",
+        "GISTWF0",
+        "GISTOF0",
+        "GISTUN0",
+        "GISTT0",
+        "GISTA0",
+        "GIS4N2",
+        "GIS4ON2",
+        "GIS4WF2",
+        "GIS4OF2",
+        "GIS4UN2",
+        "GIS4G2",
+        "GIS4T2",
+        "GIS4A2",
+        "GIS4N12",
+        "GIS4G12",
+        "GIS4T12",
+        "GIS4A12",
+        "GIS4N22",
+        "GIS4G22",
+        "GIS4T22",
+        "GIS4A22",
+        "GIS4N32",
+        "GIS4G32",
+        "GIS4T32",
+        "GIS4A32",
+        "GIS4N42",
+        "GIS4G42",
+        "GIS4T42",
+        "GIS4A42",
+        "GIS4N52",
+        "GIS4G52",
+        "GIS4T52",
+        "GIS4A52",
+        "GIS4N1",
+        "GIS4ON1",
+        "GIS4WF1",
+        "GIS4OF1",
+        "GIS4UN1",
+        "GIS4G1",
+        "GIS4T1",
+        "GIS4A1",
+        "GIS4N11",
+        "GIS4G11",
+        "GIS4T11",
+        "GIS4A11",
+        "GIS4N21",
+        "GIS4G21",
+        "GIS4T21",
+        "GIS4A21",
+        "GIS4N31",
+        "GIS4G31",
+        "GIS4T31",
+        "GIS4A31",
+        "GIS4N41",
+        "GIS4G41",
+        "GIS4T41",
+        "GIS4A41",
+        "GIS4N51",
+        "GIS4G51",
+        "GIS4T51",
+        "GIS4A51",
+        "GIS4N0",
+        "GIS4ON0",
+        "GIS4WF0",
+        "GIS4OF0",
+        "GIS4UN0",
+        "GIS4G0",
+        "GIS4T0",
+        "GIS4A0",
+        "GIS4N10",
+        "GIS4G10",
+        "GIS4T10",
+        "GIS4A10",
+        "GIS4N20",
+        "GIS4G20",
+        "GIS4T20",
+        "GIS4A20",
+        "GIS4N30",
+        "GIS4G30",
+        "GIS4T30",
+        "GIS4A30",
+        "GIS4N40",
+        "GIS4G40",
+        "GIS4T40",
+        "GIS4A40",
+        "GIS4N50",
+        "GIS4G50",
+        "GIS4T50",
+        "GIS4A50",
+        "GRNTN2",
+        "GRNTON2",
+        "GRNTWF2",
+        "GRNTOF2",
+        "GRNTUN2",
+        "GRNTT2",
+        "GRNTA2",
+        "GRNTN1",
+        "GRNTON1",
+        "GRNTWF1",
+        "GRNTOF1",
+        "GRNTUN1",
+        "GRNTT1",
+        "GRNTA1",
+        "GRNTN0",
+        "GRNTON0",
+        "GRNTWF0",
+        "GRNTOF0",
+        "GRNTUN0",
+        "GRNTT0",
+        "GRNTA0",
+        "GRN4N2",
+        "GRN4ON2",
+        "GRN4WF2",
+        "GRN4OF2",
+        "GRN4UN2",
+        "GRN4G2",
+        "GRN4T2",
+        "GRN4A2",
+        "GRN4N12",
+        "GRN4G12",
+        "GRN4T12",
+        "GRN4A12",
+        "GRN4N22",
+        "GRN4G22",
+        "GRN4T22",
+        "GRN4A22",
+        "GRN4N32",
+        "GRN4G32",
+        "GRN4T32",
+        "GRN4A32",
+        "GRN4N42",
+        "GRN4G42",
+        "GRN4T42",
+        "GRN4A42",
+        "GRN4N52",
+        "GRN4G52",
+        "GRN4T52",
+        "GRN4A52",
+        "GRN4N1",
+        "GRN4ON1",
+        "GRN4WF1",
+        "GRN4OF1",
+        "GRN4UN1",
+        "GRN4G1",
+        "GRN4T1",
+        "GRN4A1",
+        "GRN4N11",
+        "GRN4G11",
+        "GRN4T11",
+        "GRN4A11",
+        "GRN4N21",
+        "GRN4G21",
+        "GRN4T21",
+        "GRN4A21",
+        "GRN4N31",
+        "GRN4G31",
+        "GRN4T31",
+        "GRN4A31",
+        "GRN4N41",
+        "GRN4G41",
+        "GRN4T41",
+        "GRN4A41",
+        "GRN4N51",
+        "GRN4G51",
+        "GRN4T51",
+        "GRN4A51",
+        "GRN4N0",
+        "GRN4ON0",
+        "GRN4WF0",
+        "GRN4OF0",
+        "GRN4UN0",
+        "GRN4G0",
+        "GRN4T0",
+        "GRN4A0",
+        "GRN4N10",
+        "GRN4G10",
+        "GRN4T10",
+        "GRN4A10",
+        "GRN4N20",
+        "GRN4G20",
+        "GRN4T20",
+        "GRN4A20",
+        "GRN4N30",
+        "GRN4G30",
+        "GRN4T30",
+        "GRN4A30",
+        "GRN4N40",
+        "GRN4G40",
+        "GRN4T40",
+        "GRN4A40",
+        "GRN4N50",
+        "GRN4G50",
+        "GRN4T50",
+        "GRN4A50",
+        "SCUGFFP"
+      ]
+    }
+  },
+  "corrections": [
+    {
+      "year": 2023,
+      "varname": "NPIS420",
+      "varnumber": "71521",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71521:NPIS420",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS430",
+      "varnumber": "71526",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71526:NPIS430",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS440",
+      "varnumber": "71531",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71531:NPIS440",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT420",
+      "varnumber": "71656",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71656:NPT420",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT430",
+      "varnumber": "71661",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71661:NPT430",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT440",
+      "varnumber": "71666",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71666:NPT440",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTN2",
+      "varnumber": "70496",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70496:GISTN2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTON2",
+      "varnumber": "70501",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70501:GISTON2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTWF2",
+      "varnumber": "70506",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70506:GISTWF2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTOF2",
+      "varnumber": "70511",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70511:GISTOF2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTUN2",
+      "varnumber": "70516",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70516:GISTUN2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTT2",
+      "varnumber": "70521",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70521:GISTT2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTA2",
+      "varnumber": "70526",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70526:GISTA2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTN1",
+      "varnumber": "70531",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70531:GISTN1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTON1",
+      "varnumber": "70536",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70536:GISTON1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTWF1",
+      "varnumber": "70541",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70541:GISTWF1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTOF1",
+      "varnumber": "70546",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70546:GISTOF1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTUN1",
+      "varnumber": "70551",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70551:GISTUN1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTT1",
+      "varnumber": "70556",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70556:GISTT1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTA1",
+      "varnumber": "70561",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70561:GISTA1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTN0",
+      "varnumber": "70566",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70566:GISTN0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTON0",
+      "varnumber": "70571",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70571:GISTON0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTWF0",
+      "varnumber": "70576",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70576:GISTWF0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTOF0",
+      "varnumber": "70581",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70581:GISTOF0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTUN0",
+      "varnumber": "70586",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70586:GISTUN0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTT0",
+      "varnumber": "70591",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70591:GISTT0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GISTA0",
+      "varnumber": "70596",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70596:GISTA0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N2",
+      "varnumber": "70601",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70601:GIS4N2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4ON2",
+      "varnumber": "70606",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70606:GIS4ON2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4WF2",
+      "varnumber": "70611",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70611:GIS4WF2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4OF2",
+      "varnumber": "70616",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70616:GIS4OF2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4UN2",
+      "varnumber": "70621",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70621:GIS4UN2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G2",
+      "varnumber": "71802",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71802:GIS4G2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T2",
+      "varnumber": "70626",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70626:GIS4T2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A2",
+      "varnumber": "70631",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70631:GIS4A2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N12",
+      "varnumber": "70636",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70636:GIS4N12",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G12",
+      "varnumber": "71807",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71807:GIS4G12",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T12",
+      "varnumber": "70641",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70641:GIS4T12",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A12",
+      "varnumber": "70646",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70646:GIS4A12",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N22",
+      "varnumber": "70651",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70651:GIS4N22",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G22",
+      "varnumber": "71812",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71812:GIS4G22",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T22",
+      "varnumber": "70656",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70656:GIS4T22",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A22",
+      "varnumber": "70661",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70661:GIS4A22",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N32",
+      "varnumber": "70666",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70666:GIS4N32",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G32",
+      "varnumber": "71817",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71817:GIS4G32",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T32",
+      "varnumber": "70671",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70671:GIS4T32",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A32",
+      "varnumber": "70676",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70676:GIS4A32",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N42",
+      "varnumber": "70681",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70681:GIS4N42",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G42",
+      "varnumber": "71822",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71822:GIS4G42",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T42",
+      "varnumber": "70686",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70686:GIS4T42",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A42",
+      "varnumber": "70691",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70691:GIS4A42",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N52",
+      "varnumber": "70696",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70696:GIS4N52",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G52",
+      "varnumber": "71827",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71827:GIS4G52",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T52",
+      "varnumber": "70701",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70701:GIS4T52",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A52",
+      "varnumber": "70706",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70706:GIS4A52",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N1",
+      "varnumber": "71101",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71101:GIS4N1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4ON1",
+      "varnumber": "71106",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71106:GIS4ON1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4WF1",
+      "varnumber": "71111",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71111:GIS4WF1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4OF1",
+      "varnumber": "71116",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71116:GIS4OF1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4UN1",
+      "varnumber": "71121",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71121:GIS4UN1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G1",
+      "varnumber": "71832",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71832:GIS4G1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T1",
+      "varnumber": "71126",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71126:GIS4T1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A1",
+      "varnumber": "71131",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71131:GIS4A1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N11",
+      "varnumber": "71136",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71136:GIS4N11",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G11",
+      "varnumber": "71837",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71837:GIS4G11",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T11",
+      "varnumber": "71141",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71141:GIS4T11",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A11",
+      "varnumber": "71146",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71146:GIS4A11",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N21",
+      "varnumber": "71151",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71151:GIS4N21",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G21",
+      "varnumber": "71842",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71842:GIS4G21",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T21",
+      "varnumber": "71156",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71156:GIS4T21",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A21",
+      "varnumber": "71161",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71161:GIS4A21",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N31",
+      "varnumber": "71166",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71166:GIS4N31",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G31",
+      "varnumber": "71847",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71847:GIS4G31",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T31",
+      "varnumber": "71171",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71171:GIS4T31",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A31",
+      "varnumber": "71176",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71176:GIS4A31",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N41",
+      "varnumber": "71181",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71181:GIS4N41",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G41",
+      "varnumber": "71852",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71852:GIS4G41",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T41",
+      "varnumber": "71186",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71186:GIS4T41",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A41",
+      "varnumber": "71191",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71191:GIS4A41",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N51",
+      "varnumber": "71196",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71196:GIS4N51",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G51",
+      "varnumber": "71857",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71857:GIS4G51",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T51",
+      "varnumber": "71201",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71201:GIS4T51",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A51",
+      "varnumber": "71206",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71206:GIS4A51",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N0",
+      "varnumber": "71401",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71401:GIS4N0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4ON0",
+      "varnumber": "71406",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71406:GIS4ON0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4WF0",
+      "varnumber": "71411",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71411:GIS4WF0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4OF0",
+      "varnumber": "71416",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71416:GIS4OF0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4UN0",
+      "varnumber": "71421",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71421:GIS4UN0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G0",
+      "varnumber": "71862",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71862:GIS4G0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T0",
+      "varnumber": "71426",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71426:GIS4T0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A0",
+      "varnumber": "71431",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71431:GIS4A0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N10",
+      "varnumber": "71436",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71436:GIS4N10",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G10",
+      "varnumber": "71867",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71867:GIS4G10",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T10",
+      "varnumber": "71441",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71441:GIS4T10",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A10",
+      "varnumber": "71446",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71446:GIS4A10",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N20",
+      "varnumber": "71451",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71451:GIS4N20",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G20",
+      "varnumber": "71872",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71872:GIS4G20",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T20",
+      "varnumber": "71456",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71456:GIS4T20",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A20",
+      "varnumber": "71461",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71461:GIS4A20",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N30",
+      "varnumber": "71466",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71466:GIS4N30",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G30",
+      "varnumber": "71877",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71877:GIS4G30",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T30",
+      "varnumber": "71471",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71471:GIS4T30",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A30",
+      "varnumber": "71476",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71476:GIS4A30",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N40",
+      "varnumber": "71481",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71481:GIS4N40",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G40",
+      "varnumber": "71882",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71882:GIS4G40",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T40",
+      "varnumber": "71486",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71486:GIS4T40",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A40",
+      "varnumber": "71491",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71491:GIS4A40",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4N50",
+      "varnumber": "71496",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71496:GIS4N50",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4G50",
+      "varnumber": "71887",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71887:GIS4G50",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4T50",
+      "varnumber": "71501",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71501:GIS4T50",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GIS4A50",
+      "varnumber": "71506",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71506:GIS4A50",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIST2",
+      "varnumber": "70711",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70711:NPIST2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIST1",
+      "varnumber": "70716",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70716:NPIST1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIST0",
+      "varnumber": "70721",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70721:NPIST0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS412",
+      "varnumber": "70726",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70726:NPIS412",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS422",
+      "varnumber": "70731",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70731:NPIS422",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS432",
+      "varnumber": "70736",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70736:NPIS432",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS442",
+      "varnumber": "70741",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70741:NPIS442",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS452",
+      "varnumber": "70746",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70746:NPIS452",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS411",
+      "varnumber": "71216",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71216:NPIS411",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS421",
+      "varnumber": "71221",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71221:NPIS421",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS431",
+      "varnumber": "71226",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71226:NPIS431",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS441",
+      "varnumber": "71231",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71231:NPIS441",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS451",
+      "varnumber": "71236",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71236:NPIS451",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS410",
+      "varnumber": "71516",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71516:NPIS410",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPIS450",
+      "varnumber": "71536",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71536:NPIS450",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTN2",
+      "varnumber": "70751",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70751:GRNTN2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTON2",
+      "varnumber": "70756",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70756:GRNTON2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTWF2",
+      "varnumber": "70761",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70761:GRNTWF2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTOF2",
+      "varnumber": "70766",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70766:GRNTOF2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTUN2",
+      "varnumber": "70771",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70771:GRNTUN2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTT2",
+      "varnumber": "70776",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70776:GRNTT2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTA2",
+      "varnumber": "70781",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70781:GRNTA2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTN1",
+      "varnumber": "70786",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70786:GRNTN1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTON1",
+      "varnumber": "70791",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70791:GRNTON1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTWF1",
+      "varnumber": "70796",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70796:GRNTWF1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTOF1",
+      "varnumber": "70801",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70801:GRNTOF1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTUN1",
+      "varnumber": "70806",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70806:GRNTUN1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTT1",
+      "varnumber": "70811",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70811:GRNTT1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTA1",
+      "varnumber": "70816",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70816:GRNTA1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTN0",
+      "varnumber": "70821",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70821:GRNTN0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTON0",
+      "varnumber": "70826",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70826:GRNTON0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTWF0",
+      "varnumber": "70831",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70831:GRNTWF0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTOF0",
+      "varnumber": "70836",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70836:GRNTOF0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTUN0",
+      "varnumber": "70841",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70841:GRNTUN0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTT0",
+      "varnumber": "70846",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70846:GRNTT0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRNTA0",
+      "varnumber": "70851",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70851:GRNTA0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N2",
+      "varnumber": "70856",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70856:GRN4N2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4ON2",
+      "varnumber": "70861",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70861:GRN4ON2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4WF2",
+      "varnumber": "70866",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70866:GRN4WF2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4OF2",
+      "varnumber": "70871",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70871:GRN4OF2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4UN2",
+      "varnumber": "70876",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70876:GRN4UN2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G2",
+      "varnumber": "71892",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71892:GRN4G2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T2",
+      "varnumber": "70881",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70881:GRN4T2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A2",
+      "varnumber": "70886",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70886:GRN4A2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N12",
+      "varnumber": "70891",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70891:GRN4N12",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G12",
+      "varnumber": "71897",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71897:GRN4G12",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T12",
+      "varnumber": "70896",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70896:GRN4T12",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A12",
+      "varnumber": "70901",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70901:GRN4A12",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N22",
+      "varnumber": "70906",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70906:GRN4N22",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G22",
+      "varnumber": "71902",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71902:GRN4G22",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T22",
+      "varnumber": "70911",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70911:GRN4T22",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A22",
+      "varnumber": "70916",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70916:GRN4A22",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N32",
+      "varnumber": "70921",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70921:GRN4N32",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G32",
+      "varnumber": "71907",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71907:GRN4G32",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T32",
+      "varnumber": "70926",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70926:GRN4T32",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A32",
+      "varnumber": "70931",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70931:GRN4A32",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N42",
+      "varnumber": "70936",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70936:GRN4N42",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G42",
+      "varnumber": "71912",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71912:GRN4G42",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T42",
+      "varnumber": "70941",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70941:GRN4T42",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A42",
+      "varnumber": "70946",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70946:GRN4A42",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N52",
+      "varnumber": "70951",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70951:GRN4N52",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G52",
+      "varnumber": "71917",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71917:GRN4G52",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T52",
+      "varnumber": "70956",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70956:GRN4T52",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A52",
+      "varnumber": "70961",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70961:GRN4A52",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N1",
+      "varnumber": "71241",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71241:GRN4N1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4ON1",
+      "varnumber": "71246",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71246:GRN4ON1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4WF1",
+      "varnumber": "71251",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71251:GRN4WF1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4OF1",
+      "varnumber": "71256",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71256:GRN4OF1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4UN1",
+      "varnumber": "71261",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71261:GRN4UN1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G1",
+      "varnumber": "71922",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71922:GRN4G1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T1",
+      "varnumber": "71266",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71266:GRN4T1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A1",
+      "varnumber": "71271",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71271:GRN4A1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N11",
+      "varnumber": "71276",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71276:GRN4N11",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G11",
+      "varnumber": "71927",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71927:GRN4G11",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T11",
+      "varnumber": "71281",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71281:GRN4T11",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A11",
+      "varnumber": "71286",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71286:GRN4A11",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N21",
+      "varnumber": "71291",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71291:GRN4N21",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G21",
+      "varnumber": "71932",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71932:GRN4G21",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T21",
+      "varnumber": "71296",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71296:GRN4T21",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A21",
+      "varnumber": "71301",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71301:GRN4A21",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N31",
+      "varnumber": "71306",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71306:GRN4N31",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G31",
+      "varnumber": "71937",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71937:GRN4G31",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T31",
+      "varnumber": "71311",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71311:GRN4T31",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A31",
+      "varnumber": "71316",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71316:GRN4A31",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N41",
+      "varnumber": "71321",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71321:GRN4N41",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G41",
+      "varnumber": "71942",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71942:GRN4G41",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T41",
+      "varnumber": "71326",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71326:GRN4T41",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A41",
+      "varnumber": "71331",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71331:GRN4A41",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N51",
+      "varnumber": "71336",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71336:GRN4N51",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G51",
+      "varnumber": "71947",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71947:GRN4G51",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T51",
+      "varnumber": "71341",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71341:GRN4T51",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N0",
+      "varnumber": "71541",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71541:GRN4N0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4ON0",
+      "varnumber": "71546",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71546:GRN4ON0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4WF0",
+      "varnumber": "71551",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71551:GRN4WF0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4OF0",
+      "varnumber": "71556",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71556:GRN4OF0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4UN0",
+      "varnumber": "71561",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71561:GRN4UN0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G0",
+      "varnumber": "71952",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71952:GRN4G0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T0",
+      "varnumber": "71566",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71566:GRN4T0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A0",
+      "varnumber": "71571",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71571:GRN4A0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N10",
+      "varnumber": "71576",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71576:GRN4N10",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G10",
+      "varnumber": "71957",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71957:GRN4G10",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T10",
+      "varnumber": "71581",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71581:GRN4T10",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A10",
+      "varnumber": "71586",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71586:GRN4A10",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N20",
+      "varnumber": "71591",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71591:GRN4N20",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G20",
+      "varnumber": "71962",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71962:GRN4G20",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T20",
+      "varnumber": "71596",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71596:GRN4T20",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A20",
+      "varnumber": "71601",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71601:GRN4A20",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N30",
+      "varnumber": "71606",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71606:GRN4N30",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G30",
+      "varnumber": "71967",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71967:GRN4G30",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T30",
+      "varnumber": "71611",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71611:GRN4T30",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A30",
+      "varnumber": "71616",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71616:GRN4A30",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N40",
+      "varnumber": "71621",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71621:GRN4N40",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G40",
+      "varnumber": "71972",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71972:GRN4G40",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T40",
+      "varnumber": "71626",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71626:GRN4T40",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A40",
+      "varnumber": "71631",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71631:GRN4A40",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4N50",
+      "varnumber": "71636",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71636:GRN4N50",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4G50",
+      "varnumber": "71977",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71977:GRN4G50",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4T50",
+      "varnumber": "71641",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71641:GRN4T50",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A50",
+      "varnumber": "71646",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71646:GRN4A50",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPGRN2",
+      "varnumber": "70966",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70966:NPGRN2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPGRN1",
+      "varnumber": "70971",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70971:NPGRN1",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPGRN0",
+      "varnumber": "70976",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70976:NPGRN0",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT412",
+      "varnumber": "70981",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70981:NPT412",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT422",
+      "varnumber": "70986",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70986:NPT422",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT432",
+      "varnumber": "70991",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70991:NPT432",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT442",
+      "varnumber": "70996",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:70996:NPT442",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT452",
+      "varnumber": "71001",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71001:NPT452",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT411",
+      "varnumber": "71351",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71351:NPT411",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT421",
+      "varnumber": "71356",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71356:NPT421",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT431",
+      "varnumber": "71361",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71361:NPT431",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT441",
+      "varnumber": "71366",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71366:NPT441",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT451",
+      "varnumber": "71371",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71371:NPT451",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT410",
+      "varnumber": "71651",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71651:NPT410",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "NPT450",
+      "varnumber": "71671",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71671:NPT450",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCUGRAD",
+      "varnumber": "70291",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70291:SCUGRAD",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCUGDGSK",
+      "varnumber": "73004",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73004:SCUGDGSK",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCUGNDGS",
+      "varnumber": "73006",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73006:SCUGNDGS",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCUGFFN",
+      "varnumber": "70286",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70286:SCUGFFN",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFA2",
+      "varnumber": "70176",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70176:SCFA2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFA2DG",
+      "varnumber": "73014",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73014:SCFA2DG",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFA1N",
+      "varnumber": "70126",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70126:SCFA1N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFA1P",
+      "varnumber": "70131",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70131:SCFA1P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFA11N",
+      "varnumber": "70136",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70136:SCFA11N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFA11P",
+      "varnumber": "70141",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70141:SCFA11P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFA12N",
+      "varnumber": "70146",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70146:SCFA12N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFA12P",
+      "varnumber": "70151",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70151:SCFA12P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFA13N",
+      "varnumber": "70156",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70156:SCFA13N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFA13P",
+      "varnumber": "70161",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70161:SCFA13P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFA14N",
+      "varnumber": "70166",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70166:SCFA14N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFA14P",
+      "varnumber": "70171",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70171:SCFA14P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFY2",
+      "varnumber": "70191",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70191:SCFY2",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFY2DG",
+      "varnumber": "73040",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73040:SCFY2DG",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFY2ND",
+      "varnumber": "73042",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73042:SCFY2ND",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFY1N",
+      "varnumber": "70181",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70181:SCFY1N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SCFY1P",
+      "varnumber": "70186",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70186:SCFY1P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UAGRNTN",
+      "varnumber": "70401",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70401:UAGRNTN",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UAGRNTP",
+      "varnumber": "70406",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70406:UAGRNTP",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UAGRNTT",
+      "varnumber": "70301",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70301:UAGRNTT",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UAGRNTA",
+      "varnumber": "70411",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70411:UAGRNTA",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UDGAGRNTN",
+      "varnumber": "73056",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73056:UDGAGRNTN",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UDGAGRNTP",
+      "varnumber": "73058",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73058:UDGAGRNTP",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UDGAGRNTT",
+      "varnumber": "73060",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73060:UDGAGRNTT",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UDGAGRNTA",
+      "varnumber": "73062",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73062:UDGAGRNTA",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UNDAGRNTN",
+      "varnumber": "73064",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73064:UNDAGRNTN",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UNDAGRNTP",
+      "varnumber": "73066",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73066:UNDAGRNTP",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UNDAGRNTT",
+      "varnumber": "73068",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73068:UNDAGRNTT",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UNDAGRNTA",
+      "varnumber": "73070",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73070:UNDAGRNTA",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UPGRNTN",
+      "varnumber": "70306",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70306:UPGRNTN",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UPGRNTP",
+      "varnumber": "70416",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70416:UPGRNTP",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UPGRNTT",
+      "varnumber": "70421",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70421:UPGRNTT",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UPGRNTA",
+      "varnumber": "70426",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70426:UPGRNTA",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UDGPGRNTN",
+      "varnumber": "73079",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73079:UDGPGRNTN",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UDGPGRNTP",
+      "varnumber": "73080",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73080:UDGPGRNTP",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UDGPGRNTT",
+      "varnumber": "73081",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73081:UDGPGRNTT",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UDGPGRNTA",
+      "varnumber": "73082",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73082:UDGPGRNTA",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UNDPGRNTN",
+      "varnumber": "73084",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73084:UNDPGRNTN",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UNDPGRNTP",
+      "varnumber": "73085",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73085:UNDPGRNTP",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UNDPGRNTT",
+      "varnumber": "73086",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73086:UNDPGRNTT",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UNDPGRNTA",
+      "varnumber": "73087",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73087:UNDPGRNTA",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UFLOANN",
+      "varnumber": "70431",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70431:UFLOANN",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UFLOANP",
+      "varnumber": "70436",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70436:UFLOANP",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UFLOANT",
+      "varnumber": "70441",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70441:UFLOANT",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UFLOANA",
+      "varnumber": "70446",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70446:UFLOANA",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UDGFLOANN",
+      "varnumber": "73089",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73089:UDGFLOANN",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UDGFLOANP",
+      "varnumber": "73090",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73090:UDGFLOANP",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UDGFLOANT",
+      "varnumber": "73091",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73091:UDGFLOANT",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UDGFLOANA",
+      "varnumber": "73092",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73092:UDGFLOANA",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UNDFLOANN",
+      "varnumber": "73094",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73094:UNDFLOANN",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UNDFLOANP",
+      "varnumber": "73095",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73095:UNDFLOANP",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UNDFLOANT",
+      "varnumber": "73096",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73096:UNDFLOANT",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "UNDFLOANA",
+      "varnumber": "73097",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:73097:UNDFLOANA",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "ANYAIDN",
+      "varnumber": "70196",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70196:ANYAIDN",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "ANYAIDP",
+      "varnumber": "70201",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70201:ANYAIDP",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "AIDFSIN",
+      "varnumber": "71099",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:71099:AIDFSIN",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "AIDFSIP",
+      "varnumber": "71100",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:71100:AIDFSIP",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "AGRNT_N",
+      "varnumber": "70311",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70311:AGRNT_N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "AGRNT_P",
+      "varnumber": "70316",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70316:AGRNT_P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "AGRNT_T",
+      "varnumber": "70451",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70451:AGRNT_T",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "AGRNT_A",
+      "varnumber": "70321",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70321:AGRNT_A",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "FGRNT_N",
+      "varnumber": "70206",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70206:FGRNT_N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "FGRNT_P",
+      "varnumber": "70211",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70211:FGRNT_P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "FGRNT_T",
+      "varnumber": "70456",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70456:FGRNT_T",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "FGRNT_A",
+      "varnumber": "70216",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70216:FGRNT_A",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "PGRNT_N",
+      "varnumber": "70326",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70326:PGRNT_N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "PGRNT_P",
+      "varnumber": "70331",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70331:PGRNT_P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "PGRNT_T",
+      "varnumber": "70461",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70461:PGRNT_T",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "PGRNT_A",
+      "varnumber": "70336",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70336:PGRNT_A",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "OFGRT_N",
+      "varnumber": "70341",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70341:OFGRT_N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "OFGRT_P",
+      "varnumber": "70346",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70346:OFGRT_P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "OFGRT_T",
+      "varnumber": "70466",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70466:OFGRT_T",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "OFGRT_A",
+      "varnumber": "70351",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70351:OFGRT_A",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SGRNT_N",
+      "varnumber": "70221",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70221:SGRNT_N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SGRNT_P",
+      "varnumber": "70226",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70226:SGRNT_P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SGRNT_T",
+      "varnumber": "70471",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70471:SGRNT_T",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "SGRNT_A",
+      "varnumber": "70231",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70231:SGRNT_A",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "IGRNT_N",
+      "varnumber": "70236",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70236:IGRNT_N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "IGRNT_P",
+      "varnumber": "70241",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70241:IGRNT_P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "IGRNT_T",
+      "varnumber": "70476",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70476:IGRNT_T",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "IGRNT_A",
+      "varnumber": "70246",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70246:IGRNT_A",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "LOAN_N",
+      "varnumber": "70251",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70251:LOAN_N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "LOAN_P",
+      "varnumber": "70256",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70256:LOAN_P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "LOAN_T",
+      "varnumber": "70481",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70481:LOAN_T",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "LOAN_A",
+      "varnumber": "70261",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70261:LOAN_A",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "FLOAN_N",
+      "varnumber": "70356",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70356:FLOAN_N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "FLOAN_P",
+      "varnumber": "70361",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70361:FLOAN_P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "FLOAN_T",
+      "varnumber": "70486",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70486:FLOAN_T",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "FLOAN_A",
+      "varnumber": "70366",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70366:FLOAN_A",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "OLOAN_N",
+      "varnumber": "70371",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70371:OLOAN_N",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "OLOAN_P",
+      "varnumber": "70376",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70376:OLOAN_P",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "OLOAN_T",
+      "varnumber": "70491",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70491:OLOAN_T",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "OLOAN_A",
+      "varnumber": "70381",
+      "original_table": "SFA2223_P2",
+      "resolved_table": "SFA2223_P1",
+      "evidence_id": "2023-sfa-v1:70381:OLOAN_A",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    },
+    {
+      "year": 2023,
+      "varname": "GRN4A51",
+      "varnumber": "71346",
+      "original_table": "SFA2223_P1",
+      "resolved_table": "SFA2223_P2",
+      "evidence_id": "2023-sfa-v1:71346:GRN4A51",
+      "reason": "Original Access dictionary TableName differs from the unique physical column in the same locked database; verified individually, not inferred from table naming."
+    }
+  ]
+}

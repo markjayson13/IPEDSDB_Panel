@@ -59,6 +59,8 @@ def main() -> None:
     ap.add_argument("--custom-vars", default=None)
     ap.add_argument("--custom-vars-file", default=None)
     ap.add_argument("--custom-output", default=None)
+    ap.add_argument("--custom-allow-incomplete-metadata", action="store_true",
+                    help="Write a draft custom extract even when metadata/observation readiness is incomplete")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -220,7 +222,16 @@ def main() -> None:
             custom_output,
             "--years",
             year_spec,
+            "--dictionary",
+            str(dict_lake),
+            "--codes",
+            str(layout.dictionary / "dictionary_codes.parquet"),
+            "--column-lineage",
+            str(column_lineage),
+            "--strict",
         ]
+        if not args.custom_allow_incomplete_metadata:
+            cmd += ["--require-ready"]
         if args.custom_vars:
             cmd += ["--vars", args.custom_vars]
         if args.custom_vars_file:

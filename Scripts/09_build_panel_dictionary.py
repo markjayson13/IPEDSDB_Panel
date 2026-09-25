@@ -13,10 +13,17 @@ Writes:
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 from pathlib import Path
+import tempfile
 
 import pandas as pd
-import pyarrow.parquet as pq
+import pyarrow.dataset as ds
+
+from export_metadata import build_export_metadata, discover_export_metadata
+from export_integrity import (apply_observation_validation, assert_source_unchanged, export_code_provenance,
+                              promote_package, require_export_ready, scan_panel, source_fingerprint, validate_observed_codes)
+from panel_export import append_sheet, excel_cell, prepare_format_metadata, value_label_rows, write_sidecars
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
@@ -28,89 +35,48 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--input", required=True, help="Input stitched wide parquet")
     p.add_argument("--dictionary", required=True, help="dictionary_lake.parquet")
     p.add_argument("--output", required=True, help="Output .csv or .xlsx path")
+    p.add_argument("--codes", help="Year/source-scoped category codebook; defaults beside the dictionary")
+    p.add_argument("--column-lineage", help="Stage 06 output-column lineage; defaults beside the panel data root")
+    p.add_argument("--require-ready", action="store_true", help="Require complete metadata and panel observation checks")
     return p.parse_args()
 
 
-def best_text(series: pd.Series) -> str:
-    vals = [str(v).strip() for v in series.dropna().tolist()]
-    vals = [v for v in vals if v and v.lower() not in {"nan", "none", "<na>", "nat"}]
-    if not vals:
-        return ""
-    vals = sorted(set(vals), key=lambda x: (-len(x), x))
-    return vals[0]
-
-
-def summarize_dictionary(path: Path) -> pd.DataFrame:
-    cols = ["varname", "varTitle", "longDescription", "DataType"]
-    df = pd.read_parquet(path, columns=cols)
-    for col in cols:
-        if col not in df.columns:
-            df[col] = ""
-    df["varname"] = df["varname"].fillna("").astype(str).str.upper().str.strip()
-    df = df[df["varname"] != ""].copy()
-    out = (
-        df.groupby("varname", as_index=False)
-        .agg(
-            varTitle=("varTitle", best_text),
-            longDescription=("longDescription", best_text),
-            dictionaryDataType=("DataType", best_text),
-        )
-    )
-    return out
-
-
-def panel_schema_df(path: Path) -> pd.DataFrame:
-    schema = pq.read_schema(path)
+def reference_from_metadata(metadata: dict) -> pd.DataFrame:
+    """Keep legacy dictionary columns without selecting a meaning across conflicting sources."""
     rows = []
-    for idx, name in enumerate(schema.names):
-        field = schema.field(name)
-        rows.append(
-            {
-                "column_order": idx,
-                "varname": str(name).upper().strip(),
-                "panelDataType": str(field.type),
-            }
-        )
+    for index, variable in enumerate(metadata["variables"]):
+        types = sorted({str(record.get("DataType", "")).strip()
+                        for record in variable["source_metadata"] if record.get("DataType")})
+        rows.append({
+            "column_order": index, "varname": variable["name"].upper(),
+            "varTitle": variable["label"], "longDescription": variable["description"],
+            "panelDataType": variable["storage_type"],
+            "dictionaryDataType": types[0] if len(types) == 1 else "",
+            "metadata_status": variable["metadata_status"],
+            "comparability_status": variable.get("comparability_status", "unknown"),
+        })
     return pd.DataFrame(rows)
 
 
-def build_reference_df(input_path: Path, dictionary_path: Path) -> pd.DataFrame:
-    schema_df = panel_schema_df(input_path)
-    dict_df = summarize_dictionary(dictionary_path)
-    ref = schema_df.merge(dict_df, on="varname", how="left")
-
-    # Controlled metadata for stitched-wide panel keys.
-    ref.loc[ref["varname"] == "YEAR", "varTitle"] = (
-        ref.loc[ref["varname"] == "YEAR", "varTitle"].fillna("").replace("", "IPEDS reporting year")
-    )
-    ref.loc[ref["varname"] == "YEAR", "longDescription"] = (
-        ref.loc[ref["varname"] == "YEAR", "longDescription"]
-        .fillna("")
-        .replace("", "IPEDS reporting year carried by the stitched institution-year panel.")
-    )
-    ref.loc[ref["varname"] == "UNITID", "varTitle"] = (
-        ref.loc[ref["varname"] == "UNITID", "varTitle"].fillna("").replace("", "Institution identifier (panel key)")
-    )
-    ref.loc[ref["varname"] == "UNITID", "longDescription"] = (
-        ref.loc[ref["varname"] == "UNITID", "longDescription"]
-        .fillna("")
-        .replace("", "Stable institution identifier used as the unit key in the stitched institution-year panel.")
-    )
-
-    for col in ["varTitle", "longDescription", "dictionaryDataType"]:
-        ref[col] = ref[col].fillna("").astype(str)
-
-    return ref[["column_order", "varname", "varTitle", "longDescription", "panelDataType", "dictionaryDataType"]]
+def build_reference_df(input_path: Path, dictionary_path: Path,
+                       codes_path: Path | None = None, lineage_path: Path | None = None) -> pd.DataFrame:
+    dataset = ds.dataset(input_path, format="parquet")
+    names = {name.upper(): name for name in dataset.schema.names}
+    scan = scan_panel(dataset, dataset.schema.names, panel_keys=(names.get("UNITID", "UNITID"), names.get("YEAR", "year")))
+    metadata = build_export_metadata(dataset.schema, scan["years"], dictionary_path, codes_path, lineage_path)
+    return reference_from_metadata(metadata)
 
 
-def write_excel(ref: pd.DataFrame, input_path: Path, dictionary_path: Path, out_path: Path) -> None:
+def write_excel(ref: pd.DataFrame, input_path: Path, dictionary_path: Path, out_path: Path, metadata: dict) -> None:
+    if len(ref) > 1048575:
+        raise ValueError("Panel dictionary exceeds Excel's worksheet row limit; use CSV.")
     wb = Workbook()
     ws = wb.active
     ws.title = "panel_dictionary"
     headers = list(ref.columns)
-    ws.append(headers)
+    ws.append([excel_cell(ws, value) for value in headers])
     for row in ref.itertuples(index=False, name=None):
-        ws.append(list(row))
+        ws.append([excel_cell(ws, value) for value in row])
 
     header_fill = PatternFill(fill_type="solid", fgColor="17324D")
     header_font = Font(color="FFFFFF", bold=True)
@@ -189,21 +155,76 @@ def write_excel(ref: pd.DataFrame, input_path: Path, dictionary_path: Path, out_
             cell.alignment = Alignment(vertical="top", wrap_text=True)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    for name, (sheet_headers, rows) in (
+        ("value_labels", value_label_rows(metadata)),
+        ("issues", (["severity", "code", "variable", "message"],
+                    [[issue.get(key, "") for key in ("severity", "code", "variable", "message")]
+                     for issue in metadata["issues"]])),
+    ):
+        append_sheet(wb, name, sheet_headers, rows)
     wb.save(out_path)
+    wb.close()
 
 
 def main() -> None:
     args = parse_args()
     input_path = Path(args.input)
     dictionary_path = Path(args.dictionary)
+    codes_path = Path(args.codes) if args.codes else dictionary_path.parent / "dictionary_codes.parquet"
+    lineage_path = discover_export_metadata(args.column_lineage, "Checks/wide_qc/qc_column_lineage.csv",
+                                            input_path, input_path.parent.parent)
+    for explicit, path in ((True, dictionary_path), (bool(args.codes), codes_path), (bool(args.column_lineage), lineage_path)):
+        if explicit and (path is None or not path.is_file()):
+            raise ValueError(f"Metadata file does not exist: {path}")
+    codes_path = codes_path if codes_path.is_file() else None
+    lineage_path = lineage_path if lineage_path and lineage_path.is_file() else None
     out_path = Path(args.output)
+    if out_path.suffix.lower() not in {".csv", ".xlsx"}:
+        raise ValueError("Panel dictionaries require a .csv or .xlsx extension.")
+    sources = {"panel": input_path, "dictionary": dictionary_path, "codes": codes_path, "lineage": lineage_path}
+    destinations = [out_path] + [Path(str(out_path) + suffix) for suffix in
+                                (".metadata.json", ".dictionary.csv", ".value_labels.csv", ".README.txt")]
+    if any(destination.resolve() == source.resolve() or (source.is_dir() and source.resolve() in destination.resolve().parents)
+           for source in sources.values() if source for destination in destinations):
+        raise ValueError("Dictionary output cannot overwrite source data or metadata.")
+    fingerprints = {name: source_fingerprint(path) for name, path in sources.items() if path}
+    dataset = ds.dataset(input_path, format="parquet")
+    schema = dataset.schema
+    names = {name.upper(): name for name in schema.names}
+    if len(names) != len(schema.names):
+        raise ValueError("Input has duplicate or case-ambiguous column names.")
+    year_col = names.get("YEAR", "year")
+    scan = scan_panel(dataset, schema.names, panel_keys=(names.get("UNITID", "UNITID"), year_col))
+    metadata = build_export_metadata(schema, scan["years"], dictionary_path, codes_path, lineage_path)
+    metadata.update({
+        "schema_version": "1.1", "artifact_kind": "panel_dictionary",
+        "created_utc": datetime.now(timezone.utc).isoformat(), "format": out_path.suffix[1:],
+        "source_panel": str(input_path.resolve()), "source_row_count": scan["row_count"],
+        "row_count": len(schema), "column_count": len(schema),
+        "source_fingerprints": fingerprints, "export_code": export_code_provenance(),
+        "missing_values": "Definitions describe source panel values. Null reasons and cross-year comparability are not inferred.",
+    })
+    for variable in metadata["variables"]:
+        variable["null_count"] = scan["null_counts"][variable["name"]]
+    prepare_format_metadata(metadata, schema, out_path.suffix[1:])
+    code_check = validate_observed_codes(dataset, metadata, year_col=year_col)
+    apply_observation_validation(metadata, scan, code_check)
+    if args.require_ready:
+        require_export_ready(metadata)
+    ref = reference_from_metadata(metadata)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    ref = build_reference_df(input_path, dictionary_path)
-    if out_path.suffix.lower() == ".xlsx":
-        write_excel(ref, input_path, dictionary_path, out_path)
-    else:
-        ref.to_csv(out_path, index=False)
-    print(f"Wrote {len(ref):,} rows to {out_path}")
+    with tempfile.TemporaryDirectory(prefix=".ipeds-dictionary-", dir=out_path.parent) as staging:
+        staged = Path(staging) / out_path.name
+        if out_path.suffix.lower() == ".xlsx":
+            write_excel(ref, input_path, dictionary_path, staged, metadata)
+        else:
+            ref.to_csv(staged, index=False)
+        write_sidecars(staged, metadata)
+        for name, path in sources.items():
+            if path:
+                assert_source_unchanged(path, fingerprints[name])
+        promote_package(staged, out_path)
+    print(f"Wrote {len(ref):,} rows to {out_path}; metadata={metadata['metadata_status']}")
 
 
 if __name__ == "__main__":

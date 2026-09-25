@@ -86,3 +86,19 @@ def test_run_all_dry_run_respects_skip_flags_and_routes_custom_from_wide_when_no
     expected_wide = root / "Panels" / "panel_wide_analysis_2022_2023.parquet"
     assert f"--input {expected_wide}" in cmds[1]
     assert f"--output {custom_out}" in cmds[1]
+
+    assert "--require-ready" in cmds[1]
+    assert "--strict" in cmds[1]
+    assert f"--dictionary {root / 'Dictionary/dictionary_lake.parquet'}" in cmds[1]
+    assert f"--codes {root / 'Dictionary/dictionary_codes.parquet'}" in cmds[1]
+    assert f"--column-lineage {root / 'Checks/wide_qc/qc_column_lineage.csv'}" in cmds[1]
+
+
+def test_run_all_requires_explicit_draft_escape_for_custom_export(tmp_path: Path) -> None:
+    result = run_script("Scripts/00_run_all.py", "--root", tmp_path / "data", "--years", "2023:2023",
+                        "--build-custom", "--custom-vars", "CONTROL", "--custom-allow-incomplete-metadata", "--dry-run")
+    assert result.returncode == 0, result.stdout
+    command = next(line for line in command_lines(result.stdout) if "08_build_custom_panel.py" in line)
+    assert "--require-ready" not in command
+    assert "--strict" in command
+    assert "--dictionary" in command and "--codes" in command and "--column-lineage" in command

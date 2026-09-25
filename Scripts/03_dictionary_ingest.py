@@ -25,6 +25,7 @@ import zlib
 from pathlib import Path
 
 import pandas as pd
+from source_metadata_corrections import apply_source_metadata_corrections
 
 from access_build_utils import (
     DATA_TABLE_CANDIDATES,
@@ -510,6 +511,7 @@ def main() -> None:
     )
     lake, synth_imp_count = append_synthetic_imputation_rows(lake)
     lake, unitid_count = append_unitid_metadata_rows(lake)
+    lake = apply_source_metadata_corrections(lake, root=layout.root)
     lake.to_parquet(layout.dictionary / "dictionary_lake.parquet", index=False)
     lake.to_csv(layout.dictionary / "dictionary_lake.csv", index=False)
 
@@ -535,6 +537,7 @@ def main() -> None:
             ]
         )
     codes = codes.drop_duplicates().reset_index(drop=True)
+    codes = apply_source_metadata_corrections(codes, root=layout.root, codebook=True)
     codes.to_parquet(layout.dictionary / "dictionary_codes.parquet", index=False)
     codes.to_csv(layout.dictionary / "dictionary_codes.csv", index=False)
 

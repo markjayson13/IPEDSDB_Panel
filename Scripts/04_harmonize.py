@@ -30,6 +30,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from access_build_utils import ensure_data_layout, normalize_varnumber, parse_years, repo_root
+from source_metadata_corrections import exact_table_dictionary_rows
 
 
 HARMONIZE_SUMMARY_COLUMNS = [
@@ -320,16 +321,13 @@ def select_dict_source(
     source_file: str,
     access_table_name: str,
     overrides: pd.DataFrame | None = None,
+    *,
+    physical_columns: list[str] | None = None,
 ) -> pd.DataFrame:
     source_norm = str(source_file or "").strip().upper()
     access_norm = str(access_table_name or "").strip().upper()
     dict_year = ensure_dict_columns(dict_year)
-    subset = dict_year[
-        (dict_year["source_file"].fillna("").astype(str).str.upper() == source_norm)
-        | (dict_year["access_table_name"].fillna("").astype(str).str.upper() == access_norm)
-    ].copy()
-    if subset.empty and source_norm:
-        subset = dict_year[dict_year["source_file"].fillna("").astype(str).str.upper() == source_norm].copy()
+    subset = exact_table_dictionary_rows(dict_year, source_norm, access_norm, physical_columns)
     if subset.empty:
         return subset
     return enforce_unambiguous_dict_source(
@@ -607,6 +605,7 @@ def main() -> None:
                     rec.get("normalized_table_name", ""),
                     access_table_name,
                     ambiguity_overrides,
+                    physical_columns=pd.read_csv(table_path, nrows=0).columns.tolist(),
                 )
                 if dict_source.empty:
                     year_summary_rows.append(

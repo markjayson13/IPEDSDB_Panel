@@ -1,0 +1,14 @@
+{
+  "url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2023-24_Final.zip",
+  "final_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2023-24_Final.zip",
+  "retrieved_utc": "2026-09-25T00:21:46Z",
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/x-zip-compressed",
+    "Last-Modified": "Mon, 02 Mar 2026 18:47:02 GMT",
+    "ETag": "\"1dcaa74f085a5bc\""
+  },
+  "sha256": "5a29f4b8d0fbdd5e091015e286dbddcecdf8d423926521a8af560967cd376629",
+  "size": 94499516,
+  "elapsed_seconds": 905.0194852352142
+}

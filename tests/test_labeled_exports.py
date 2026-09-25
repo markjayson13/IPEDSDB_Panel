@@ -18,7 +18,7 @@ import pyarrow.parquet as pq
 import pytest
 from openpyxl import load_workbook
 
-from helpers import run_script
+from helpers import load_script_module, run_script
 
 
 @pytest.fixture
@@ -314,3 +314,85 @@ def test_portable_parquet_reexports_native_stata_labels_without_external_metadat
     assert metadata["metadata_source_modes"]["codes"] == "embedded_parquet"
     assert metadata["metadata_sources"]["dictionary"] is None
     assert metadata["metadata_sources"]["codes"] is None
+
+
+@pytest.mark.parametrize("problem", ["null_unitid", "invalid_unitid", "duplicate_key", "unknown_code"])
+def test_readiness_checks_observations_without_recoding(export_fixture: dict, problem: str) -> None:
+    table = export_fixture["table"]
+    if problem == "null_unitid":
+        values = pa.array([None, *range(100655, 100660)], type=pa.int64())
+        column, expected = "UNITID", "invalid_panel_key"
+    elif problem == "invalid_unitid":
+        values = pa.array([100654.5, *range(100655, 100660)], type=pa.float64())
+        column, expected = "UNITID", "invalid_panel_key"
+    elif problem == "duplicate_key":
+        values = pa.array([100654, 100655, 100654, *range(100657, 100660)], type=pa.int64())
+        column, expected = "UNITID", "duplicate_panel_key"
+    else:
+        values = pa.array([99, 2, -1, None, 1, 2], type=pa.int64())
+        column, expected = "CONTROL", "unknown_observed_code"
+    table = table.set_column(table.schema.get_field_index(column), column, values)
+    pq.write_table(table, export_fixture["panel"])
+    output = export_fixture["root"] / "not_ready.parquet"
+    strict = export_to(export_fixture, output, "--require-ready", "--batch-rows", "2")
+    assert strict.returncode != 0
+    assert "observations are not ready" in strict.stdout
+    assert not list(output.parent.glob(output.name + "*"))
+    diagnostic = export_to(export_fixture, output, "--batch-rows", "2")
+    assert diagnostic.returncode == 0, diagnostic.stdout
+    metadata = read_metadata(output)
+    assert metadata["metadata_status"] == "complete"
+    assert metadata["readiness_status"] == "incomplete"
+    assert metadata["observation_validation"]["status"] == "incomplete"
+    assert any(issue["code"] == expected for issue in metadata["issues"])
+    assert pq.read_table(output).to_pydict() == table.to_pydict()
+
+
+def test_observed_codes_are_checked_in_their_reporting_year(export_fixture: dict) -> None:
+    table = export_fixture["table"]
+    table = table.set_column(0, "year", pa.array([2022, 2023, 2023, 2023, 2023, 2023], type=pa.int32()))
+    # Code 2 exists in the 2023 codebook but not the 2022 codebook.
+    table = table.set_column(2, "CONTROL", pa.array([2, 2, -1, None, 1, 2], type=pa.int64()))
+    pq.write_table(table, export_fixture["panel"])
+    output = export_fixture["root"] / "year_scoped.csv"
+    result = export_to(export_fixture, output)
+    assert result.returncode == 0, result.stdout
+    metadata = read_metadata(output)
+    issue = next(issue for issue in metadata["issues"] if issue["code"] == "unknown_observed_code")
+    assert issue["count"] == 1
+    assert issue["examples"] == [{"year": 2022, "value": "2"}]
+
+
+def test_export_records_source_and_exporter_fingerprints(export_fixture: dict) -> None:
+    output = export_fixture["root"] / "fingerprinted.csv"
+    result = export_to(export_fixture, output, "--require-ready")
+    assert result.returncode == 0, result.stdout
+    metadata = read_metadata(output)
+    assert metadata["source_panel_sha256"] == hashlib.sha256(export_fixture["panel"].read_bytes()).hexdigest()
+    assert metadata["source_fingerprint"]["kind"] == "file"
+    assert metadata["readiness_status"] == "complete"
+    assert "Scripts/export_integrity.py" in metadata["exporter_provenance"]["files"]
+
+
+def test_source_mutation_with_same_row_count_preserves_prior_package(export_fixture: dict, monkeypatch) -> None:
+    output = export_fixture["root"] / "protected.parquet"
+    result = export_to(export_fixture, output, "--require-ready")
+    assert result.returncode == 0, result.stdout
+    before = {path: path.read_bytes() for path in output.parent.glob(output.name + "*")}
+    module = load_script_module("stage08_source_mutation", "Scripts/08_build_custom_panel.py")
+    original_write = module.write_stream
+    def mutate_source_after_write(*args, **kwargs):
+        rows = original_write(*args, **kwargs)
+        source = export_fixture["table"].set_column(2, "CONTROL", pa.array([2, 2, -1, None, 1, 2], type=pa.int64()))
+        pq.write_table(source, export_fixture["panel"])
+        return rows
+    monkeypatch.setattr(module, "write_stream", mutate_source_after_write)
+    monkeypatch.setattr("sys.argv", [
+        "08_build_custom_panel.py", "--input", str(export_fixture["panel"]), "--output", str(output),
+        "--vars", "CONTROL,INSTNM", "--dictionary", str(export_fixture["dictionary"]),
+        "--codes", str(export_fixture["codes"]), "--column-lineage", str(export_fixture["lineage"]),
+        "--log-file", "", "--require-ready",
+    ])
+    with pytest.raises(ValueError, match="Source changed during export"):
+        module.main()
+    assert {path: path.read_bytes() for path in output.parent.glob(output.name + "*")} == before

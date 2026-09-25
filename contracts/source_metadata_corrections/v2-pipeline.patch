@@ -1,0 +1,70 @@
+--- a/Scripts/03_dictionary_ingest.py
++++ b/Scripts/03_dictionary_ingest.py
+@@ -25,6 +25,7 @@
+ import tomllib
+ 
+ import pandas as pd
++from source_metadata_corrections import apply_source_metadata_corrections
+ 
+ from access_build_utils import (
+     DATA_TABLE_CANDIDATES,
+@@ -1185,6 +1186,7 @@
+     backfill_report.to_csv(dictionary_qc_dir / "metadata_backfill_report.csv", index=False)
+     lake, synth_imp_count = append_synthetic_imputation_rows(lake)
+     lake, unitid_count = append_unitid_metadata_rows(lake)
++    lake = apply_source_metadata_corrections(lake, root=layout.root)
+     contract_id = current_contract_id()
+     if not contract_id:
+         raise SystemExit("[fatal] panel contract_id is blank")
+@@ -1208,6 +1210,7 @@
+     lake.to_csv(layout.dictionary / "dictionary_lake.csv", index=False)
+ 
+     codes = codes.drop_duplicates().reset_index(drop=True)
++    codes = apply_source_metadata_corrections(codes, root=layout.root, codebook=True)
+     codes["contract_id"] = contract_id
+     codes = codes[["contract_id", *[column for column in codes.columns if column != "contract_id"]]]
+     codes.to_parquet(v2_dictionary_dir / "dictionary_codes.parquet", index=False)
+--- a/Scripts/04_harmonize.py
++++ b/Scripts/04_harmonize.py
+@@ -36,6 +36,7 @@
+ 
+ import duckdb
+ import pandas as pd
++from source_metadata_corrections import exact_table_dictionary_rows
+ import pyarrow as pa
+ import pyarrow.parquet as pq
+ 
+@@ -1069,6 +1070,9 @@
+                 f"access_table_name={access_norm} varname={varname} "
+                 f"matched {len(candidates)} dictionary rows; expected exactly 1"
+             )
++        candidates = candidates.copy()
++        candidates["resolved_physical_table"] = access_norm
++        candidates["source_metadata_alias_id"] = str(alias["decision_id"])
+         selected.append(candidates)
+     if not selected:
+         return subset.iloc[0:0].copy()
+@@ -1091,6 +1095,7 @@
+     overrides: pd.DataFrame | None = None,
+     *,
+     aliases: pd.DataFrame | None = None,
++    physical_columns: list[str] | None = None,
+ ) -> pd.DataFrame:
+     source_norm = str(source_file or "").strip().upper()
+     access_norm = str(access_table_name or "").strip().upper()
+@@ -1112,6 +1117,7 @@
+         source_norm=source_norm,
+         access_norm=access_norm,
+     )
++    subset = exact_table_dictionary_rows(subset, source_norm, access_norm, physical_columns)
+     return enforce_unambiguous_dict_source(
+         subset,
+         source_norm=source_norm,
+@@ -2149,6 +2155,7 @@
+                 access_table_name,
+                 ambiguity_overrides,
+                 aliases=source_metadata_aliases,
++                physical_columns=pd.read_csv(table_path, nrows=0).columns.tolist(),
+             )
+             dict_source = ensure_dict_columns(dict_source)
+ 
