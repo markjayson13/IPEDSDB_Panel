@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "supplement_id": "2026-09-exact-year-labels-v1",
+  "verification": "Exact reporting year, workbook-declared table filename, variable name, variable number, and whitespace-normalized title matched to the corrected source dictionary. Frequency labels are copied literally; no other-year labels are borrowed.",
+  "sources": {
+    "2010:IC2010": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/IC2010_Dict.zip",
+      "archive_sha256": "86cde67961afd5e5d82692791bdd58955fc2818bd3745d4ded9598772f1864d3",
+      "workbook": "ic2010.xls",
+      "workbook_sha256": "f922c6ccf78a7cdb87bf74c1130e8af3b5041069014d450b8bbf84d59796ce4b",
+      "year": 2010,
+      "access_table_name": "IC2010"
+    },
+    "2010:HD2010": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/HD2010_Dict.zip",
+      "archive_sha256": "e5aae5fa45bb36b328fae3f4fdbd2b3ee43eca0b315688c9c910bd22f95dabbf",
+      "workbook": "hd2010.xls",
+      "workbook_sha256": "8f594a7b10f7edcb76e1d14543f427d9f37cf2b4fb5fceae099e2a2f5ce50189",
+      "year": 2010,
+      "access_table_name": "HD2010"
+    },
+    "2006:IC2006_PY": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/IC2006_PY_Dict.zip",
+      "archive_sha256": "ca91c9ee64b0c074d0656414810105601a12dd7d94fc13a2626e1c281cb9d067",
+      "workbook": "ic2006_py.xlsx",
+      "workbook_sha256": "eef2252a08b8f148dfa72a90c6205d7053dc8c907f4edd846245770adcd14638",
+      "year": 2006,
+      "access_table_name": "IC2006_PY"
+    },
+    "2017:IC2017": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/IC2017_Dict.zip",
+      "archive_sha256": "2796c8ef649c0c9c46c67a7f5aa03f64e17ea77f77ae97b753efda7b2ac91a78",
+      "workbook": "ic2017.xlsx",
+      "workbook_sha256": "c85aac2f41c7195d6c659b14f28af853e1f6a3c1b3563fda2d4b82ab0e5180e5",
+      "year": 2017,
+      "access_table_name": "IC2017"
+    },
+    "2018:IC2018": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/IC2018_Dict.zip",
+      "archive_sha256": "10220ec0106d48672b03dcae73aa121dbe48a09f73195240012ad81dbd91c9d8",
+      "workbook": "ic2018.xlsx",
+      "workbook_sha256": "30b8f6c9ba38f8251ee7861fbd071cbacf697dd435d5d691e7dd97a400a68971",
+      "year": 2018,
+      "access_table_name": "IC2018"
+    },
+    "2019:IC2019": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/IC2019_Dict.zip",
+      "archive_sha256": "69ba91d4d52840e5433e54dc2f825dad25d05768f707e399ae57961136297947",
+      "workbook": "ic2019.xlsx",
+      "workbook_sha256": "95a17f2579529be6f9886e2230a59d983602e0ad98fe82b0a8077a998fe9b95b",
+      "year": 2019,
+      "access_table_name": "IC2019"
+    },
+    "2020:IC2020": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/IC2020_Dict.zip",
+      "archive_sha256": "73b80b0072dedb9ff7fe23b58f2306c8779829ab7f2b4fd71a84bc720e9bc184",
+      "workbook": "ic2020.xlsx",
+      "workbook_sha256": "c5238a59f6e90c7dd0aadd6ca713a4a7b2b026516c1cf83cfe09d4c6c7ba01d3",
+      "year": 2020,
+      "access_table_name": "IC2020"
+    },
+    "2021:IC2021": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/IC2021_Dict.zip",
+      "archive_sha256": "d8da8124b9f7612c9ac1c969f1ae12b7f7c7acb9d02664268ba989eecdc3e49e",
+      "workbook": "ic2021.xlsx",
+      "workbook_sha256": "95486f6ef82b2ef985ee43054ba93242c811895e6e205511c297dd08c6157341",
+      "year": 2021,
+      "access_table_name": "IC2021"
+    },
+    "2022:IC2022": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/IC2022_Dict.zip",
+      "archive_sha256": "64c61cf9176c46718f11e5bcca1d778872f2a6c9549c944ceb49d72261c2d1a4",
+      "workbook": "ic2022.xlsx",
+      "workbook_sha256": "d8e82123c461d28e420dcc139e7d31b08ab90930c639d676b5585eb0175d65ee",
+      "year": 2022,
+      "access_table_name": "IC2022"
+    },
+    "2013:HD2013": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/HD2013_Dict.zip",
+      "archive_sha256": "313fafff0e439e0f13cde9066a9b9bf79903be7d1e610ee9b131e24629a0309f",
+      "workbook": "hd2013.xlsx",
+      "workbook_sha256": "91efdd8c37019d16ad69a12f09574ced58723b1d780f1077a4acc9061776378b",
+      "year": 2013,
+      "access_table_name": "HD2013"
+    },
+    "2014:HD2014": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/HD2014_Dict.zip",
+      "archive_sha256": "3daa3ae6aa8ca3d55a1acb757c6d262f85ed58569886ad0831b092c6d1416f32",
+      "workbook": "hd2014.xlsx",
+      "workbook_sha256": "45b592393087125077dfda290492f38e3d9dc95b76109552baa5b22b012f5450",
+      "year": 2014,
+      "access_table_name": "HD2014"
+    },
+    "2010:FLAGS2010": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/FLAGS2010_Dict.zip",
+      "archive_sha256": "7da8a6bf33a24ea86744506dff5738ba62e73764159024bacbfa02cf33b1192d",
+      "workbook": "flags2010.xls",
+      "workbook_sha256": "e3641b865ae660b6283c83a6028608992668a7bc733e3405bbe50ef6d30b5e8d",
+      "year": 2010,
+      "access_table_name": "FLAGS2010"
+    },
+    "2005:FLAGS2005": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/FLAGS2005_Dict.zip",
+      "archive_sha256": "74c257a3977b40e0e3e5288188ee78063443448274a9e2db566a15bf5d96ddba",
+      "workbook": "flags2005.xlsx",
+      "workbook_sha256": "8ca3dc54d832c2a1c14813fc33fec9191ddbeeefb208f0dedaaed868bd2b0840",
+      "year": 2005,
+      "access_table_name": "FLAGS2005"
+    },
+    "2006:FLAGS2006": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/FLAGS2006_Dict.zip",
+      "archive_sha256": "6a1dab0e57b93aeb509ad187e24e1cb248997a02bd3d8e52d4bfbe5f5d57eee2",
+      "workbook": "flags2006.xlsx",
+      "workbook_sha256": "dc1d6163c108c98e8ac8035eaaf70418008b3dabc43b3ad813046416e536be54",
+      "year": 2006,
+      "access_table_name": "FLAGS2006"
+    },
+    "2007:FLAGS2007": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/FLAGS2007_Dict.zip",
+      "archive_sha256": "c0b105b05cc3ff26ef7553e4be0ebd538ea54336f4fe11e04b2942d894bb20ac",
+      "workbook": "flags2007.xlsx",
+      "workbook_sha256": "00297adb581b8f510e1c622568f66621e8083e9a2faae10432dcdd1672bee133",
+      "year": 2007,
+      "access_table_name": "FLAGS2007"
+    },
+    "2008:FLAGS2008": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/FLAGS2008_Dict.zip",
+      "archive_sha256": "b2d46fa3e5a55aaadd69ab03da1958685319f01ff8d71ddf27fd82a82f45b064",
+      "workbook": "flags2008.xlsx",
+      "workbook_sha256": "2fd771dee1009410996092a065e27e6280b0df9c15eb883b72f80c7a5c8a4d94",
+      "year": 2008,
+      "access_table_name": "FLAGS2008"
+    },
+    "2009:FLAGS2009": {
+      "url": "https://nces.ed.gov/ipeds/datacenter/data/FLAGS2009_Dict.zip",
+      "archive_sha256": "be54a059aedeb71beadd695ceda5557ee574167cb71bbbc2338ed395f02602e9",
+      "workbook": "flags2009.xls",
+      "workbook_sha256": "717177e3dff6878ef9b2770baf77e6290f5a9f3bb2dc7e39af4fb612c49eaeaf",
+      "year": 2009,
+      "access_table_name": "FLAGS2009"
+    }
+  },
+  "limitations": [
+    "The supplement fills only missing code definitions or blank labels. Existing nonblank labels remain authoritative and are never overwritten.",
+    "6256 originally flagged observations remain without usable authoritative labels: STAT_AL 6023; DEATHYR 229; ADMCON9 2; CUFASB/CUGASB 2.",
+    "Blank source long descriptions remain blank; no description supplement is supplied."
+  ],
+  "audit_candidate_sha256": "681e9058da9205d90fbfea6478c6f4576294f69bcf8505bcb77afdea0a96932f"
+}

@@ -166,6 +166,48 @@ def test_missing_year_coverage_is_explicit(tmp_path: Path) -> None:
     assert "2022" in issue["message"]
 
 
+def test_absent_observations_do_not_require_a_definition_for_that_year(tmp_path: Path) -> None:
+    dictionary = write_records(tmp_path / "dictionary.parquet", [definition(2023)])
+    codes = write_records(tmp_path / "codes.parquet", [code(2023)])
+    result = build_export_metadata(
+        pa.schema([("CONTROL", pa.int32())]), [2022, 2023], dictionary, codes,
+        observed_years_by_variable={"CONTROL": [2023]},
+    )
+    variable = result["variables"][0]
+    assert variable["metadata_status"] == "complete"
+    assert variable["value_labels"] == [{"value": "1", "label": "Public"}]
+    assert result["years"] == [2022, 2023]
+    assert not any(row["code"] == "variable_year_coverage_incomplete" for row in result["issues"])
+
+
+@pytest.mark.parametrize("observed", [{}, {"CONTROL": [2022, 2023]}])
+def test_observed_or_unassessed_year_still_requires_definition(tmp_path: Path, observed: dict) -> None:
+    dictionary = write_records(tmp_path / "dictionary.parquet", [definition(2023)])
+    codes = write_records(tmp_path / "codes.parquet", [code(2023)])
+    result = build_export_metadata(
+        pa.schema([("CONTROL", pa.int32())]), [2022, 2023], dictionary, codes,
+        observed_years_by_variable=observed,
+    )
+    assert result["variables"][0]["metadata_status"] == "incomplete"
+    assert any(row["code"] == "variable_year_coverage_incomplete" for row in result["issues"])
+
+
+def test_observed_year_coverage_does_not_discard_historical_source_meanings(tmp_path: Path) -> None:
+    dictionary = write_records(tmp_path / "dictionary.parquet", [
+        definition(2022, varTitle="Historical control"), definition(2023),
+    ])
+    codes = write_records(tmp_path / "codes.parquet", [code(2022, valuelabel="Historical category"), code(2023)])
+    result = build_export_metadata(
+        pa.schema([("CONTROL", pa.int32())]), [2022, 2023], dictionary, codes,
+        observed_years_by_variable={"CONTROL": [2023]},
+    )
+    variable = result["variables"][0]
+    assert {row["year"] for row in variable["source_metadata"]} == {2022, 2023}
+    assert {row["valuelabel"] for row in variable["value_label_records"]} == {"Historical category", "Public"}
+    assert variable["value_labels"] == []
+    assert {row["code"] for row in result["issues"]} >= {"variable_label_conflict", "value_label_conflict"}
+
+
 def test_partial_definitions_and_missing_categorical_codes_are_incomplete(tmp_path: Path) -> None:
     dictionary = write_records(tmp_path / "dictionary.parquet", [
         definition(2022, DataType="disc", longDescription=None),

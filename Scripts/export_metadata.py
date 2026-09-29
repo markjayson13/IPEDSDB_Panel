@@ -7,10 +7,12 @@ selected source records agree; format-specific coercion belongs to writers.
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import math
 import re
 import tempfile
+import zlib
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -41,6 +43,72 @@ SEMANTIC_FIELDS = {
     "price_basis": ("price_basis", "priceBasis"),
     "reference_period": ("reference_period", "referencePeriod"),
 }
+
+# Large repeated source codebooks otherwise inflate Arrow's serialized schema
+# past ordinary Parquet readers' default Thrift string limits.
+EMBEDDED_VARIABLE_COMPRESS_BYTES = 16 * 1024
+MAX_EMBEDDED_VARIABLE_BYTES = 64 * 1024 * 1024
+
+
+def encode_embedded_variable_metadata(variable: dict) -> dict[bytes, bytes]:
+    """Keep small JSON readable and compress large records without losing data."""
+    raw = json.dumps(variable, ensure_ascii=False).encode("utf-8")
+    if len(raw) > MAX_EMBEDDED_VARIABLE_BYTES:
+        raise ValueError(f"{variable.get('name')}: embedded variable metadata exceeds the 64 MiB limit.")
+    if len(raw) < EMBEDDED_VARIABLE_COMPRESS_BYTES:
+        return {b"ipeds:variable": raw}
+    summary = {
+        "name": variable["name"], "label": variable.get("label", ""),
+        "metadata_status": variable.get("metadata_status"),
+        "metadata_encoding": "zlib", "payload_key": "ipeds:variable:zlib",
+        "uncompressed_bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
+    }
+    return {b"ipeds:variable": json.dumps(summary, ensure_ascii=False).encode("utf-8"),
+            b"ipeds:variable:zlib": zlib.compress(raw)}
+
+
+def decode_embedded_variable_metadata(field: pa.Field) -> dict | None:
+    """Decode a bounded, checksummed record; never accept partial metadata."""
+    tags = field.metadata or {}
+    raw = tags.get(b"ipeds:variable")
+    compressed = tags.get(b"ipeds:variable:zlib")
+    if raw is None:
+        if compressed is not None:
+            raise ValueError("compressed embedded metadata has no marker summary")
+        return None
+    if len(raw) > MAX_EMBEDDED_VARIABLE_BYTES:
+        raise ValueError("embedded variable metadata exceeds the 64 MiB limit")
+    summary = json.loads(raw)
+    if not isinstance(summary, dict):
+        raise ValueError("embedded variable metadata is not an object")
+    if summary.get("metadata_encoding") == "zlib":
+        size = summary.get("uncompressed_bytes")
+        if not isinstance(size, int) or isinstance(size, bool) or not 0 < size <= MAX_EMBEDDED_VARIABLE_BYTES:
+            raise ValueError("compressed embedded metadata declares an invalid or oversized byte length")
+        if compressed is None or summary.get("payload_key") != "ipeds:variable:zlib":
+            raise ValueError("compressed embedded metadata payload is missing or its marker is invalid")
+        try:
+            decoder = zlib.decompressobj()
+            raw = decoder.decompress(compressed, size + 1)
+        except zlib.error as exc:
+            raise ValueError(f"invalid compressed embedded metadata: {exc}") from exc
+        if len(raw) > size or decoder.unconsumed_tail:
+            raise ValueError("compressed embedded metadata expands beyond its declared byte length")
+        if not decoder.eof:
+            raise ValueError("compressed embedded metadata is truncated")
+        if decoder.unused_data:
+            raise ValueError("compressed embedded metadata has unexpected trailing data")
+        if len(raw) != size:
+            raise ValueError("compressed embedded metadata byte length does not match its marker")
+        if hashlib.sha256(raw).hexdigest() != summary.get("sha256"):
+            raise ValueError("compressed embedded metadata checksum does not match its marker")
+        variable = json.loads(raw)
+        if not isinstance(variable, dict) or variable.get("name") != summary.get("name"):
+            raise ValueError("compressed embedded metadata does not match its marker identity")
+        return variable
+    if "metadata_encoding" in summary or compressed is not None:
+        raise ValueError("unrecognized or unmarked compressed embedded variable metadata")
+    return summary
 
 
 def _text(value: Any) -> str:
@@ -247,6 +315,7 @@ def build_export_metadata(
     dictionary_path: Path | None,
     codes_path: Path | None,
     lineage_path: Path | None = None,
+    observed_years_by_variable: dict[str, list[int]] | None = None,
 ) -> dict:
     """Return JSON-serializable definitions and diagnostics for the actual schema.
 
@@ -259,6 +328,10 @@ def build_export_metadata(
     records for observation validation. ``comparability_status`` reports
     consistency of supplied definitions/semantics; absent measurement facts
     remain explicitly ``unknown`` and are never inferred from titles.
+    When observed years are supplied, missing definitions are required only
+    for years containing nonmissing values of that variable. Missing mapping
+    entries retain the conservative all-export-years check. Source records
+    and their year-specific meanings are retained in either case.
     """
     selected_years = sorted(set(int(year) for year in years))
     year_set = set(selected_years)
@@ -282,6 +355,7 @@ def build_export_metadata(
             provenance_fields = ("schema_version", "created_utc", "format", "artifact_kind", "source_panel",
                                  "source_panel_sha256", "source_fingerprint", "exporter_provenance", "metadata_sources",
                                  "metadata_source_sha256", "metadata_source_modes", "row_count", "column_count")
+            provenance_fields += ("metadata_scope_policy", "metadata_supplement")
             parent = {key: prior_export[key] for key in provenance_fields if key in prior_export}
             upstream_export_provenance = ([parent] if parent else []) + prior_chain
         except (ValueError, TypeError, UnicodeDecodeError) as exc:
@@ -386,11 +460,10 @@ def build_export_metadata(
 
     embedded_variables: list[dict] = []
     for field in schema:
-        raw_metadata = (field.metadata or {}).get(b"ipeds:variable")
-        if raw_metadata is None:
-            continue
         try:
-            variable_metadata = json.loads(raw_metadata)
+            variable_metadata = decode_embedded_variable_metadata(field)
+            if variable_metadata is None:
+                continue
             if not isinstance(variable_metadata, dict) or variable_metadata.get("name") != field.name:
                 raise ValueError("embedded variable name does not match its field")
             for key in ("source_metadata", "value_label_records", "imputation_parent_metadata", "lineage_records", "code_identity_candidates"):
@@ -495,6 +568,8 @@ def build_export_metadata(
         start_issues = len(issues)
         name = field.name
         key = _name(name)
+        observed_years = (None if observed_years_by_variable is None or name not in observed_years_by_variable
+                          else sorted(year_set.intersection(observed_years_by_variable[name])))
         lineage_records = lineage_by_name.get(key, [])
         source_names = set().union(*[_tokens(row.get("source_varnames")) for row in lineage_records]) if lineage_records else set()
         source_names = source_names or {key}
@@ -561,7 +636,8 @@ def build_export_metadata(
             elif any(not _text(record.get("longDescription")) for record in source_records):
                 issue("variable_description_coverage_incomplete", "Some selected source definitions have no description.", name)
             covered_years = {_year(record.get("year")) for record in source_records}
-            missing_years = sorted(year_set - covered_years)
+            required_years = year_set if observed_years is None else set(observed_years)
+            missing_years = sorted(required_years - covered_years)
             if source_records and missing_years:
                 issue("variable_year_coverage_incomplete", f"No matching dictionary definition for export years: {', '.join(map(str, missing_years))}.", name)
             if any(_text(record.get("metadata_source")).startswith("synthetic") for record in source_records):
@@ -575,6 +651,7 @@ def build_export_metadata(
 
         matched_codes: list[dict] = []
         resolved_codes: list[dict] = []
+        inactive_unmatched_codes: list[dict] = []
         identity_candidates: list[dict] = []
         code_scope_unproven = False
         for source_name in sorted(source_names):
@@ -588,8 +665,11 @@ def build_export_metadata(
                 if not any(_same_scope(code, row) for row in definitions):
                     # Keep the named record for audit, but its year/source
                     # identity is not sufficient to label the observations.
-                    code_scope_unproven = True
-                    issue("value_label_source_unmatched", "Named value-label records have no matching dictionary year/source scope; retained in value_label_records without a universal mapping.", name)
+                    if observed_years is not None and _year(code.get("year")) not in observed_years:
+                        inactive_unmatched_codes.append(code)
+                    else:
+                        code_scope_unproven = True
+                        issue("value_label_source_unmatched", "Named value-label records have no matching dictionary year/source scope; retained in value_label_records without a universal mapping.", name)
                 else:
                     resolved_codes.append(code)
                 matched_codes.append(code)
@@ -673,11 +753,13 @@ def build_export_metadata(
             "label": label,
             "description": description,
             "storage_type": str(field.type),
+            "observed_years": observed_years,
             "metadata_status": variable_status,
             "value_labels": value_labels,
             "source_metadata": source_records,
             "value_label_records": matched_codes,
             "resolved_value_label_records": resolved_codes,
+            "inactive_unmatched_value_label_records": _unique_records(inactive_unmatched_codes),
             "code_identity_candidates": _unique_records(identity_candidates),
             "lineage_records": lineage_records,
             "imputation_parent_metadata": _unique_records(parents),

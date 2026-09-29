@@ -31,25 +31,35 @@ export IPEDSDB_ROOT="/Volumes/CIRAGO/IPEDSDB_PANEL"
 ```
 
 Open `$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet` for the full
-2004-2023 panel: 141,711 institution-year rows and 2,721 columns. Its matching
-variable definitions and codebooks are in `Final/Metadata/`, and its source
-lineage is `Final/value_lineage.parquet`. `Final/manifest.json` records their
-current paths and checksums.
+2004-2023 panel: 141,711 institution-year rows and 2,721 columns. The labeled
+release embeds its metadata in Parquet and provides the same full panel as
+`Final/panel_clean_prch_2004_2023.dta` with native Stata labels. Keep each file
+with its `.metadata.json`, `.dictionary.csv`, `.value_labels.csv`, and
+`.README.txt` companions. `Final/Metadata/` preserves the original corrected
+source dictionaries, and `Final/value_lineage.parquet` traces source values.
+`Final/manifest.json` records current paths and checksums.
+
+Some source meanings remain undocumented: five variables lack descriptions
+in some years, and 6,256 observations lack a verified code meaning for their
+year. These gaps are disclosed; the full package does not claim complete
+metadata readiness. See [full-panel labeling evidence](docs/FULL_PANEL_LABELS.md).
 
 `Final/SFA_2023_exports/` contains the validated 2023 SFA subset in Stata, CSV,
 Excel, and Parquet: 6,163 rows and 345 columns, including the two panel keys.
 Use the full Parquet panel when working beyond that subset, and export the
 variables and years you need with Stage 08.
 
-The current release is `2023-sfa-v1`. The marker `layout.json` selects it;
-`Final` links to its unchanged files under `Releases/2023-sfa-v1/`. Future builds
-write to `Work` and do not replace `Final` automatically.
+The corrected base release is `2023-sfa-v1`; its original files remain
+unchanged. `layout.json` also records the labeled copy, `full-panel-labels-v1`.
+`Final` links to that copy's full datasets and companions. Future builds write
+to `Work` and do not replace `Final` automatically.
 
 ## Common tasks
 
 | Goal | Start here |
 | --- | --- |
 | Open the current full dataset | `$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet` |
+| Open the full labeled Stata dataset | `$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.dta` |
 | Open the validated 2023 SFA exports | `$IPEDSDB_ROOT/Final/SFA_2023_exports/` |
 | Run the whole pipeline | `bash manual_commands.sh` |
 | Test the setup without a full historical build | `python Scripts/00_run_all.py --years "2022:2023" --run-cleaning --run-qaqc` |
@@ -693,12 +703,37 @@ the two must agree. `UNITID` and `year` are retained automatically. Stata
 exports load the selected extract into memory; Parquet, CSV, and Excel use
 batches. Select the variables and years needed for the analysis.
 
+Use `--all-vars` instead of a variable selection to export the full panel in
+its original column order. For a historical panel, `--year-scoped-labels`
+renders changing definitions and code meanings with explicit year ranges.
+Variable titles that change are marked `[varies by year]`; their latest
+observed-year title is displayed, and every annual definition is retained.
+This resolves presentation differences only when each year's meaning is
+unambiguous. Missing source definitions, unknown observed codes, and conflicting
+same-year meanings still fail `--require-ready`. Years containing only nulls
+for a variable do not require definitions for that variable. Embedded Parquet
+exports retain this scope policy when re-exported.
+
+Exact-year NCES dictionary supplements are versioned under
+`contracts/source_metadata_corrections/2026-09-exact-year-labels-v1.json`.
+They fill only verified missing or blank labels after matching year, physical
+table, variable name, number, and title. Original Access records remain in the
+metadata alongside each supplement's source URL, workbook row, and checksums.
+Undocumented source codes remain unresolved. Literal labels such as `None` are
+preserved as text during dictionary ingestion. The value-label companion's
+`resolved_for_export` column distinguishes applied records from preserved
+original rows that were ambiguous or superseded by an evidenced supplement.
+
 | Output | Labels and metadata |
 | --- | --- |
-| Stata `.dta` | Native variable labels and unambiguous integer value labels; full definitions and original-to-Stata name mappings in companions |
+| Stata `.dta` | Native variable and value labels, including reversible string-category encoding; full definitions and original-to-Stata mappings in companions |
 | Excel `.xlsx` | `data`, `dictionary`, `value_labels`, `about`, and `issues` sheets; original codes remain in the data sheet |
 | CSV `.csv` | UTF-8 data with a header; labels and types travel in companion files |
 | Parquet `.parquet` | Original types, field labels, and JSON metadata embedded in the Arrow schema, plus companions |
+
+Large Parquet metadata records use lossless compression, with plain field
+labels retained for inspection. The exporter reads both legacy JSON and the
+compressed records; readers do not need increased Parquet footer limits.
 
 Keep each data file with its four companions, for example
 `custom_panel.dta.metadata.json`, `custom_panel.dta.dictionary.csv`,
@@ -717,10 +752,16 @@ never acquire labels simply because their names resemble source variables.
 
 Stata variable labels are shortened when needed, with the full text retained
 in the companions. Invalid or long Stata variable names receive stable aliases.
-String categories remain strings; their labels are in the companions. Numeric
-nulls become Stata system missing, and string nulls become empty strings. Excel
+String categories with a complete unambiguous mapping receive numeric Stata
+codes so their labels work natively. Canonical integer strings keep their
+numeric codes; other categories receive deterministic IDs and labels including
+the original token (for example, `AL: Alabama`). The exact reverse mapping is
+recorded in `stata_source_code_map`. Unmapped observed tokens cause the write to
+fail, and identifiers or text without category mappings remain strings. Numeric
+and encoded-category nulls become Stata system missing; ordinary string nulls
+become empty strings. Excel
 has blank cells for nulls and cannot reliably distinguish an empty string from
-a missing string. Negative codes and imputation flags are not recoded. An export
+a missing string. Numeric negative codes and imputation flags are preserved. An export
 fails if the chosen format would silently lose integer precision, truncate cell
 text, or exceed worksheet limits. Existing output files are left intact when
 validation or writing fails. A failed file replacement restores the prior data

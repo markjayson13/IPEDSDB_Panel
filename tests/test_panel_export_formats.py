@@ -7,7 +7,7 @@ import pyarrow.parquet as pq
 import pytest
 
 from panel_export import dictionary_rows, prepare_format_metadata, stata_names, write_stata
-from export_integrity import PACKAGE_SUFFIXES, assert_source_unchanged, promote_package, source_fingerprint
+from export_integrity import PACKAGE_SUFFIXES, assert_source_unchanged, promote_package, source_fingerprint, require_export_ready
 
 
 def metadata_for(schema, label="Test label", values=None):
@@ -54,6 +54,74 @@ def test_all_null_strings_export_as_stata_missing_strings(tmp_path: Path) -> Non
     output = tmp_path / "strings.dta"
     write_stata(table, output, metadata)
     assert pd.read_stata(output)["TEXT"].tolist() == ["", ""]
+
+
+def test_integer_string_categories_receive_native_labels_and_preserve_nulls(tmp_path):
+    table = pa.table({"CONTROL": ["1", "2", "-3", None]})
+    values = [{"value": "1", "label": "Public"}, {"value": "2", "label": "Private"},
+              {"value": "-3", "label": "Not available"}]
+    metadata = metadata_for(table.schema, values=values)
+    metadata.update(metadata_status="complete", readiness_status="complete")
+    prepare_format_metadata(metadata, table.schema, "dta")
+    require_export_ready(metadata)
+    output = tmp_path / "string_codes.dta"
+    write_stata(table, output, metadata)
+    with pd.read_stata(output, iterator=True, convert_categoricals=False) as reader:
+        assert reader.value_labels()["CONTROL"] == {1: "Public", 2: "Private", -3: "Not available"}
+        actual = reader.read()["CONTROL"]
+    restored = [None if pd.isna(value) else str(int(value)) for value in actual]
+    assert restored == table["CONTROL"].to_pylist()
+    assert metadata["variables"][0]["stata_storage_conversion"] == "integer_code_strings_to_numeric"
+
+
+@pytest.mark.parametrize("code", ["1.5", "2147483621"])
+def test_unsupported_stata_code_labels_fail_readiness(code):
+    schema = pa.schema([("CODE", pa.float64())])
+    metadata = metadata_for(schema, values=[{"value": code, "label": "Category"}])
+    metadata.update(metadata_status="complete", readiness_status="complete")
+    prepare_format_metadata(metadata, schema, "dta")
+    with pytest.raises(ValueError, match="not ready"):
+        require_export_ready(metadata)
+    assert metadata["variables"][0]["stata_value_labels"] == {}
+
+
+def test_alphanumeric_and_noncanonical_categories_encode_reversibly(tmp_path):
+    tokens = ["01", "1", "AL", "", None]
+    table = pa.table({"CODE": tokens})
+    values = [{"value": token, "label": "Category " + token} for token in tokens if token is not None]
+    metadata = metadata_for(table.schema, values=values)
+    metadata.update(metadata_status="complete", readiness_status="complete")
+    prepare_format_metadata(metadata, table.schema, "dta")
+    require_export_ready(metadata)
+    variable = metadata["variables"][0]
+    assert variable["stata_storage_conversion"] == "string_categories_to_numeric"
+    output = tmp_path / "encoded.dta"
+    write_stata(table, output, metadata)
+    with pd.read_stata(output, iterator=True, convert_categoricals=False) as reader:
+        labels = reader.value_labels()["CODE"]
+        actual = reader.read()["CODE"]
+    inverse = {record["export_code"]: record["source_code"] for record in variable["stata_source_code_map"]}
+    assert [None if pd.isna(value) else inverse[int(value)] for value in actual] == tokens
+    assert all(labels[record["export_code"]].startswith(record["source_code"] + ": ") for record in variable["stata_source_code_map"])
+
+
+def test_native_value_label_size_limit_blocks_strict_export():
+    schema = pa.schema([("CODE", pa.int64())])
+    metadata = metadata_for(schema, values=[{"value": "1", "label": "é" * 16001}])
+    metadata.update(metadata_status="complete", readiness_status="complete")
+    prepare_format_metadata(metadata, schema, "dta")
+    with pytest.raises(ValueError, match="not ready"):
+        require_export_ready(metadata)
+
+
+@pytest.mark.parametrize("observed", ["01", "+1", "1.0", "", "A"])
+def test_numeric_string_conversion_never_normalizes_unexpected_observations(tmp_path, observed):
+    table = pa.table({"CODE": ["1", observed]})
+    metadata = metadata_for(table.schema, values=[{"value": "1", "label": "Category"}])
+    prepare_format_metadata(metadata, table.schema, "dta")
+    with pytest.raises(ValueError, match="losslessly"):
+        write_stata(table, tmp_path / "bad.dta", metadata)
+    assert not (tmp_path / "bad.dta").exists()
 
 
 def test_stata_rejects_nul_in_variable_label_before_silent_truncation() -> None:

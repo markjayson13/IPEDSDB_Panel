@@ -40,6 +40,8 @@ from export_metadata import build_export_metadata, discover_export_metadata
 from export_integrity import (apply_observation_validation, assert_source_unchanged, export_code_provenance,
                               require_export_ready, scan_panel, source_fingerprint, validate_observed_codes)
 from panel_export import prepare_format_metadata, write_excel, write_sidecars, write_stata, write_stream
+from scoped_export_metadata import apply_year_scoped_metadata, year_scope_enabled
+from export_metadata_supplement import apply_export_metadata_supplement
 
 
 def queries_root() -> Path:
@@ -359,16 +361,25 @@ def verified_projection(con, query: str, result_schema: pa.Schema, sources: dict
                                   "source_relation": f"inspect.{source['table_name']}", "fields": field_provenance}
 
 
-def query_export_metadata(con, query: str, dataset, sources: dict, *, root: Path, mode: str) -> tuple[dict, dict]:
+def query_export_metadata(con, query: str, dataset, sources: dict, *, root: Path, mode: str,
+                          year_scoped_labels: bool = False) -> tuple[dict, dict]:
     schema = dataset.schema
     source_path, verified, provenance = verified_projection(con, query, schema, sources)
     source_schema = pq.read_schema(source_path) if source_path else None
+    # Only verified direct projections inherit source field metadata. Keep a
+    # self-contained panel's definitions together instead of replacing them
+    # with an older dictionary exposed by the inspection views.
+    use_embedded = source_schema is not None and any(
+        (source_schema.field(name).metadata or {}).get(b"ipeds:variable")
+        for name in verified.values()
+    )
     dictionary = Path(sources["dictionary_lake_path"])
     codes = Path(sources["dictionary_codes_path"])
-    lineage = discover_export_metadata(None, "Checks/wide_qc/qc_column_lineage.csv",
-                                       source_path or Path(sources["clean_path"]), root)
-    paths = {"dictionary": dictionary if dictionary.is_file() else None,
-             "codes": codes if codes.is_file() else None, "lineage": lineage}
+    lineage = (None if use_embedded else
+               discover_export_metadata(None, "Checks/wide_qc/qc_column_lineage.csv",
+                                        source_path or Path(sources["clean_path"]), root))
+    paths = {"dictionary": dictionary if not use_embedded and dictionary.is_file() else None,
+             "codes": codes if not use_embedded and codes.is_file() else None, "lineage": lineage}
     verified_keys = {name.upper(): name for name in verified if name.upper() in {"UNITID", "YEAR"}}
     panel_mode = mode != "diagnostic" and set(verified_keys) == {"UNITID", "YEAR"}
     if mode == "panel" and not panel_mode:
@@ -406,7 +417,11 @@ def query_export_metadata(con, query: str, dataset, sources: dict, *, root: Path
             temporary_name = f"__sql_expression_{index}"
             fields.append(pa.field(temporary_name, field.type))
             renamed[temporary_name] = field.name
-    metadata = build_export_metadata(pa.schema(fields), years, paths["dictionary"], paths["codes"], paths["lineage"])
+    metadata = build_export_metadata(pa.schema(fields, metadata=source_schema.metadata if source_schema is not None else None), years, paths["dictionary"], paths["codes"], paths["lineage"],
+                                     observed_years_by_variable=scan["observed_years_by_variable"] if panel_mode else None)
+    apply_export_metadata_supplement(metadata)
+    if year_scoped_labels or (source_schema is not None and year_scope_enabled(source_schema)):
+        apply_year_scoped_metadata(metadata)
     for variable in metadata["variables"]:
         original_name = variable["name"]
         if original_name in renamed:
@@ -434,6 +449,7 @@ def query_export_metadata(con, query: str, dataset, sources: dict, *, root: Path
                      "created_utc": datetime.now(timezone.utc).isoformat(),
                      "row_count": scan["row_count"], "column_count": len(schema),
                      "panel_keys": [verified_keys["UNITID"], verified_keys["YEAR"]] if panel_mode else [],
+                     "metadata_source_modes": dict(metadata["metadata_sources"]),
                      "metadata_sources": {key: str(path.resolve()) if path else None for key, path in paths.items()},
                      "missing_values": "SQL result nulls remain missing. SQL may transform observations; consult query.sql and per-field provenance.",
                      "export_code": export_code_provenance()})
@@ -467,6 +483,7 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--export-mode", choices=["auto", "panel", "diagnostic"], default="auto",
                     help="Auto recognizes direct panel keys; panel enforces analyst readiness; diagnostic makes no panel claim")
     ap.add_argument("--require-ready", action="store_true", help="Require full metadata and panel observation validation")
+    ap.add_argument("--year-scoped-labels", action="store_true", help="Render changing meanings with explicit year ranges")
     ap.add_argument("--allow-incomplete-metadata", action="store_true", help="Explicit draft escape for --export-mode panel")
     ap.add_argument("--name", default=None, help="Optional label override for the output folder")
     ap.add_argument("--preview-rows", type=int, default=20, help="Rows to include in preview.txt")
@@ -511,7 +528,8 @@ def main() -> None:
             copy_query_to_parquet(con, query_sql, str(intermediate))
             dataset = ds.dataset(intermediate, format="parquet")
             metadata, _ = query_export_metadata(con, query_sql, dataset, source_manifest,
-                                                root=layout.root, mode=args.export_mode)
+                                                root=layout.root, mode=args.export_mode,
+                                                year_scoped_labels=args.year_scoped_labels)
             metadata.update({"format": args.format, "source_fingerprints": fingerprints,
                              "query_source_sha256": fingerprints["query_path"]["sha256"]})
             prepare_format_metadata(metadata, dataset.schema, args.format)

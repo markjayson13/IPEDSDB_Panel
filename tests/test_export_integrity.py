@@ -52,6 +52,22 @@ def test_continuous_and_categorical_declarations_are_scoped_by_year() -> None:
     assert result["issues"][0]["examples"] == [{"year": 2023, "value": "99"}]
 
 
+def test_alpha_identifiers_without_an_enumeration_do_not_borrow_another_years_domain():
+    table = pa.table({"year": [2013, 2014, 2015, 2015], "VALUE": ["00123", "101050", "101050", "999999"]})
+    records = metadata({2013: "Alpha", 2014: "Alpha", 2015: "Disc"}, {2015: ["101050"]})
+    result = validate_observed_codes(ds.dataset(table), records)
+    assert result["code_domain_by_year"]["VALUE"] == {"2013": "text", "2014": "text", "2015": "categorical"}
+    assert result["unknown_code_count"] == 1
+    assert result["issues"][0]["examples"] == [{"year": 2015, "value": "999999"}]
+
+
+def test_alpha_codebooks_still_validate_their_same_year_codes():
+    table = pa.table({"year": [2023, 2023], "VALUE": ["AL", "ZZ"]})
+    result = validate_observed_codes(ds.dataset(table), metadata({2023: "Alpha"}, {2023: ["AL"]}))
+    assert result["unknown_code_count"] == 1
+    assert result["issues"][0]["examples"] == [{"year": 2023, "value": "ZZ"}]
+
+
 def test_conflicting_source_domains_are_explicit() -> None:
     table = pa.table({"year": [2023], "VALUE": [100]})
     definitions = metadata({2023: "Cont"}, {2023: ["-1"]})

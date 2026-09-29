@@ -20,6 +20,7 @@ import tempfile
 from decimal import Decimal, InvalidOperation
 
 import pyarrow as pa
+import pyarrow.compute as pc
 import pyarrow.dataset as ds
 
 from export_metadata import _definition_identity, _name, _number, _same_scope, _source_table
@@ -54,6 +55,7 @@ select dictionary records.
     missing_keys = [name for name in panel_keys if name not in columns]
     issues = [_issue("panel_key_missing", f"Panel key column is absent: {name}.", name) for name in missing_keys]
     nulls = {name: 0 for name in columns}
+    observed_years = {name: set() for name in columns}
     years = set()
     rows = 0
     invalid = {name: 0 for name in panel_keys}
@@ -65,8 +67,19 @@ select dictionary records.
             connection.execute("CREATE TABLE keys (unitid TEXT NOT NULL, year TEXT NOT NULL, PRIMARY KEY(unitid, year)) WITHOUT ROWID")
             for batch in dataset.to_batches(columns=columns, filter=filt, batch_size=batch_rows):
                 rows += batch.num_rows
+                batch_year_values = batch.column(columns.index(year_col)) if year_col in columns else None
+                valid_years = ({year for value in pc.unique(batch_year_values).to_pylist()
+                                if (year := _positive_integer(value)) is not None}
+                               if batch_year_values is not None else set())
+                year_masks = {year: pc.equal(batch_year_values, year) for year in valid_years}
                 for name, values in zip(columns, batch.columns):
                     nulls[name] += values.null_count
+                    if values.null_count == 0:
+                        observed_years[name].update(valid_years)
+                    elif values.null_count < len(values):
+                        for year, mask in year_masks.items():
+                            if year not in observed_years[name] and pc.any(pc.and_(pc.is_valid(values), mask)).as_py():
+                                observed_years[name].add(year)
                 if missing_keys:
                     continue
                 units = batch.column(columns.index(unitid_col)).to_pylist()
@@ -99,6 +112,7 @@ select dictionary records.
     if duplicate_count:
         issues.append(_issue("duplicate_panel_key", f"{duplicate_count} duplicate institution-year rows occur after the first observation.", count=duplicate_count, examples=duplicate_examples))
     return {"row_count": rows, "years": sorted(years), "null_counts": nulls, "issues": issues,
+            "observed_years_by_variable": {name: sorted(values) for name, values in observed_years.items()},
             "observation_status": "incomplete" if issues else "complete"}
 
 
@@ -125,6 +139,8 @@ def _declared_code_domains(record: dict) -> set[str]:
             domains.add("continuous")
         elif value in {"disc", "discrete", "categorical", "category"}:
             domains.add("categorical")
+        elif field == "format" and value == "alpha":
+            domains.add("text")
     return domains
 
 
@@ -221,6 +237,10 @@ without cell-level source lineage, even when their union covers every value.
             elif declared == {"continuous"}:
                 modes[year] = "ambiguous"
                 issues.append(_issue("continuous_code_type_mismatch", f"{name} is declared continuous in {year} but its export storage type is {dtype}.", name, year=year))
+            elif declared == {"text"} and not numeric and not allowed.get(year):
+                # An explicitly alphabetic identifier is not a closed code
+                # domain merely because a different year has an enumeration.
+                modes[year] = "text"
             else:
                 modes[year] = "categorical"
                 components = _component_code_domains(variable, records, year, numeric)
@@ -254,6 +274,8 @@ without cell-level source lineage, even when their union covers every value.
                 mode = modes.get(numeric_year, "categorical")
                 if mode == "ambiguous":
                     continue
+                if mode == "text":
+                    continue
                 if mode == "continuous" and code is not None:
                     if code in allowed.get(numeric_year, set()):
                         special_counts[name] += 1
@@ -268,6 +290,7 @@ without cell-level source lineage, even when their union covers every value.
     return {"issues": issues, "checked_variables": list(checks), "unknown_code_count": sum(counts.values()),
             "categorical_variables": [name for name, (_, _, modes) in checks.items() if "categorical" in modes.values()],
             "continuous_variables": [name for name, (_, _, modes) in checks.items() if "continuous" in modes.values()],
+            "text_variables": [name for name, (_, _, modes) in checks.items() if "text" in modes.values()],
             "special_code_count": sum(special_counts.values()), "special_code_counts": special_counts,
             "code_domain_by_year": domain_by_year}
 
@@ -288,7 +311,8 @@ def apply_observation_validation(metadata: dict, scan: dict, code_check: dict) -
 
 
 def require_export_ready(metadata: dict) -> None:
-    if metadata.get("readiness_status", metadata["metadata_status"]) != "complete":
+    if (metadata.get("readiness_status", metadata["metadata_status"]) != "complete"
+            or metadata.get("format_readiness_status", "complete") != "complete"):
         detail = "; ".join(issue["message"] for issue in metadata["issues"][:8])
         raise ValueError(f"Metadata is incomplete or observations are not ready: {detail}")
 
@@ -326,7 +350,7 @@ def assert_source_unchanged(path: Path, baseline: dict) -> None:
 
 def export_code_provenance() -> dict:
     scripts = Path(__file__).resolve().parent
-    paths = [scripts / name for name in ("00_run_all.py", "08_build_custom_panel.py", "09_build_panel_dictionary.py", "panel_export.py", "export_metadata.py", "export_integrity.py", "run_saved_query.py")]
+    paths = [scripts / name for name in ("00_run_all.py", "08_build_custom_panel.py", "09_build_panel_dictionary.py", "panel_export.py", "export_metadata.py", "export_integrity.py", "scoped_export_metadata.py", "export_metadata_supplement.py", "run_saved_query.py")]
     result = {"files": {str(path.relative_to(scripts.parent)): _file_hash(path) for path in paths if path.is_file()},
               "python_version": platform.python_version(),
               "package_versions": {name: importlib.metadata.version(name) for name in ("pandas", "pyarrow", "openpyxl", "duckdb")}}

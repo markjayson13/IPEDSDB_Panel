@@ -374,6 +374,55 @@ def test_export_records_source_and_exporter_fingerprints(export_fixture: dict) -
     assert "Scripts/export_integrity.py" in metadata["exporter_provenance"]["files"]
 
 
+def test_full_year_scoped_export_preserves_order_and_reexports_embedded_labels(export_fixture: dict) -> None:
+    fixture = export_fixture
+    table = fixture["table"].set_column(0, "year", pa.array([2022, 2023, 2023, 2023, 2023, 2023], type=pa.int32()))
+    # No 2022 institution-name definition is needed for a wholly missing year.
+    table = table.set_column(3, "INSTNM", pa.array([None, "A", "B", "C", None, ""]))
+    table = table.select(["CONTROL", "UNITID", "INSTNM", "year"])
+    pq.write_table(table, fixture["panel"])
+    output = fixture["root"] / "full.parquet"
+    result = run_script(
+        "Scripts/08_build_custom_panel.py", "--input", fixture["panel"], "--output", output,
+        "--all-vars", "--year-scoped-labels", "--require-ready", "--log-file", "",
+        "--dictionary", fixture["dictionary"], "--codes", fixture["codes"],
+        "--column-lineage", fixture["lineage"], env={"IPEDSDB_ROOT": str(fixture["root"])},
+    )
+    assert result.returncode == 0, result.stdout
+    actual = pq.read_table(output)
+    assert actual.column_names == table.column_names
+    assert actual.to_pydict() == table.to_pydict()
+    metadata = read_metadata(output)
+    assert metadata["metadata_scope_policy"] == "explicit_year_scopes"
+    variables = {v["name"]: v for v in metadata["variables"]}
+    assert variables["INSTNM"]["observed_years"] == [2023]
+    assert variables["CONTROL"]["label"] == "[varies by year] Institution control"
+    assert {v["value"]: v["label"] for v in variables["CONTROL"]["value_labels"]}["1"] == "2022: Older label; 2023: Public"
+    # An annotated Parquet must remain portable without the original metadata files.
+    for key in ("dictionary", "codes", "lineage"):
+        fixture[key].unlink()
+    dta = fixture["root"] / "full.dta"
+    result = run_script(
+        "Scripts/08_build_custom_panel.py", "--input", output, "--output", dta,
+        "--all-vars", "--require-ready", "--log-file", "",
+        env={"IPEDSDB_ROOT": str(fixture["root"])},
+    )
+    assert result.returncode == 0, result.stdout
+    with pd.read_stata(dta, iterator=True, convert_categoricals=False) as reader:
+        assert reader.variable_labels()["CONTROL"] == variables["CONTROL"]["label"]
+        assert reader.value_labels()["CONTROL"][1] == "2022: Older label; 2023: Public"
+        assert reader.read().columns.tolist() == table.column_names
+    assert read_metadata(dta)["metadata_scope_policy"] == "explicit_year_scopes"
+
+
+def test_all_vars_rejects_a_simultaneous_variable_selection(export_fixture: dict) -> None:
+    output = export_fixture["root"] / "ambiguous_selection.parquet"
+    result = export_to(export_fixture, output, "--all-vars")
+    assert result.returncode != 0
+    assert "Use --all-vars or a variable selection" in result.stdout
+    assert not output.exists()
+
+
 def test_source_mutation_with_same_row_count_preserves_prior_package(export_fixture: dict, monkeypatch) -> None:
     output = export_fixture["root"] / "protected.parquet"
     result = export_to(export_fixture, output, "--require-ready")

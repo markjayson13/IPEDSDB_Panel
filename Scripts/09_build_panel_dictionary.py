@@ -4,7 +4,7 @@ Stage 09: build a panel-specific variable dictionary for a stitched wide panel.
 
 Reads:
 - a stitched wide or cleaned wide parquet panel
-- `Dictionary/dictionary_lake.parquet`
+- embedded source definitions, or `Dictionary/dictionary_lake.parquet`
 
 Writes:
 - a panel-level dictionary keyed to the actual output columns
@@ -26,6 +26,8 @@ from export_metadata import build_export_metadata, discover_export_metadata
 from export_integrity import (apply_observation_validation, assert_source_unchanged, export_code_provenance,
                               promote_package, require_export_ready, scan_panel, source_fingerprint, validate_observed_codes)
 from panel_export import append_sheet, excel_cell, prepare_format_metadata, value_label_rows, write_sidecars
+from scoped_export_metadata import apply_year_scoped_metadata, year_scope_enabled
+from export_metadata_supplement import apply_export_metadata_supplement
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
@@ -41,6 +43,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--codes", help="Year/source-scoped category codebook; defaults beside the dictionary")
     p.add_argument("--column-lineage", help="Stage 06 output-column lineage; defaults beside the panel data root")
     p.add_argument("--require-ready", action="store_true", help="Require complete metadata and panel observation checks")
+    p.add_argument("--year-scoped-labels", action="store_true", help="Render changing meanings with explicit year ranges")
     return p.parse_args()
 
 
@@ -61,16 +64,20 @@ def reference_from_metadata(metadata: dict) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def build_reference_df(input_path: Path, dictionary_path: Path,
+def build_reference_df(input_path: Path, dictionary_path: Path | None = None,
                        codes_path: Path | None = None, lineage_path: Path | None = None) -> pd.DataFrame:
     dataset = ds.dataset(input_path, format="parquet")
     names = {name.upper(): name for name in dataset.schema.names}
     scan = scan_panel(dataset, dataset.schema.names, panel_keys=(names.get("UNITID", "UNITID"), names.get("YEAR", "year")))
-    metadata = build_export_metadata(dataset.schema, scan["years"], dictionary_path, codes_path, lineage_path)
+    metadata = build_export_metadata(dataset.schema, scan["years"], dictionary_path, codes_path, lineage_path,
+                                     observed_years_by_variable=scan["observed_years_by_variable"])
+    apply_export_metadata_supplement(metadata)
+    if year_scope_enabled(dataset.schema):
+        apply_year_scoped_metadata(metadata)
     return reference_from_metadata(metadata)
 
 
-def write_excel(ref: pd.DataFrame, input_path: Path, dictionary_path: Path, out_path: Path, metadata: dict) -> None:
+def write_excel(ref: pd.DataFrame, input_path: Path, dictionary_path: Path | None, out_path: Path, metadata: dict) -> None:
     if len(ref) > 1048575:
         raise ValueError("Panel dictionary exceeds Excel's worksheet row limit; use CSV.")
     wb = Workbook()
@@ -139,7 +146,7 @@ def write_excel(ref: pd.DataFrame, input_path: Path, dictionary_path: Path, out_
     about["B6"] = str(input_path)
     about["A7"] = "Source metadata"
     about["A7"].font = Font(bold=True)
-    about["B7"] = str(dictionary_path)
+    about["B7"] = str(dictionary_path) if dictionary_path else "Embedded definitions in the source panel"
     about["A8"] = "Rows in dictionary"
     about["A8"].font = Font(bold=True)
     about["B8"] = int(len(ref))
@@ -173,16 +180,22 @@ def main() -> None:
     args = parse_args()
     layout = data_layout(args.root)
     input_path = Path(args.input) if args.input else default_final_panel(layout.root)
-    dictionary_path = discover_export_metadata(args.dictionary, "Dictionary/dictionary_lake.parquet", input_path, layout.root)
-    if dictionary_path is None:
+    dataset = ds.dataset(input_path, format="parquet")
+    schema = dataset.schema
+    embedded = any((field.metadata or {}).get(b"ipeds:variable") for field in schema)
+    use_embedded = embedded and not args.dictionary and not args.codes
+    dictionary_path = (None if use_embedded else
+                       discover_export_metadata(args.dictionary, "Dictionary/dictionary_lake.parquet", input_path, layout.root))
+    if dictionary_path is None and not use_embedded:
         raise ValueError(f"No matching dictionary found for panel: {input_path}")
-    codes_path = Path(args.codes) if args.codes else dictionary_path.parent / "dictionary_codes.parquet"
-    lineage_path = discover_export_metadata(args.column_lineage, "Checks/wide_qc/qc_column_lineage.csv",
-                                            input_path, layout.root)
-    for explicit, path in ((True, dictionary_path), (bool(args.codes), codes_path), (bool(args.column_lineage), lineage_path)):
+    codes_path = (Path(args.codes) if args.codes else
+                  dictionary_path.parent / "dictionary_codes.parquet" if dictionary_path else None)
+    lineage_path = (None if use_embedded and not args.column_lineage else
+                    discover_export_metadata(args.column_lineage, "Checks/wide_qc/qc_column_lineage.csv", input_path, layout.root))
+    for explicit, path in ((bool(args.dictionary), dictionary_path), (bool(args.codes), codes_path), (bool(args.column_lineage), lineage_path)):
         if explicit and (path is None or not path.is_file()):
             raise ValueError(f"Metadata file does not exist: {path}")
-    codes_path = codes_path if codes_path.is_file() else None
+    codes_path = codes_path if codes_path and codes_path.is_file() else None
     lineage_path = lineage_path if lineage_path and lineage_path.is_file() else None
     out_path = Path(args.output)
     if out_path.suffix.lower() not in {".csv", ".xlsx"}:
@@ -194,14 +207,16 @@ def main() -> None:
            for source in sources.values() if source for destination in destinations):
         raise ValueError("Dictionary output cannot overwrite source data or metadata.")
     fingerprints = {name: source_fingerprint(path) for name, path in sources.items() if path}
-    dataset = ds.dataset(input_path, format="parquet")
-    schema = dataset.schema
     names = {name.upper(): name for name in schema.names}
     if len(names) != len(schema.names):
         raise ValueError("Input has duplicate or case-ambiguous column names.")
     year_col = names.get("YEAR", "year")
     scan = scan_panel(dataset, schema.names, panel_keys=(names.get("UNITID", "UNITID"), year_col))
-    metadata = build_export_metadata(schema, scan["years"], dictionary_path, codes_path, lineage_path)
+    metadata = build_export_metadata(schema, scan["years"], dictionary_path, codes_path, lineage_path,
+                                     observed_years_by_variable=scan["observed_years_by_variable"])
+    apply_export_metadata_supplement(metadata)
+    if year_scope_enabled(schema, args.year_scoped_labels):
+        apply_year_scoped_metadata(metadata)
     metadata.update({
         "schema_version": "1.1", "artifact_kind": "panel_dictionary",
         "created_utc": datetime.now(timezone.utc).isoformat(), "format": out_path.suffix[1:],

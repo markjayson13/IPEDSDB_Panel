@@ -309,7 +309,7 @@ def build_description_maps(desc_candidates: pd.DataFrame, year_dir: Path) -> dic
         csv_path = year_dir / rec["csv_path"]
         if not csv_path.exists():
             continue
-        df = pd.read_csv(csv_path, dtype=str).fillna("")
+        df = pd.read_csv(csv_path, dtype=str, keep_default_na=False)
         varnum_col = pick_column(df.columns, VAR_NUMBER_CANDIDATES)
         varname_col = pick_column(df.columns, VAR_NAME_CANDIDATES)
         access_table_col = pick_column(df.columns, DATA_TABLE_CANDIDATES)
@@ -378,7 +378,7 @@ def main() -> None:
             csv_path = year_dir / rec["csv_path"]
             if not csv_path.exists():
                 continue
-            df = pd.read_csv(csv_path, dtype=str).fillna("")
+            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False)
             varnum_col = pick_column(df.columns, VAR_NUMBER_CANDIDATES)
             varname_col = pick_column(df.columns, VAR_NAME_CANDIDATES)
             vartitle_col = pick_column(df.columns, VAR_TITLE_CANDIDATES)
@@ -429,7 +429,7 @@ def main() -> None:
             csv_path = year_dir / rec["csv_path"]
             if not csv_path.exists():
                 continue
-            df = pd.read_csv(csv_path, dtype=str).fillna("")
+            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False)
             varnum_col = pick_column(df.columns, VAR_NUMBER_CANDIDATES)
             varname_col = pick_column(df.columns, VAR_NAME_CANDIDATES)
             code_col = pick_column(df.columns, CODE_VALUE_CANDIDATES)
@@ -464,7 +464,7 @@ def main() -> None:
             csv_path = year_dir / rec["csv_path"]
             if not csv_path.exists():
                 continue
-            df = pd.read_csv(csv_path, dtype=str).fillna("")
+            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False)
             code_col = pick_column(df.columns, CODE_VALUE_CANDIDATES)
             label_col = pick_column(df.columns, VALUE_LABEL_CANDIDATES)
             access_table_col = pick_column(df.columns, DATA_TABLE_CANDIDATES)

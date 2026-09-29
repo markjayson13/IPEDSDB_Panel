@@ -8,8 +8,8 @@ Reads:
 Writes:
 - a custom Parquet, CSV, Stata, or Excel extract with companion metadata
 
-`UNITID` and `year` are always retained. Users choose the remaining variables
-with `--vars` or `--vars-file`.
+`UNITID` and `year` are always retained. Choose variables with `--vars` or
+`--vars-file`, or preserve every column in source order with `--all-vars`.
 """
 from __future__ import annotations
 
@@ -29,6 +29,8 @@ from export_integrity import (apply_observation_validation, assert_source_unchan
                               export_code_provenance, promote_package, require_export_ready,
                               scan_panel, source_fingerprint, validate_observed_codes)
 from panel_export import prepare_format_metadata, write_excel, write_sidecars, write_stata, write_stream
+from scoped_export_metadata import apply_year_scoped_metadata, year_scope_enabled
+from export_metadata_supplement import apply_export_metadata_supplement
 
 
 def setup_logging(log_path: str | None) -> None:
@@ -97,6 +99,8 @@ def main() -> None:
     ap.add_argument("--output", required=True, help="Output .parquet, .csv, .dta, or .xlsx path")
     ap.add_argument("--vars", default=None, help="Comma-separated list of varnames")
     ap.add_argument("--vars-file", default=None, help="File with varnames (one per line or comma-separated)")
+    ap.add_argument("--all-vars", action="store_true", help="Export every column in source order")
+    ap.add_argument("--year-scoped-labels", action="store_true", help="Render changing historical meanings with explicit year ranges; retain source gaps as failures")
     ap.add_argument("--years", default=None, help='Optional year filter, e.g. "2004:2023" or "2004,2006"')
     ap.add_argument("--format", choices=["parquet", "csv", "dta", "xlsx"], default=None, help="Default: infer from output extension")
     ap.add_argument("--dictionary", help="dictionary_lake.parquet; auto-discovered beside the input data root")
@@ -125,8 +129,10 @@ def main() -> None:
         raise ValueError("Output must not overwrite or become part of the source dataset.")
 
     vars_requested = load_vars(args.vars, args.vars_file)
-    if not vars_requested:
-        raise SystemExit("Provide --vars or --vars-file with at least one variable.")
+    if args.all_vars and vars_requested:
+        raise SystemExit("Use --all-vars or a variable selection, not both.")
+    if not vars_requested and not args.all_vars:
+        raise SystemExit("Provide --all-vars, --vars or --vars-file with at least one variable.")
 
     source_identity = source_fingerprint(input_path)
     dataset = ds.dataset(input_path, format="parquet")
@@ -140,6 +146,8 @@ def main() -> None:
     unitid_col = name_map.get("UNITID", "UNITID" if "UNITID" in schema.names else None)
     if not year_col or not unitid_col:
         raise SystemExit("Input must include UNITID and year columns.")
+    if args.all_vars:
+        vars_requested = list(schema.names)
 
     requested_upper = [v.upper() for v in vars_requested]
     resolved = []
@@ -155,7 +163,7 @@ def main() -> None:
             raise SystemExit(msg)
         print("[warn]", msg)
 
-    cols = [year_col, unitid_col] + resolved
+    cols = list(schema.names) if args.all_vars else [year_col, unitid_col] + resolved
     # De-dup while preserving order
     seen: set[str] = set()
     cols = [c for c in cols if not (c in seen or seen.add(c))]
@@ -193,7 +201,11 @@ def main() -> None:
                            (("dictionary", dictionary), ("codes", codes), ("lineage", lineage)) if p}
     scan = scan_panel(dataset, cols, filt, args.batch_rows, (unitid_col, year_col))
     row_count = scan["row_count"]
-    metadata = build_export_metadata(selected_schema, scan["years"], dictionary, codes, lineage)
+    metadata = build_export_metadata(selected_schema, scan["years"], dictionary, codes, lineage,
+                                     observed_years_by_variable=scan["observed_years_by_variable"])
+    apply_export_metadata_supplement(metadata)
+    if year_scope_enabled(schema, args.year_scoped_labels):
+        apply_year_scoped_metadata(metadata)
     code_check = validate_observed_codes(dataset, metadata, filt, args.batch_rows, year_col)
     apply_observation_validation(metadata, scan, code_check)
     metadata["metadata_source_modes"] = metadata.get("metadata_sources", {})

@@ -165,9 +165,14 @@ def organize(root: Path, *, apply: bool = False, expected_manifest_sha256: str |
         if expected_manifest_sha256 and digest != expected_manifest_sha256:
             raise ValueError("Unexpected release manifest checksum")
         for name, target in LINKS.items():
+            if name == PANEL and layout.get("labeled_panel_release"):
+                continue
             if not (root / "Final" / name).is_symlink() or (root / "Final" / name).resolve(strict=True) != release / target:
                 raise ValueError(f"Final link is not the verified release: {name}")
-        if json.loads((root / "Final/manifest.json").read_text()) != final_manifest(root, manifest, digest):
+        if layout.get("labeled_panel_release"):
+            from publish_labeled_panel import verify_labeled_layer
+            verify_labeled_layer(root, layout, manifest, digest, verify=apply)
+        elif json.loads((root / "Final/manifest.json").read_text()) != final_manifest(root, manifest, digest):
             raise ValueError("Final manifest does not match the verified release")
         return {"status": "already_organized", "verified_checksums": apply,
                 "artifacts": len(manifest["artifacts"]), "manifest_sha256": digest}
