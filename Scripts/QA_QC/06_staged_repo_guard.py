@@ -74,7 +74,10 @@ def main() -> int:
             blocked.append((rel, "forbidden_basename"))
         if rel.endswith(forbid_suffixes):
             blocked.append((rel, "forbidden_suffix"))
-        if path.is_file() and path.stat().st_size > threshold_bytes:
+        # Match the tracked-file guard's single, bounded documentation allowance.
+        file_limit = (max(threshold_bytes, 16 * 1024 * 1024)
+                      if rel == "docs/codebook/ipeds-panel-codebook.pdf" else threshold_bytes)
+        if path.is_file() and path.stat().st_size > file_limit:
             too_large.append((path.stat().st_size, rel))
 
     if blocked or too_large or symlinks:

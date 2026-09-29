@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "release": "full-panel-labels-v1",
+  "column_count": 2721,
+  "row_count": 141711,
+  "generated_from": {
+    "parquet_sha256": "f93cf45fe50e04250465a0b583a384737f4954cb7034f5a880f853d55827bb61",
+    "parquet_metadata_sha256": "d9ddbd4ca12842718cfb052369bebb1d01d556c34e2db700bb25d161a44f0b0e",
+    "stata_sha256": "37570f3a5f54a28a6ea02f1888d8e89e89cee499cc04100e36badcbd5f07386f",
+    "stata_metadata_sha256": "10e102c6751d37957744ad333ba7913d405b401becda67cab7aa9b5a52027a85"
+  },
+  "artifacts": [
+    {
+      "path": "README.txt",
+      "size_bytes": 925,
+      "sha256": "f16cb431f7f6d9bf998e63ab16a4d958e17d16c7808699857e36fd3cf9115e33"
+    },
+    {
+      "path": "codebook.csv",
+      "size_bytes": 3215293,
+      "sha256": "0c151b2655cd78af38bf864100fc223181863c6ca840ba6823100ebc1b1c537e"
+    },
+    {
+      "path": "definitions.csv.gz",
+      "size_bytes": 482282,
+      "sha256": "a1c0e3f978a71197c1b0fc821042d7d6ef268da2c9caa2ff83500dcaea32d202"
+    },
+    {
+      "path": "index.json",
+      "size_bytes": 975934,
+      "sha256": "56f9af23c1383c152b8c5f3b90d7570a9a374a04df1b96fc20528b35c1d3fd48"
+    },
+    {
+      "path": "ipeds-panel-codebook.pdf",
+      "size_bytes": 12016373,
+      "sha256": "7ce553e72bbbab62a0da52fbd42833e9334948531f706b1d4c234e180f416421"
+    },
+    {
+      "path": "value-labels.csv",
+      "size_bytes": 2178896,
+      "sha256": "14f53e482f1e89dcbc0bec8f1fc93de3d099fd72d7fb82e42fffb6e62192955b"
+    },
+    {
+      "path": "variables-001.json",
+      "size_bytes": 4174246,
+      "sha256": "4a1581d095fb52cbb559d2a0068719637391c03282de9cb3090d41d0ec735894"
+    },
+    {
+      "path": "variables-002.json",
+      "size_bytes": 3816783,
+      "sha256": "f109c8bef460ecc0a90f5e025c015d20dd595ac28add1b03b6a3fa064bc2f7d4"
+    },
+    {
+      "path": "variables-003.json",
+      "size_bytes": 4191715,
+      "sha256": "eae836bd0318e0981709fa5c8c3eb638edd06a241bf7ece0849d9a354d8863b4"
+    },
+    {
+      "path": "variables-004.json",
+      "size_bytes": 4185888,
+      "sha256": "5256a1dee65d7ffc0f052dc3b8a5ab3fb9b4b041b55d5e281440a70557df8049"
+    },
+    {
+      "path": "variables-005.json",
+      "size_bytes": 4171668,
+      "sha256": "8f1161db80c9c1bb95fbe1fadaf41622ec08b92e9582785e7d3018fa82a4e8f9"
+    },
+    {
+      "path": "variables-006.json",
+      "size_bytes": 4182515,
+      "sha256": "4acbac2750676dadea274cec4281aee7bac7bcddd62df0c232e222ed58b670eb"
+    },
+    {
+      "path": "variables-007.json",
+      "size_bytes": 4177008,
+      "sha256": "c0f039c35a9b912a74c7d19f6eba298f705351b9c2dc7b3a8029a0ed5b519831"
+    },
+    {
+      "path": "variables-008.json",
+      "size_bytes": 4176607,
+      "sha256": "92de310cf7fa13b5a09b4f478fcb00cba60aa310530d000a21b9a2a92085423e"
+    },
+    {
+      "path": "variables-009.json",
+      "size_bytes": 2053307,
+      "sha256": "42582a1711746012086d5cae1ea4702a253156f1893c9ff73d795a8876e84205"
+    }
+  ]
+}

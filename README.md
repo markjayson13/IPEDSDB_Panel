@@ -44,6 +44,14 @@ in some years, and 6,256 observations lack a verified code meaning for their
 year. These gaps are disclosed; the full package does not claim complete
 metadata readiness. See [full-panel labeling evidence](docs/FULL_PANEL_LABELS.md).
 
+Use the [interactive user codebook](https://markjayson13.github.io/IPEDSDB_Panel/)
+to search all 2,721 variables and inspect definitions, year coverage, category
+codes, Stata mappings, and source corrections. Download the
+[full PDF codebook](https://markjayson13.github.io/IPEDSDB_Panel/codebook/ipeds-panel-codebook.pdf)
+or the dictionary and code-label CSVs from the same page. The codebook replaces
+the former public variable-browser snapshot and describes the labeled release.
+It contains metadata only; the panel data remain outside Git.
+
 `Final/SFA_2023_exports/` contains the validated 2023 SFA subset in Stata, CSV,
 Excel, and Parquet: 6,163 rows and 345 columns, including the two panel keys.
 Use the full Parquet panel when working beyond that subset, and export the
@@ -70,7 +78,8 @@ to `Work` and do not replace `Final` automatically.
 | Record the build environment | `python Scripts/QA_QC/20_environment_report.py --root "$IPEDSDB_ROOT"` |
 | Build join-risk outputs | `python Scripts/QA_QC/22_build_entity_continuity_crosswalk.py --root "$IPEDSDB_ROOT"` |
 | Run saved inspection SQL and export results | `python Scripts/run_saved_query.py --list` |
-| Browse variables present in the current panel | `python Scripts/10_build_variable_browser.py ...` |
+| Search the published panel codebook | [Interactive codebook](https://markjayson13.github.io/IPEDSDB_Panel/) |
+| Rebuild the codebook and PDF | [Codebook build instructions](docs/CODEBOOK.md) |
 | Pull only a subset of variables | `python Scripts/08_build_custom_panel.py ...` |
 | Understand the current dataset's sources | open `Final/manifest.json`, `Final/Metadata/`, and the evidence in `Releases/2023-sfa-v1/` |
 | Inspect what the repo is doing | `manual_commands.sh` -> `Scripts/00_run_all.py` -> stage scripts in `Scripts/01-09` |
@@ -787,7 +796,11 @@ also records consistent and absent variables. Stage 03 verifies the exact source
 release and extracted inputs before applying it; Stage 04 requires physical
 table/variable matches instead of using a shared canonical source family.
 
-### Build a variable browser for the current panel
+### Build a local variable-selection browser
+
+The public [codebook](https://markjayson13.github.io/IPEDSDB_Panel/) is the
+reference for published definitions and labels. The optional local tool below
+is for selecting variables from a custom panel; it does not publish the site.
 
 ```bash
 python3 Scripts/10_build_variable_browser.py \

@@ -17,6 +17,8 @@ If `README.md` describes the repo from the outside, this folder describes the bu
 - `00_run_all.py`: main Python orchestrator
 - `01_download_access_databases.py` to `09_build_panel_dictionary.py`: ordered pipeline stages
 - `10_build_variable_browser.py`: optional static HTML browser for finding real panel columns and exporting `selectedvars.txt`
+- `build_codebook.py`: generate the public codebook from verified published Parquet and Stata metadata
+- `codebook_pdf.py`: render the full bookmarked PDF and documentation checksum manifest
 - `run_saved_query.py`: analyst query runner for saved SQL and result exports
 - `QA_QC/`: validation, parity, monitoring, and repo guards
 - `QA_QC/08_acceptance_audit.py`: top-level pass/fail audit over the generated live artifacts
@@ -65,6 +67,8 @@ If `README.md` describes the repo from the outside, this folder describes the bu
 | `09_build_panel_dictionary.py` | build a dictionary for an actual panel output in `.csv` or formatted `.xlsx` |
 | `10_build_variable_browser.py` | build a self-contained HTML browser for panel vars with semantic grouping, card/table browsing, detail inspection, presets, group/family bulk actions, saved-set lifecycle, import diffing, and export artifacts |
 | `run_saved_query.py` | run saved SQL against the build DB and standard outputs |
+| `build_codebook.py` | verify the published data/metadata hashes and generate website JSON plus downloadable codebook CSVs |
+| `codebook_pdf.py` | generate a searchable PDF for every variable, with exact year scopes and source-gap disclosures |
 | `prch_policy.py` | shared parent-child cleaning policy used by cleaning and QA |
 
 ## Shared helpers
