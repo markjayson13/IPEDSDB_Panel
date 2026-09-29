@@ -20,6 +20,14 @@ Checks/
 build/
 audit_pack/
 
+# Organized external data layout (never repository inputs)
+/Final/
+/Releases/
+/Sources/
+/Work/
+/Archive/
+/layout.json
+
 # Binary outputs
 *.parquet
 *.parquet.tmp

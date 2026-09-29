@@ -11,11 +11,15 @@ import hashlib
 import json
 import re
 import subprocess
+import sys
 import zipfile
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
 import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from access_build_utils import data_layout
 
 ARCHIVE_SHA256 = "5a29f4b8d0fbdd5e091015e286dbddcecdf8d423926521a8af560967cd376629"
 DATABASE_SHA256 = "95983414e996ffce605f3de728b86eb572500353164da98dc818b055df3c9026"
@@ -38,7 +42,7 @@ def normalized(frame: pd.DataFrame) -> pd.DataFrame:
 
 def audit(root: Path, output: Path) -> dict:
     output.mkdir(parents=True, exist_ok=True)
-    year_root = root / "Raw_Access_Databases/2023"
+    year_root = data_layout(root).raw_access / "2023"
     archive = year_root / "downloads/IPEDS_2023-24_Final.zip"
     if digest(archive) != ARCHIVE_SHA256:
         raise ValueError("Original release differs from the audited source lock")
@@ -112,7 +116,8 @@ def audit(root: Path, output: Path) -> dict:
                 "evidence_path": "contracts/source_metadata_corrections/2023-sfa-v1.evidence.json",
                 "archive": {"url": source_manifest["access_url"], "sha256": ARCHIVE_SHA256},
                 "database": {"name": database.name, "sha256": DATABASE_SHA256},
-                "pipeline_inputs": [{"path": str(p.relative_to(root)), "sha256": digest(p)} for p in inputs],
+                "pipeline_inputs": [{"path": str(Path("Raw_Access_Databases") / p.relative_to(data_layout(root).raw_access)),
+                                     "sha256": digest(p)} for p in inputs],
                 "physical_tables": {name.upper(): {"sha256": digest(output / f"{name}.csv"), "columns": physical[name.upper()]}
                                     for name in TABLES[:3]},
                 "corrections": corrections}

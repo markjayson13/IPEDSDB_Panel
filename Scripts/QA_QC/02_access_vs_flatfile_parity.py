@@ -30,7 +30,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT, DEFAULT_LEGACY_PANELING_ROOT
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, DEFAULT_LEGACY_PANELING_ROOT, data_layout
 
 
 def parse_args() -> argparse.Namespace:
@@ -87,19 +87,21 @@ def main() -> None:
     years = parse_years(args.years)
     access_root = Path(args.access_root)
     flat_root = Path(args.flatfile_root)
+    access_layout = data_layout(access_root)
+    flat_layout = data_layout(flat_root)
 
-    access_long = Path(args.access_long or access_root / "Panels" / "2004-2023" / "panel_long_varnum_2004_2023.parquet")
-    flat_long = Path(args.flat_long or flat_root / "Panels" / "2004-2024" / "panel_long_varnum_2004_2024.parquet")
-    access_wide = Path(args.access_wide or access_root / "Panels" / "panel_wide_analysis_2004_2023.parquet")
-    flat_wide = Path(args.flat_wide or flat_root / "Panels" / "panel_wide_analysis_2004_2023.parquet")
+    access_long = Path(args.access_long or access_layout.panels / "2004-2023" / "panel_long_varnum_2004_2023.parquet")
+    flat_long = Path(args.flat_long or flat_layout.panels / "2004-2024" / "panel_long_varnum_2004_2024.parquet")
+    access_wide = Path(args.access_wide or access_layout.panels / "panel_wide_analysis_2004_2023.parquet")
+    flat_wide = Path(args.flat_wide or flat_layout.panels / "panel_wide_analysis_2004_2023.parquet")
 
     if not access_long.exists() or not flat_long.exists():
         raise SystemExit("Missing access or flatfile long panel input.")
     if not access_wide.exists() or not flat_wide.exists():
         raise SystemExit("Missing access or flatfile wide panel input.")
 
-    out_csv = Path(args.summary_csv or access_root / "Checks" / "wide_qc" / "access_vs_flatfile_parity_summary.csv")
-    out_md = Path(args.summary_md or access_root / "Checks" / "wide_qc" / "access_vs_flatfile_parity_summary.md")
+    out_csv = Path(args.summary_csv or access_layout.checks / "wide_qc" / "access_vs_flatfile_parity_summary.csv")
+    out_md = Path(args.summary_md or access_layout.checks / "wide_qc" / "access_vs_flatfile_parity_summary.md")
     out_csv.parent.mkdir(parents=True, exist_ok=True)
     out_md.parent.mkdir(parents=True, exist_ok=True)
 
@@ -230,17 +232,17 @@ def main() -> None:
 
     add(
         "anti_garbage_failures",
-        qc_count(access_root / "Checks" / "wide_qc" / "qc_anti_garbage_failures.csv"),
-        qc_count(flat_root / "Checks" / "wide_qc" / "qc_anti_garbage_failures.csv"),
-        qc_count(access_root / "Checks" / "wide_qc" / "qc_anti_garbage_failures.csv")
-        == qc_count(flat_root / "Checks" / "wide_qc" / "qc_anti_garbage_failures.csv"),
+        qc_count(access_layout.checks / "wide_qc" / "qc_anti_garbage_failures.csv"),
+        qc_count(flat_layout.checks / "wide_qc" / "qc_anti_garbage_failures.csv"),
+        qc_count(access_layout.checks / "wide_qc" / "qc_anti_garbage_failures.csv")
+        == qc_count(flat_layout.checks / "wide_qc" / "qc_anti_garbage_failures.csv"),
     )
     add(
         "scalar_conflict_rows",
-        qc_count(access_root / "Checks" / "wide_qc" / "qc_scalar_conflicts.csv"),
-        qc_count(flat_root / "Checks" / "wide_qc" / "qc_scalar_conflicts.csv"),
-        qc_count(access_root / "Checks" / "wide_qc" / "qc_scalar_conflicts.csv")
-        == qc_count(flat_root / "Checks" / "wide_qc" / "qc_scalar_conflicts.csv"),
+        qc_count(access_layout.checks / "wide_qc" / "qc_scalar_conflicts.csv"),
+        qc_count(flat_layout.checks / "wide_qc" / "qc_scalar_conflicts.csv"),
+        qc_count(access_layout.checks / "wide_qc" / "qc_scalar_conflicts.csv")
+        == qc_count(flat_layout.checks / "wide_qc" / "qc_scalar_conflicts.csv"),
     )
 
     summary = pd.DataFrame(rows)

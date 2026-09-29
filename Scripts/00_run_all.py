@@ -8,7 +8,7 @@ Reads:
 
 Writes:
 - the staged outputs produced by any enabled pipeline step
-- final panel artifacts under `Panels/`
+- draft panel artifacts under `Work/Panels/` for organized roots
 - QA artifacts when `--run-qaqc` is enabled
 
 This is the main Python entrypoint behind `manual_commands.sh`.
@@ -26,7 +26,7 @@ import pyarrow.compute as pc
 import pyarrow.dataset as ds
 import pyarrow.parquet as pq
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT, ensure_data_layout, parse_years, repo_root
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, data_layout, ensure_data_layout, parse_years, repo_root
 
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
@@ -64,7 +64,11 @@ def main() -> None:
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
-    layout = ensure_data_layout(args.root)
+    layout = data_layout(args.root) if args.dry_run else ensure_data_layout(args.root)
+    # Stages without a --root option still need the selected root for logs.
+    os.environ["IPEDSDB_ROOT"] = str(layout.root)
+    if layout.organized:
+        print(f"[build] Draft outputs: {layout.work}; Final requires separate verified publication.")
     years = parse_years(args.years)
     year_spec = f"{years[0]}:{years[-1]}"
     long_out = layout.panels / f"{years[0]}-{years[-1]}" / f"panel_long_varnum_{years[0]}_{years[-1]}.parquet"

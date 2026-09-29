@@ -3,8 +3,6 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ROOT="$REPO_ROOT"
-DEFAULT_IPEDSDB_ROOT="$(dirname "$REPO_ROOT")/IPEDSDB_ROOT"
-export IPEDSDB_ROOT="${IPEDSDB_ROOT:-$DEFAULT_IPEDSDB_ROOT}"
 
 usage() {
   cat <<'EOF'
@@ -32,12 +30,28 @@ if [[ -f "$ROOT/.venv/bin/activate" ]]; then
   source "$ROOT/.venv/bin/activate"
 fi
 
-echo "[ipedsdb-panel] QA root: $IPEDSDB_ROOT"
-echo "[ipedsdb-panel] checking required inputs"
+# Resolve both organized and legacy roots through the same Python layout helper.
+LAYOUT_TEXT="$(python3 - "$REPO_ROOT/Scripts" <<'PY_LAYOUT'
+import sys
+sys.path.insert(0, sys.argv[1])
+from access_build_utils import data_layout
+layout = data_layout()
+for path in (layout.root, layout.dictionary, layout.panels, layout.checks):
+    print(path)
+PY_LAYOUT
+)"
+LAYOUT_PATHS=()
+while IFS= read -r path; do
+  LAYOUT_PATHS+=("$path")
+done <<< "$LAYOUT_TEXT"
+export IPEDSDB_ROOT="${LAYOUT_PATHS[0]}"
+DICT_LAKE="${LAYOUT_PATHS[1]}/dictionary_lake.parquet"
+WIDE_RAW="${LAYOUT_PATHS[2]}/panel_wide_analysis_2004_2023.parquet"
+WIDE_CLEAN="${LAYOUT_PATHS[2]}/panel_clean_analysis_2004_2023.parquet"
+CHECKS_ROOT="${LAYOUT_PATHS[3]}"
 
-DICT_LAKE="$IPEDSDB_ROOT/Dictionary/dictionary_lake.parquet"
-WIDE_RAW="$IPEDSDB_ROOT/Panels/panel_wide_analysis_2004_2023.parquet"
-WIDE_CLEAN="$IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023.parquet"
+echo "[ipedsdb-panel] QA root: $IPEDSDB_ROOT"
+echo "[ipedsdb-panel] checking required build inputs"
 
 check_path() {
   local label="$1"
@@ -56,33 +70,33 @@ check_path "Wide raw panel" "$WIDE_RAW"
 check_path "Wide clean panel" "$WIDE_CLEAN"
 
 mkdir -p \
-  "$IPEDSDB_ROOT/Checks/dictionary_qc" \
-  "$IPEDSDB_ROOT/Checks/panel_qc" \
-  "$IPEDSDB_ROOT/Checks/acceptance_qc"
+  "$CHECKS_ROOT/dictionary_qc" \
+  "$CHECKS_ROOT/panel_qc" \
+  "$CHECKS_ROOT/acceptance_qc"
 
 python3 "$ROOT/Scripts/QA_QC/00_dictionary_qaqc.py" --root "$IPEDSDB_ROOT"
 python3 "$ROOT/Scripts/QA_QC/01_panel_qa.py" \
   --raw "$WIDE_RAW" \
   --clean "$WIDE_CLEAN" \
-  --out-dir "$IPEDSDB_ROOT/Checks/panel_qc" \
-  --prch-qc-dir "$IPEDSDB_ROOT/Checks/prch_qc"
+  --out-dir "$CHECKS_ROOT/panel_qc" \
+  --prch-qc-dir "$CHECKS_ROOT/prch_qc"
 python3 "$ROOT/Scripts/QA_QC/09_panel_structure_qc.py" \
   --root "$IPEDSDB_ROOT" \
   --years "2004:2023" \
-  --out-dir "$IPEDSDB_ROOT/Checks/panel_qc"
+  --out-dir "$CHECKS_ROOT/panel_qc"
 python3 "$ROOT/Scripts/QA_QC/08_acceptance_audit.py" \
   --root "$IPEDSDB_ROOT" \
   --years "2004:2023" \
-  --out-dir "$IPEDSDB_ROOT/Checks/acceptance_qc"
+  --out-dir "$CHECKS_ROOT/acceptance_qc"
 
 echo ""
 echo "[ipedsdb-panel] QA complete"
 echo "QC outputs written to:"
-echo "  $IPEDSDB_ROOT/Checks/dictionary_qc"
-echo "  $IPEDSDB_ROOT/Checks/panel_qc"
-echo "  $IPEDSDB_ROOT/Checks/acceptance_qc"
+echo "  $CHECKS_ROOT/dictionary_qc"
+echo "  $CHECKS_ROOT/panel_qc"
+echo "  $CHECKS_ROOT/acceptance_qc"
 echo ""
 echo "Open these first:"
-echo "  $IPEDSDB_ROOT/Checks/acceptance_qc/acceptance_summary.md"
-echo "  $IPEDSDB_ROOT/Checks/panel_qc/panel_qa_summary.csv"
-echo "  $IPEDSDB_ROOT/Checks/panel_qc/panel_structure_summary.csv"
+echo "  $CHECKS_ROOT/acceptance_qc/acceptance_summary.md"
+echo "  $CHECKS_ROOT/panel_qc/panel_qa_summary.csv"
+echo "  $CHECKS_ROOT/panel_qc/panel_structure_summary.csv"

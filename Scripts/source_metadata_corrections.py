@@ -12,6 +12,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from access_build_utils import data_layout
+
 DEFAULT_REGISTRY = Path(__file__).resolve().parents[1] / "contracts/source_metadata_corrections/2023-sfa-v1.json"
 
 
@@ -51,9 +53,19 @@ def load_registry(path: Path = DEFAULT_REGISTRY) -> dict:
 def verify_source_files(root: Path, registry: dict) -> None:
     """Bind a correction to the exact release and exact extracted input bytes."""
     for item in registry["pipeline_inputs"]:
-        path = root / item["path"]
+        path = resolve_source_input(root, item["path"])
         if not path.is_file() or sha256(path) != item["sha256"]:
             raise ValueError(f"Source correction evidence does not match input: {path}")
+
+
+def resolve_source_input(root: Path, relative: str) -> Path:
+    """Resolve pinned legacy registry paths without rewriting their evidence."""
+    path = Path(relative)
+    if path.is_absolute() or ".." in path.parts:
+        raise ValueError(f"Source evidence must be relative to the data root: {relative}")
+    if path.parts and path.parts[0] == "Raw_Access_Databases":
+        return data_layout(root).raw_access.joinpath(*path.parts[1:])
+    return root / path
 
 
 def apply_source_metadata_corrections(

@@ -14,12 +14,14 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import os
 from pathlib import Path
 import tempfile
 
 import pandas as pd
 import pyarrow.dataset as ds
 
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, data_layout, default_final_panel
 from export_metadata import build_export_metadata, discover_export_metadata
 from export_integrity import (apply_observation_validation, assert_source_unchanged, export_code_provenance,
                               promote_package, require_export_ready, scan_panel, source_fingerprint, validate_observed_codes)
@@ -32,8 +34,9 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--input", required=True, help="Input stitched wide parquet")
-    p.add_argument("--dictionary", required=True, help="dictionary_lake.parquet")
+    p.add_argument("--root", default=os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)), help="External IPEDSDB root")
+    p.add_argument("--input", help="Input stitched wide parquet; defaults to the root's final clean panel")
+    p.add_argument("--dictionary", help="dictionary_lake.parquet; defaults beside the selected panel")
     p.add_argument("--output", required=True, help="Output .csv or .xlsx path")
     p.add_argument("--codes", help="Year/source-scoped category codebook; defaults beside the dictionary")
     p.add_argument("--column-lineage", help="Stage 06 output-column lineage; defaults beside the panel data root")
@@ -168,11 +171,14 @@ def write_excel(ref: pd.DataFrame, input_path: Path, dictionary_path: Path, out_
 
 def main() -> None:
     args = parse_args()
-    input_path = Path(args.input)
-    dictionary_path = Path(args.dictionary)
+    layout = data_layout(args.root)
+    input_path = Path(args.input) if args.input else default_final_panel(layout.root)
+    dictionary_path = discover_export_metadata(args.dictionary, "Dictionary/dictionary_lake.parquet", input_path, layout.root)
+    if dictionary_path is None:
+        raise ValueError(f"No matching dictionary found for panel: {input_path}")
     codes_path = Path(args.codes) if args.codes else dictionary_path.parent / "dictionary_codes.parquet"
     lineage_path = discover_export_metadata(args.column_lineage, "Checks/wide_qc/qc_column_lineage.csv",
-                                            input_path, input_path.parent.parent)
+                                            input_path, layout.root)
     for explicit, path in ((True, dictionary_path), (bool(args.codes), codes_path), (bool(args.column_lineage), lineage_path)):
         if explicit and (path is None or not path.is_file()):
             raise ValueError(f"Metadata file does not exist: {path}")

@@ -23,7 +23,7 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.dataset as ds
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, data_layout, default_final_panel
 from export_metadata import build_export_metadata, discover_export_metadata as discover_metadata
 from export_integrity import (apply_observation_validation, assert_source_unchanged,
                               export_code_provenance, promote_package, require_export_ready,
@@ -92,7 +92,8 @@ def load_vars(vars_arg: str | None, vars_file: str | None) -> list[str]:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--input", required=True, help="Input wide parquet (raw/clean)")
+    ap.add_argument("--root", default=os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)), help="External IPEDSDB root")
+    ap.add_argument("--input", help="Input wide parquet; defaults to the root's final clean panel")
     ap.add_argument("--output", required=True, help="Output .parquet, .csv, .dta, or .xlsx path")
     ap.add_argument("--vars", default=None, help="Comma-separated list of varnames")
     ap.add_argument("--vars-file", default=None, help="File with varnames (one per line or comma-separated)")
@@ -105,13 +106,14 @@ def main() -> None:
                     help="Require complete definitions, valid unique panel keys, and known categorical codes")
     ap.add_argument("--batch-rows", type=int, default=100_000, help="Batch size for streaming output")
     ap.add_argument("--strict", action="store_true", help="Fail if any requested varname is missing")
-    data_root = Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
-    ap.add_argument("--log-file", default=str(data_root / "Checks" / "logs" / "08_build_custom_panel.log"), help="Optional log file path")
+    ap.add_argument("--log-file", default=None, help="Optional log file path; empty string disables logging")
     args = ap.parse_args()
-    setup_logging(args.log_file)
+    layout = data_layout(args.root)
+    data_root = layout.root
+    input_path = Path(args.input) if args.input else default_final_panel(data_root)
+    setup_logging(args.log_file if args.log_file is not None else str(layout.checks / "logs/08_build_custom_panel.log"))
     if args.batch_rows < 1:
         raise ValueError("--batch-rows must be positive.")
-    input_path = Path(args.input)
     out_path = Path(args.output)
     suffix_format = out_path.suffix.lower().lstrip(".")
     fmt = args.format or suffix_format
@@ -127,7 +129,7 @@ def main() -> None:
         raise SystemExit("Provide --vars or --vars-file with at least one variable.")
 
     source_identity = source_fingerprint(input_path)
-    dataset = ds.dataset(args.input, format="parquet")
+    dataset = ds.dataset(input_path, format="parquet")
     schema = dataset.schema
     if len({name.upper() for name in schema.names}) != len(schema.names):
         raise ValueError("Input has duplicate or case-ambiguous column names.")

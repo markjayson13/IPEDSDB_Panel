@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -29,7 +30,7 @@ from pathlib import Path
 from typing import Iterable
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_IPEDSDB_ROOT = REPO_ROOT.parent / "IPEDSDB_ROOT"
+DEFAULT_IPEDSDB_ROOT = Path("/Volumes/CIRAGO/IPEDSDB_PANEL")
 DEFAULT_LEGACY_PANELING_ROOT = REPO_ROOT.parent / "IPEDS_Paneling"
 
 CANONICAL_SOURCE_FILES = {
@@ -192,6 +193,12 @@ class DataRootLayout:
     panels: Path
     checks: Path
     build: Path
+    work: Path
+    final: Path
+    releases: Path
+    archive: Path
+    organized: bool
+    current_release: str | None
 
 
 def repo_root() -> Path:
@@ -204,19 +211,46 @@ def data_root() -> Path:
 
 def data_layout(root: str | Path | None = None) -> DataRootLayout:
     base = Path(root).expanduser() if root is not None else data_root()
+    marker = base / "layout.json"
+    current_release = None
+    organized = marker.exists()
+    if organized:
+        configuration = json.loads(marker.read_text(encoding="utf-8"))
+        current_release = configuration.get("current_release")
+        if (type(configuration.get("schema_version")) is not int or configuration["schema_version"] != 1
+                or not isinstance(current_release, str)
+                or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", current_release)):
+            raise ValueError(f"Invalid or unsupported data layout marker: {marker}")
+    work = base / "Work" if organized else base
     return DataRootLayout(
         root=base,
-        raw_access=base / "Raw_Access_Databases",
-        dictionary=base / "Dictionary",
-        cross_sections=base / "Cross_sections",
-        panels=base / "Panels",
-        checks=base / "Checks",
-        build=base / "build",
+        raw_access=base / "Sources" / "Raw_Access_Databases" if organized else base / "Raw_Access_Databases",
+        dictionary=work / "Dictionary",
+        cross_sections=work / "Cross_sections",
+        panels=work / "Panels",
+        checks=work / "Checks",
+        build=work / "build",
+        work=work,
+        final=base / "Final",
+        releases=base / "Releases",
+        archive=base / "Archive",
+        organized=organized,
+        current_release=current_release,
     )
+
+
+def require_data_volume(root: str | Path) -> None:
+    """Never create a replacement directory for an unmounted external volume."""
+    base = Path(root).expanduser().absolute()
+    if len(base.parts) >= 3 and base.parts[1] == "Volumes":
+        volume = Path(*base.parts[:3])
+        if not volume.is_mount():
+            raise FileNotFoundError(f"Data volume is not mounted: {volume}. Attach the drive or set IPEDSDB_ROOT explicitly.")
 
 
 def ensure_data_layout(root: str | Path | None = None) -> DataRootLayout:
     layout = data_layout(root)
+    require_data_volume(layout.root)
     for path in (
         layout.root,
         layout.raw_access,
@@ -228,6 +262,25 @@ def ensure_data_layout(root: str | Path | None = None) -> DataRootLayout:
     ):
         path.mkdir(parents=True, exist_ok=True)
     return layout
+
+
+def default_final_panel(root: str | Path | None = None, years: str = "2004:2023") -> Path:
+    """Select an analyst panel; organized roots never fall back to draft Work."""
+    layout = data_layout(root)
+    selected = parse_years(years)
+    if not selected:
+        raise ValueError("At least one reporting year is required")
+    token = f"{min(selected)}_{max(selected)}"
+    if layout.organized:
+        panel = layout.final / f"panel_clean_prch_{token}.parquet"
+        if not panel.is_file():
+            raise FileNotFoundError(f"Verified analyst panel is absent: {panel}. Work outputs are drafts and are not used as a fallback.")
+        return panel
+    for panel in (layout.panels / "v2" / f"panel_clean_prch_{token}.parquet",
+                  layout.panels / f"panel_clean_analysis_{token}.parquet"):
+        if panel.is_file():
+            return panel
+    raise FileNotFoundError(f"No completed analyst panel exists under {layout.panels} for {years}")
 
 
 def parse_years(spec: str) -> list[int]:

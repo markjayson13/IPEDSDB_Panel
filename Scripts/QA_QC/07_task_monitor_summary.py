@@ -29,7 +29,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, data_layout
 
 
 def default_data_root() -> Path:
@@ -39,7 +39,7 @@ def default_data_root() -> Path:
 def parse_args() -> argparse.Namespace:
     data_root = default_data_root()
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--run-dir-root", default=str(data_root / "Checks" / "real_parity_runs"), help="Root containing monitored run folders")
+    p.add_argument("--run-dir-root", default=str(data_layout(data_root).checks / "real_parity_runs"), help="Root containing monitored run folders")
     p.add_argument("--output-dir", default=None, help="Where summary artifacts should be written")
     p.add_argument("--markdown-limit", type=int, default=12, help="How many recent runs to include in the Markdown table")
     return p.parse_args()

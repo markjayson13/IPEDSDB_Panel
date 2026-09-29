@@ -30,7 +30,7 @@ from typing import Iterable
 import pandas as pd
 import pyarrow as pa
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, data_layout
 
 
 NULL_LIKE_TOKENS = ("", ".", "nan", "none", "<na>", "na", "nat")
@@ -331,8 +331,9 @@ class WideBuildRuntime:
 def build_arg_parser(repo_root: pathlib.Path | None = None) -> argparse.ArgumentParser:
     repo_root = repo_root or default_repo_root()
     code_root = pathlib.Path(__file__).resolve().parents[1]
-    logs_root = repo_root / "Checks" / "logs"
-    build_root = repo_root / "build"
+    layout = data_layout(repo_root)
+    logs_root = layout.checks / "logs"
+    build_root = layout.build
 
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True, help="Stitched LONG panel parquet")
@@ -398,7 +399,7 @@ def prepare_runtime(args: argparse.Namespace) -> WideBuildRuntime:
     if args.wide_analysis_out and not args.write_single:
         args.write_single = args.wide_analysis_out
     if args.write_single is None and args.lane_split:
-        args.write_single = str(repo_root / "Panels" / f"panel_wide_analysis_{years[0]}_{years[-1]}.parquet")
+        args.write_single = str(data_layout(repo_root).panels / f"panel_wide_analysis_{years[0]}_{years[-1]}.parquet")
 
     if args.qc_dir:
         Path(args.qc_dir).mkdir(parents=True, exist_ok=True)

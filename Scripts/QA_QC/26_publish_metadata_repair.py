@@ -14,7 +14,19 @@ import json
 import os
 from pathlib import Path
 import shutil
+import sys
 import uuid
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from access_build_utils import data_layout
+
+PUBLICATION_ROOT = Path("/Volumes/CIRAGO/IPEDSDB_PANEL")
+
+
+def intended_destination() -> Path:
+    layout = data_layout(PUBLICATION_ROOT)
+    releases = layout.releases if layout.organized else layout.root / "Metadata_repairs"
+    return (releases / "2023-sfa-v1").resolve()
 
 
 def sha256(path: Path) -> str:
@@ -97,7 +109,7 @@ def publish(work: Path, repository: Path, destination: Path) -> dict:
     if destination.exists():
         raise ValueError("A versioned publication already exists; refusing replacement")
     # This publisher is intentionally confined to the requested IPEDS output root.
-    intended = Path("/Volumes/CIRAGO/IPEDSDB_PANEL/Metadata_repairs/2023-sfa-v1").resolve()
+    intended = intended_destination()
     if destination.resolve() != intended:
         raise ValueError("Publication must use the versioned IPEDS metadata-repair destination")
     expected = expected_member_hashes(work, receipt, review, export_receipt)

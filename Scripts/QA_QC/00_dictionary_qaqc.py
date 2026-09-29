@@ -28,11 +28,11 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from access_build_utils import CANONICAL_SOURCE_FILES, DEFAULT_IPEDSDB_ROOT, source_file_qaqc_category
+from access_build_utils import CANONICAL_SOURCE_FILES, data_layout, data_root, source_file_qaqc_category
 
 
 def parse_args() -> argparse.Namespace:
-    default_root = DEFAULT_IPEDSDB_ROOT
+    default_root = data_root()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--root", default=str(default_root), help="External IPEDSDB_ROOT")
     return ap.parse_args()
@@ -52,13 +52,13 @@ def normalize_varnumber(value: object) -> str:
 
 def main() -> None:
     args = parse_args()
-    root = Path(args.root)
-    checks_dir = root / "Checks" / "dictionary_qc"
+    layout = data_layout(args.root)
+    checks_dir = layout.checks / "dictionary_qc"
     checks_dir.mkdir(parents=True, exist_ok=True)
 
-    lake_path = root / "Dictionary" / "dictionary_lake.parquet"
-    codes_path = root / "Dictionary" / "dictionary_codes.parquet"
-    inventory_all_path = root / "Checks" / "extract_qc" / "table_inventory_all_years.csv"
+    lake_path = layout.dictionary / "dictionary_lake.parquet"
+    codes_path = layout.dictionary / "dictionary_codes.parquet"
+    inventory_all_path = layout.checks / "extract_qc" / "table_inventory_all_years.csv"
     candidate_path = checks_dir / "dictionary_metadata_candidates.csv"
 
     if not lake_path.exists():

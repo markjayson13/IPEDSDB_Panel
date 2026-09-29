@@ -29,6 +29,8 @@ import pyarrow as pa
 import pyarrow.dataset as ds
 import pyarrow.parquet as pq
 
+from access_build_utils import data_layout
+
 from duckdb_build_utils import (
     bootstrap_build_db,
     copy_query_to_parquet,
@@ -317,7 +319,7 @@ def resolve_profile_dir(args, runtime: WideBuildRuntime) -> Path | None:
     elif args.qc_dir:
         path = Path(args.qc_dir) / "sql_profiles"
     else:
-        path = runtime.repo_root / "Checks" / "wide_qc" / "sql_profiles"
+        path = data_layout(runtime.repo_root).checks / "wide_qc" / "sql_profiles"
     path.mkdir(parents=True, exist_ok=True)
     return path
 

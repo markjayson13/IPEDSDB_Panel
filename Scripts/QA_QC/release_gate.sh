@@ -2,13 +2,20 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-DEFAULT_IPEDSDB_ROOT="$(dirname "$REPO_ROOT")/IPEDSDB_ROOT"
+DEFAULT_IPEDSDB_ROOT="/Volumes/CIRAGO/IPEDSDB_PANEL"
 ROOT="${IPEDSDB_ROOT:-$DEFAULT_IPEDSDB_ROOT}"
 YEARS="${YEARS:-2004:2023}"
 BASELINE_MANIFEST="${BASELINE_MANIFEST:-}"
 BASELINE_ROOT="${BASELINE_ROOT:-}"
 REQUIRE_EXTERNAL_BENCHMARKS="${REQUIRE_EXTERNAL_BENCHMARKS:-0}"
 cd "$REPO_ROOT"
+CHECKS="$(python3 - "$ROOT" <<'PY'
+import sys
+sys.path.insert(0, 'Scripts')
+from access_build_utils import data_layout
+print(data_layout(sys.argv[1]).checks)
+PY
+)"
 
 python3 Scripts/QA_QC/11_validate_panel_contract.py
 python3 Scripts/QA_QC/18_public_release_guard.py
@@ -16,7 +23,7 @@ python3 Scripts/QA_QC/19_docs_style_guard.py
 python3 Scripts/QA_QC/08_acceptance_audit.py --root "$ROOT" --years "$YEARS"
 python3 Scripts/QA_QC/12_build_release_manifest.py --root "$ROOT" --years "$YEARS"
 python3 Scripts/QA_QC/13_verify_release_manifest.py \
-  --manifest "$ROOT/Checks/release_manifest/release_manifest.csv" \
+  --manifest "$CHECKS/release_manifest/release_manifest.csv" \
   --root "$ROOT"
 python3 Scripts/QA_QC/16_build_datapackage.py \
   --root "$ROOT" \
@@ -40,9 +47,9 @@ python3 Scripts/QA_QC/21_external_benchmark_reconciliation.py "${benchmark_args[
 if [[ -n "$BASELINE_MANIFEST" ]]; then
   args=(
     --baseline-manifest "$BASELINE_MANIFEST"
-    --current-manifest "$ROOT/Checks/release_manifest/release_manifest.csv"
+    --current-manifest "$CHECKS/release_manifest/release_manifest.csv"
     --current-root "$ROOT"
-    --out-dir "$ROOT/Checks/release_compare"
+    --out-dir "$CHECKS/release_compare"
   )
   if [[ -n "$BASELINE_ROOT" ]]; then
     args+=(--baseline-root "$BASELINE_ROOT")

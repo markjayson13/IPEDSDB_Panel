@@ -21,7 +21,8 @@ from pathlib import Path
 import pandas as pd
 import pyarrow.parquet as pq
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, data_layout, default_final_panel
+from export_metadata import discover_export_metadata
 
 
 GROUP_ORDER = [
@@ -2901,25 +2902,21 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 
 def parse_args() -> argparse.Namespace:
-    repo_root = Path(__file__).resolve().parents[1]
-    data_root = Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
     parser = argparse.ArgumentParser(
         description="Build a static HTML variable browser for a panel parquet."
     )
+    parser.add_argument("--root", default=os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)), help="External IPEDSDB root")
     parser.add_argument(
         "--input",
-        default=str(data_root / "Panels" / "panel_clean_analysis_2004_2023.parquet"),
-        help="Wide or cleaned panel parquet",
+        help="Wide or cleaned panel parquet; defaults to the root's final clean panel",
     )
     parser.add_argument(
         "--dictionary",
-        default=str(data_root / "Dictionary" / "dictionary_lake.parquet"),
-        help="Path to dictionary_lake.parquet",
+        help="dictionary_lake.parquet; defaults beside the selected panel",
     )
     parser.add_argument(
         "--output",
-        default=str(repo_root / "Customize_Panel" / "variable_browser.html"),
-        help="Output HTML file",
+        help="Output HTML file; organized roots default to Work/Customize_Panel",
     )
     parser.add_argument(
         "--title",
@@ -3540,9 +3537,14 @@ def render_html(payload: dict) -> str:
 
 def main() -> None:
     args = parse_args()
-    input_path = Path(args.input)
-    dictionary_path = Path(args.dictionary)
-    output_path = Path(args.output)
+    layout = data_layout(args.root)
+    input_path = Path(args.input) if args.input else default_final_panel(layout.root)
+    dictionary_path = discover_export_metadata(args.dictionary, "Dictionary/dictionary_lake.parquet", input_path, layout.root)
+    if dictionary_path is None:
+        raise SystemExit(f"No matching dictionary found for panel: {input_path}")
+    default_output = ((layout.work if layout.organized else Path(__file__).resolve().parents[1])
+                      / "Customize_Panel/variable_browser.html")
+    output_path = Path(args.output) if args.output else default_output
 
     if not input_path.exists():
         raise SystemExit(f"Missing input panel: {input_path}")

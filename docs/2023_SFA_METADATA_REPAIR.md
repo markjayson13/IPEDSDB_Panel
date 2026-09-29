@@ -5,6 +5,21 @@ released March 2026. The SFA tables themselves record a December 2025 final
 release. Panel year `2023` indexes this collection; the two Pell measures cover
 July 1, 2022 through June 30, 2023.
 
+## Current analysis paths
+
+Set `IPEDSDB_ROOT=/Volumes/CIRAGO/IPEDSDB_PANEL`. The current full dataset is
+`Final/panel_clean_prch_2004_2023.parquet`, paired with `Final/Metadata/` and
+`Final/value_lineage.parquet`. It contains 141,711 rows and 2,721 columns.
+`Final/SFA_2023_exports/` contains the validated 2023 subset, with 6,163 rows and
+345 columns; it is not the full twenty-year panel.
+
+The complete immutable correction bundle is now `Releases/2023-sfa-v1/`.
+`Final/manifest.json` records the current paths and hashes and binds the original
+release manifest. The `layout.json` marker selects `2023-sfa-v1` as current.
+Original downloads live in `Sources/Raw_Access_Databases/`; future builds use
+`Work/`. The pre-repair folders are retained together under
+`Archive/pre_metadata_repair/` so their relative links still resolve.
+
 ## Root cause and source verification
 
 The original `varTable23` inside `IPEDS202324.accdb` assigns `UPGRNTN` (70306)
@@ -85,6 +100,8 @@ Independent raw-source comparison covers all 362 present SFA variables and
 original wide and cleaned panels. No 2023 SFA cells were changed by PRCH cleaning.
 Both requested Pell variables match all 5,653 source institutions exactly.
 
+Baseline paths below are relative to `Archive/pre_metadata_repair/`.
+
 | Baseline artifact | SHA-256 |
 | --- | --- |
 | `Panels/v2/panel_wide_analysis_2004_2023.parquet` | `ef3926acda4674551d5a51d0b0c3c1d56b97805021483626d62f73f1e6c4a9ef` |
@@ -147,15 +164,22 @@ labels. The Stage 09 dictionary export passed strict readiness. The final
 software suite passed all 169 tests. Missing measurement semantics remain
 explicitly unknown; these checks do not assert undocumented comparability.
 
-Use the versioned correction bundle at
-`/Volumes/CIRAGO/IPEDSDB_PANEL/Metadata_repairs/2023-sfa-v1`.
-The original canonical output files are retained as the before-repair baseline;
-the corrected dictionary and panel must be used together from this new root.
-The downstream FSA dataset was not modified.
+Use `Final/panel_clean_prch_2004_2023.parquet` with the matching definitions
+in `Final/Metadata/`. These links select files from the complete correction
+bundle at `/Volumes/CIRAGO/IPEDSDB_PANEL/Releases/2023-sfa-v1`.
+The downstream FSA dataset was not modified by this IPEDS repair.
 
-Paths below are relative to that correction root. `manifest.json` records every
-absolute output path, SHA-256, source dependency, and validation receipt;
-`SHA256SUMS` also covers the manifest itself.
+The bundle was originally published at
+`/Volumes/CIRAGO/IPEDSDB_PANEL/Metadata_repairs/2023-sfa-v1` and subsequently
+moved intact to `Releases/2023-sfa-v1`. Its original `manifest.json`,
+`SHA256SUMS`, and verification receipts are retained byte-for-byte. Absolute
+paths inside those historical records intentionally describe the publication
+location at that time. The relocation record and `Final/manifest.json` identify
+the current paths without rewriting the original audit evidence.
+
+Paths below are relative to `Releases/2023-sfa-v1/`. The preserved release
+manifest records output hashes, source dependencies, and validation receipts;
+`SHA256SUMS` also covers that manifest itself.
 
 | Corrected output | SHA-256 |
 | --- | --- |

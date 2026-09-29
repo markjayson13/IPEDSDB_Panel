@@ -23,11 +23,9 @@ Open this file when you want to see the actual row-preserving parent/child clean
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 import time
 from pathlib import Path
-import pathlib
 
 import pandas as pd
 import pyarrow as pa
@@ -42,7 +40,7 @@ from prch_policy import (
     review_only_codes,
     targets_source_file,
 )
-from access_build_utils import DEFAULT_IPEDSDB_ROOT
+from access_build_utils import data_layout
 
 
 def setup_logging(log_path: str | None) -> None:
@@ -78,8 +76,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--batch-rows", type=int, default=100_000, help="Batch size for streaming")
     p.add_argument("--log-every", type=int, default=50, help="Log progress every N batches")
     p.add_argument("--drop-imputation-flags", action=argparse.BooleanOptionalAction, default=False, help="Drop X* imputation columns")
-    data_root = pathlib.Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
-    logs_root = data_root / "Checks" / "logs"
+    logs_root = data_layout().checks / "logs"
     p.add_argument("--log-file", default=str(logs_root / "07_clean_panel.log"), help="Optional log file path")
     return p.parse_args()
 

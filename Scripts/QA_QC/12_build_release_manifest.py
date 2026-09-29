@@ -33,7 +33,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT, compute_file_metadata, ensure_data_layout, parse_years, repo_root
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, compute_file_metadata, data_layout, ensure_data_layout, parse_years, repo_root
 
 
 MANIFEST_VERSION = "1.0"
@@ -178,6 +178,15 @@ def discover_files(root: Path, rel_dir: str) -> Iterable[str]:
 
 
 def expected_root_artifacts(root: Path, years: list[int], include_qa_files: bool) -> list[tuple[str, str, str]]:
+    layout = data_layout(root)
+    directories = {"Dictionary": layout.dictionary, "Panels": layout.panels,
+                   "Raw_Access_Databases": layout.raw_access, "Checks": layout.checks,
+                   "Cross_sections": layout.cross_sections}
+
+    def located(relative: str) -> str:
+        path = Path(relative)
+        return str((directories[path.parts[0]] / Path(*path.parts[1:])).relative_to(root))
+
     start, end = years[0], years[-1]
     artifacts: list[tuple[str, str, str]] = [
         ("dictionary_artifact", "Dictionary/dictionary_lake.parquet", "Stitched variable metadata"),
@@ -188,14 +197,15 @@ def expected_root_artifacts(root: Path, years: list[int], include_qa_files: bool
         ("panel_output", f"Panels/panel_wide_analysis_{start}_{end}.parquet", "Wide analysis panel"),
         ("panel_output", f"Panels/panel_clean_analysis_{start}_{end}.parquet", "PRCH-cleaned analysis panel"),
     ]
+    artifacts = [(role, located(relative), notes) for role, relative, notes in artifacts]
     for year in years:
-        artifacts.append(("raw_manifest", f"Raw_Access_Databases/{year}/manifest.csv", "Year-level download/extract manifest"))
-        artifacts.extend(("raw_download", rel, "Downloaded NCES source artifact") for rel in discover_files(root, f"Raw_Access_Databases/{year}/downloads"))
-        artifacts.extend(("extract_metadata", rel, "Extracted Access metadata") for rel in discover_files(root, f"Raw_Access_Databases/{year}/metadata"))
-        artifacts.append(("long_year_output", f"Cross_sections/panel_long_varnum_{year}.parquet", "Per-year harmonized long output"))
+        artifacts.append(("raw_manifest", located(f"Raw_Access_Databases/{year}/manifest.csv"), "Year-level download/extract manifest"))
+        artifacts.extend(("raw_download", rel, "Downloaded NCES source artifact") for rel in discover_files(root, located(f"Raw_Access_Databases/{year}/downloads")))
+        artifacts.extend(("extract_metadata", rel, "Extracted Access metadata") for rel in discover_files(root, located(f"Raw_Access_Databases/{year}/metadata")))
+        artifacts.append(("long_year_output", located(f"Cross_sections/panel_long_varnum_{year}.parquet"), "Per-year harmonized long output"))
     if include_qa_files:
         for qa_dir in QA_DIRS:
-            artifacts.extend(("qa_artifact", rel, f"QA artifact from {qa_dir}") for rel in discover_files(root, f"Checks/{qa_dir}"))
+            artifacts.extend(("qa_artifact", rel, f"QA artifact from {qa_dir}") for rel in discover_files(root, located(f"Checks/{qa_dir}")))
     return artifacts
 
 

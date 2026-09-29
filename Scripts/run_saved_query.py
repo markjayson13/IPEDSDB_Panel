@@ -34,7 +34,7 @@ import pyarrow as pa
 import pyarrow.dataset as ds
 import pyarrow.parquet as pq
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT, ensure_data_layout, parse_years, repo_root
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, default_final_panel, ensure_data_layout, parse_years, repo_root
 from duckdb_build_utils import copy_query_to_parquet, sql_quote
 from export_metadata import build_export_metadata, discover_export_metadata
 from export_integrity import (apply_observation_validation, assert_source_unchanged, export_code_provenance,
@@ -126,7 +126,22 @@ def bootstrap_artifact_views(
     v2_clean = layout.panels / "v2" / f"panel_clean_prch_{start_year}_{end_year}.parquet"
     v2_wide = layout.panels / "v2" / f"panel_wide_analysis_{start_year}_{end_year}.parquet"
     versioned = v2_clean.is_file() or v2_wide.is_file()
-    if versioned:
+    if layout.organized:
+        versioned = True
+        clean_path = default_final_panel(root, years_spec)
+        physical = clean_path.resolve()
+        release_root = next((parent.parent for parent in physical.parents
+                             if parent.name == "Panels" and parent.parent.parent == layout.releases.resolve()),
+                            None)
+        panel_directory = release_root / "Panels/v2" if release_root else layout.final
+        metadata_directory = release_root / "Dictionary/v2" if release_root else layout.final / "Metadata"
+        wide_path = panel_directory / f"panel_wide_analysis_{start_year}_{end_year}.parquet"
+        long_path = panel_directory / f"panel_long_scalar_{start_year}_{end_year}.parquet"
+        dict_lake_path = (discover_export_metadata(None, "Dictionary/dictionary_lake.parquet", clean_path, root)
+                          or metadata_directory / "dictionary_lake.parquet")
+        dict_codes_path = (discover_export_metadata(None, "Dictionary/dictionary_codes.parquet", clean_path, root)
+                           or metadata_directory / "dictionary_codes.parquet")
+    elif versioned:
         clean_path, wide_path = v2_clean, v2_wide
         long_path = layout.panels / "v2" / f"panel_long_scalar_{start_year}_{end_year}.parquet"
         dict_lake_path = layout.dictionary / "v2/dictionary_lake.parquet"

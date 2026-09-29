@@ -19,6 +19,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import duckdb
 
+from access_build_utils import data_layout
+
 
 KEY_METADATA = {
     "UNITID": (
@@ -195,12 +197,30 @@ def discover_export_metadata(explicit: str | Path | None, relative: str,
         if not path.is_file():
             raise ValueError(f"Metadata file does not exist: {path}")
         return path
-    input_path, root = Path(input_path), Path(root)
+    input_path, root = Path(input_path).expanduser(), Path(root).expanduser()
+    physical_path = input_path.resolve()
+    # A Final symlink belongs to the release containing its physical panel.
+    # Never fill missing release companions from competing Work/legacy files.
+    release_root = next((parent.parent for parent in physical_path.parents
+                         if parent.name == "Panels" and parent.parent.parent.name == "Releases"), None)
+    final_root = next((parent for parent in input_path.absolute().parents
+                       if parent.name == "Final" and data_layout(parent.parent).organized), None)
+    target = Path(relative)
+    if final_root is not None and release_root is None:
+        if target.parts[:1] == ("Dictionary",):
+            candidate = final_root / "Metadata" / target.name
+        elif target.name in {"qc_column_lineage.csv", "qc_column_lineage.parquet", "qc_value_lineage.parquet"}:
+            candidate = final_root / "value_lineage.parquet"
+        else:
+            candidate = final_root / target
+        return candidate if candidate.is_file() else None
+    if release_root is not None:
+        input_path = physical_path
     parts = input_path.parts
     versioned = any(parts[index:index + 2] == ("Panels", "v2") for index in range(len(parts) - 1))
     panel_roots = [parent.parent for parent in input_path.parents if parent.name == "Panels"]
-    bases = list(dict.fromkeys([*panel_roots, input_path.parent, input_path.parent.parent, root]))
-    target = Path(relative)
+    bases = ([release_root] if release_root is not None else
+             list(dict.fromkeys([*panel_roots, input_path.parent, input_path.parent.parent, root])))
     if target.parts[:1] == ("Dictionary",):
         relatives = [Path("Dictionary") / "v2" / target.name] if versioned else [target]
     elif target.name in {"qc_column_lineage.csv", "qc_column_lineage.parquet", "qc_value_lineage.parquet"}:

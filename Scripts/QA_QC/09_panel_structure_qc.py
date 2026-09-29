@@ -40,7 +40,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT, ensure_data_layout, parse_years
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, data_layout, ensure_data_layout, parse_years
 from panel_structure_utils import (
     CLASSIFICATION_COLUMNS,
     build_classification_stability_summary,
@@ -55,14 +55,16 @@ from panel_structure_utils import (
 
 def parse_args() -> argparse.Namespace:
     data_root = Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
-    checks_root = data_root / "Checks"
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", default=str(data_root), help="External IPEDSDB_ROOT")
     p.add_argument("--years", default="2004:2023", help='Expected year span, e.g. "2004:2023"')
     p.add_argument("--input", default=None, help="Optional cleaned panel override")
     p.add_argument("--dictionary", default=None, help="Optional dictionary_lake override")
-    p.add_argument("--out-dir", default=str(checks_root / "panel_qc"), help="Panel QA output directory")
-    return p.parse_args()
+    p.add_argument("--out-dir", default=None, help="Panel QA output directory")
+    args = p.parse_args()
+    if args.out_dir is None:
+        args.out_dir = str(data_layout(args.root).checks / "panel_qc")
+    return args
 
 
 def write_csv(path: Path, df: pd.DataFrame, columns: list[str] | None = None) -> None:

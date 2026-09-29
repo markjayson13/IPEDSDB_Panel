@@ -33,7 +33,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, data_layout
 
 
 def parse_years(spec: str) -> list[int]:
@@ -79,7 +79,7 @@ def first_present(df: pd.DataFrame, candidates: list[str]) -> str | None:
 
 
 def summarize_release_inventory(root: Path, years: list[int]) -> pd.DataFrame:
-    path = root / "Checks" / "download_qc" / "release_inventory.csv"
+    path = data_layout(root).checks / "download_qc" / "release_inventory.csv"
     df = read_csv(path)
     if df.empty:
         return pd.DataFrame([{"artifact": str(path), "present": False}])
@@ -106,7 +106,7 @@ def summarize_release_inventory(root: Path, years: list[int]) -> pd.DataFrame:
 
 
 def summarize_extract_inventory(root: Path, years: list[int]) -> pd.DataFrame:
-    path = root / "Checks" / "extract_qc" / "table_inventory_all_years.csv"
+    path = data_layout(root).checks / "extract_qc" / "table_inventory_all_years.csv"
     df = read_csv(path)
     if df.empty:
         return pd.DataFrame([{"artifact": str(path), "present": False}])
@@ -129,8 +129,8 @@ def summarize_extract_inventory(root: Path, years: list[int]) -> pd.DataFrame:
 
 
 def summarize_dictionary(root: Path, years: list[int]) -> pd.DataFrame:
-    dict_path = root / "Dictionary" / "dictionary_lake.parquet"
-    codes_path = root / "Dictionary" / "dictionary_codes.parquet"
+    dict_path = data_layout(root).dictionary / "dictionary_lake.parquet"
+    codes_path = data_layout(root).dictionary / "dictionary_codes.parquet"
     dict_rows = parquet_row_count(dict_path)
     codes_rows = parquet_row_count(codes_path)
     unique_vars = None
@@ -161,9 +161,9 @@ def summarize_dictionary(root: Path, years: list[int]) -> pd.DataFrame:
 def summarize_panel_files(root: Path, years: list[int]) -> pd.DataFrame:
     start, end = years[0], years[-1]
     files = {
-        "long_panel": root / "Panels" / f"{start}-{end}" / f"panel_long_varnum_{start}_{end}.parquet",
-        "wide_panel": root / "Panels" / f"panel_wide_analysis_{start}_{end}.parquet",
-        "clean_panel": root / "Panels" / f"panel_clean_analysis_{start}_{end}.parquet",
+        "long_panel": data_layout(root).panels / f"{start}-{end}" / f"panel_long_varnum_{start}_{end}.parquet",
+        "wide_panel": data_layout(root).panels / f"panel_wide_analysis_{start}_{end}.parquet",
+        "clean_panel": data_layout(root).panels / f"panel_clean_analysis_{start}_{end}.parquet",
     }
     rows = []
     for label, path in files.items():
@@ -182,7 +182,7 @@ def summarize_panel_files(root: Path, years: list[int]) -> pd.DataFrame:
 
 
 def summarize_prch(root: Path) -> pd.DataFrame:
-    path = root / "Checks" / "prch_qc" / "prch_clean_summary.csv"
+    path = data_layout(root).checks / "prch_qc" / "prch_clean_summary.csv"
     df = read_csv(path)
     if df.empty:
         return pd.DataFrame([{"artifact": str(path), "present": False}])
@@ -206,7 +206,7 @@ def summarize_prch(root: Path) -> pd.DataFrame:
 def summarize_wide_qc(root: Path) -> pd.DataFrame:
     rows = []
     for name in ["qc_target_lineage.csv", "qc_column_lineage.csv", "qc_scalar_conflicts.csv", "qc_anti_garbage_failures.csv", "qc_cast_report.csv"]:
-        path = root / "Checks" / "wide_qc" / name
+        path = data_layout(root).checks / "wide_qc" / name
         df = read_csv(path)
         rows.append({"artifact": str(path), "name": name, "present": path.exists(), "rows": int(len(df)) if not df.empty else 0 if path.exists() else None})
     return pd.DataFrame(rows)
@@ -214,10 +214,10 @@ def summarize_wide_qc(root: Path) -> pd.DataFrame:
 
 def summarize_panel_structure(root: Path) -> pd.DataFrame:
     files = [
-        root / "Checks" / "panel_qc" / "panel_structure_summary.csv",
-        root / "Checks" / "panel_qc" / "identifier_linkage_summary.csv",
-        root / "Checks" / "panel_qc" / "classification_stability_summary.csv",
-        root / "Checks" / "panel_qc" / "finance_comparability_summary.csv",
+        data_layout(root).checks / "panel_qc" / "panel_structure_summary.csv",
+        data_layout(root).checks / "panel_qc" / "identifier_linkage_summary.csv",
+        data_layout(root).checks / "panel_qc" / "classification_stability_summary.csv",
+        data_layout(root).checks / "panel_qc" / "finance_comparability_summary.csv",
     ]
     rows = []
     for path in files:
@@ -227,7 +227,7 @@ def summarize_panel_structure(root: Path) -> pd.DataFrame:
 
 
 def acceptance_pass_count(root: Path) -> tuple[int | None, int | None]:
-    path = root / "Checks" / "acceptance_qc" / "acceptance_summary.csv"
+    path = data_layout(root).checks / "acceptance_qc" / "acceptance_summary.csv"
     df = read_csv(path)
     if df.empty:
         return None, None
@@ -286,7 +286,12 @@ def build_validation_table(
         ("8. Release reproducibility", "Acceptance checks passed", accepted, "checks", "Checks/acceptance_qc/acceptance_summary.csv", f"Total checks: {acceptance_total}"),
         ("8. Release reproducibility", "Final clean panel SHA-256", clean.get("sha256", ""), "hash", "Panels/panel_clean_analysis_2004_2023.parquet", "For archive manifest"),
     ]
-    return pd.DataFrame(rows, columns=["section", "metric", "value", "units", "source", "notes"])
+    result = pd.DataFrame(rows, columns=["section", "metric", "value", "units", "source", "notes"])
+    if data_layout(root).organized:
+        result["source"] = result["source"].map(
+            lambda value: "Work/" + value if value.startswith(("Panels/", "Dictionary/", "Checks/")) else value
+        )
+    return result
 
 
 def main() -> None:

@@ -32,7 +32,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT, DEFAULT_LEGACY_PANELING_ROOT
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, DEFAULT_LEGACY_PANELING_ROOT, data_layout, repo_root as code_root
 from duckdb_build_utils import quote_ident, sql_quote
 from wide_build_common import setup_logging
 
@@ -178,7 +178,7 @@ def content_diff_counts(left_path_or_glob: str, right_path_or_glob: str, columns
 
 def parse_args() -> argparse.Namespace:
     repo_root = default_repo_root()
-    checks_root = repo_root / "Checks"
+    checks_root = data_layout(repo_root).checks
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--run-dir", default=None, help="Monitored run directory containing build_telemetry.json and run_meta.json")
     p.add_argument("--out-root", default=None, help="Build output root if run-dir is unavailable")
@@ -207,12 +207,13 @@ def main() -> None:
 
     years = parse_years_spec(args.years)
     baseline_root = Path(args.baseline_root).resolve()
-    baseline_wide_parts = baseline_root / "Panels" / "wide_analysis_parts"
+    baseline_layout = data_layout(baseline_root)
+    baseline_wide_parts = baseline_layout.panels / "wide_analysis_parts"
     baseline_wide_glob = part_glob(baseline_wide_parts)
-    baseline_scalar = baseline_root / "Panels" / "panel_long_scalar_unique.parquet"
-    baseline_dim = baseline_root / "Panels" / "panel_long_dim.parquet"
-    baseline_wide_qc = baseline_root / "Checks" / "wide_qc"
-    baseline_disc_qc = baseline_root / "Checks" / "disc_qc"
+    baseline_scalar = baseline_layout.panels / "panel_long_scalar_unique.parquet"
+    baseline_dim = baseline_layout.panels / "panel_long_dim.parquet"
+    baseline_wide_qc = baseline_layout.checks / "wide_qc"
+    baseline_disc_qc = baseline_layout.checks / "disc_qc"
 
     run_wide_parts = out_root / "wide_parts"
     run_wide_glob = part_glob(run_wide_parts)
@@ -547,7 +548,7 @@ def main() -> None:
     )
 
     run_seeded = csv_df(run_wide_qc / "qc_seeded_legacy_columns.csv", ["column_name"])
-    manifest_path = default_repo_root() / "Artifacts" / "legacy_analysis_schema_seed.csv"
+    manifest_path = code_root() / "Artifacts" / "legacy_analysis_schema_seed.csv"
     manifest_df = csv_df(manifest_path, ["column_name"])
     if not run_seeded.empty and not manifest_df.empty:
         manifest_names = manifest_df[["column_name"]].drop_duplicates().sort_values(["column_name"], kind="mergesort").reset_index(drop=True)

@@ -8,8 +8,9 @@ If you are new to the repo, start with this:
 
 - the repo holds the code, docs, and small tracked artifacts
 - `IPEDSDB_ROOT` holds the real downloads, outputs, and QA files
-- `bash manual_commands.sh` is the normal full build entrypoint
-- `bash Scripts/QA_QC/qc_only.sh` checks an existing build
+- `Final/` contains the current panel and its matching metadata
+- `bash manual_commands.sh` starts a new build under `Work/`
+- `Releases/` retains complete versioned releases and their evidence
 
 This repository is code-first and data-outside-git by design:
 
@@ -17,12 +18,39 @@ This repository is code-first and data-outside-git by design:
 - Default coverage in this repo: `2004:2023`
 - Release policy: `Final` Access releases only
 - Upstream input: annual IPEDS Access databases, not flat component files
-- Canonical final output: `panel_clean_analysis_2004_2023.parquet`
+- Current final output: `Final/panel_clean_prch_2004_2023.parquet`
+
+## Quickstart
+
+Open your `IPEDSDB_Panel` repository and use the CIRAGO data root:
+
+```bash
+cd /path/to/IPEDSDB_Panel
+source .venv/bin/activate
+export IPEDSDB_ROOT="/Volumes/CIRAGO/IPEDSDB_PANEL"
+```
+
+Open `$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet` for the full
+2004-2023 panel: 141,711 institution-year rows and 2,721 columns. Its matching
+variable definitions and codebooks are in `Final/Metadata/`, and its source
+lineage is `Final/value_lineage.parquet`. `Final/manifest.json` records their
+current paths and checksums.
+
+`Final/SFA_2023_exports/` contains the validated 2023 SFA subset in Stata, CSV,
+Excel, and Parquet: 6,163 rows and 345 columns, including the two panel keys.
+Use the full Parquet panel when working beyond that subset, and export the
+variables and years you need with Stage 08.
+
+The current release is `2023-sfa-v1`. The marker `layout.json` selects it;
+`Final` links to its unchanged files under `Releases/2023-sfa-v1/`. Future builds
+write to `Work` and do not replace `Final` automatically.
 
 ## Common tasks
 
 | Goal | Start here |
 | --- | --- |
+| Open the current full dataset | `$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet` |
+| Open the validated 2023 SFA exports | `$IPEDSDB_ROOT/Final/SFA_2023_exports/` |
 | Run the whole pipeline | `bash manual_commands.sh` |
 | Test the setup without a full historical build | `python Scripts/00_run_all.py --years "2022:2023" --run-cleaning --run-qaqc` |
 | Check whether an existing build passes QA | `bash Scripts/QA_QC/qc_only.sh` |
@@ -34,7 +62,7 @@ This repository is code-first and data-outside-git by design:
 | Run saved inspection SQL and export results | `python Scripts/run_saved_query.py --list` |
 | Browse variables present in the current panel | `python Scripts/10_build_variable_browser.py ...` |
 | Pull only a subset of variables | `python Scripts/08_build_custom_panel.py ...` |
-| Understand where a file came from | open `Checks/`, then `Dictionary/`, then `Raw_Access_Databases/<year>/metadata/` |
+| Understand the current dataset's sources | open `Final/manifest.json`, `Final/Metadata/`, and the evidence in `Releases/2023-sfa-v1/` |
 | Inspect what the repo is doing | `manual_commands.sh` -> `Scripts/00_run_all.py` -> stage scripts in `Scripts/01-09` |
 
 ## At a glance
@@ -50,85 +78,35 @@ This repository is code-first and data-outside-git by design:
 
 ## Build model
 
-If the folder tree feels large, reduce it to this:
+The organized data root separates everyday analysis from build products:
 
-1. the repo explains and runs the build
-2. `Raw_Access_Databases/` stages the yearly source material
-3. `Dictionary/` explains what the variables mean
-4. `Cross_sections/` holds the yearly long-form intermediate outputs
-5. `Panels/` holds the analysis outputs
-6. `Checks/` tells you whether the outputs are worth trusting
+| Folder | Purpose |
+| --- | --- |
+| `Final/` | current full panel, matched metadata, lineage, and validated SFA exports |
+| `Releases/2023-sfa-v1/` | complete immutable corrected release with verification evidence |
+| `Sources/Raw_Access_Databases/` | original downloaded releases and extracted source tables |
+| `Work/` | new dictionaries, intermediate tables, panels, QA, and build state |
+| `Archive/pre_metadata_repair/` | retained pre-repair panels, dictionaries, QA, and build files |
 
-You do not need to read every script or every CSV to work effectively here. In most cases:
-
-- to run the build: use `manual_commands.sh`
-- to inspect a finished build: start in `Checks/`
-- to understand the logic: read `Scripts/README.md`, then `Scripts/00_run_all.py`
+Use `Final` for current analysis. Use `manual_commands.sh` for a future build
+and inspect its outputs in `Work/Checks`. The archive preserves the earlier
+folder relationships so its relative links continue to resolve.
 
 ## Release status
 
-For the current verified `2004:2023` build under `IPEDSDB_ROOT`, the released panel is structurally sound and QA-clean.
+The current corrected release is `2023-sfa-v1`, described in the
+[repair and validation report](docs/2023_SFA_METADATA_REPAIR.md).
 
-If you only need the headline:
+- Full clean panel: 141,711 rows, 2,721 columns, years 2004-2023.
+- Corrected dictionary: 66,746 rows; category codebook: 208,339 rows.
+- All 343 affected SFA definitions retain original metadata and verified physical-table corrections.
+- Full wide and clean panel values, schemas, and missingness equal the pre-repair baseline.
+- All 150,801,591 value-lineage rows and 286,180 PRCH actions remain unchanged.
+- The 2023 SFA subset passed exact Parquet, CSV, Stata, and Excel readback; native Stata verified its values and labels.
 
-- acceptance audit: `39 / 39` checks passed
-- final clean panel: `141,711` rows and `1,864` columns
-- year window: `2004` through `2023`
-- key integrity: `0` duplicate `(UNITID, year)` rows
-- cleaning preserved all institution-year rows
-- dictionary QA reports `0` unresolved duplicate, conflict, or unmapped failures
-
-The status applies to the validated artifacts under `IPEDSDB_ROOT`, especially:
-
-- `Panels/2004-2023/panel_long_varnum_2004_2023.parquet`
-- `Panels/panel_wide_analysis_2004_2023.parquet`
-- `Panels/panel_clean_analysis_2004_2023.parquet`
-
-<details>
-<summary>See the full release evidence and metrics</summary>
-
-That release status is based on generated audit artifacts, not just on the fact that the code ran:
-
-- `Checks/acceptance_qc/acceptance_summary.csv` and `acceptance_summary.md` pass
-- `Checks/panel_qc/panel_qa_summary.csv` shows row preservation and zero suspicious flags
-- `Checks/panel_qc/panel_structure_summary.csv` and `identifier_linkage_summary.csv` document unbalancedness and identifier continuity
-- `Checks/panel_qc/component_timing_reference.csv`, `finance_comparability_summary.csv`, and `classification_stability_summary.csv` cover key comparability cautions
-- `Checks/wide_qc/qc_column_lineage.csv` records the Stage-06 source lineage used by Stage 07 cleaning
-- `Checks/dictionary_qc/dictionary_qaqc_summary.csv` shows zero unresolved duplicate/conflict/unmapped dictionary failures
-- `METHODS_PRCH_CLEANING.md` documents the parent-child cleaning method
-- `METHODS_PANEL_CONSTRUCTION.md` documents the full panel-construction method
-
-| Metric | Current value | Why it matters |
-| --- | --- | --- |
-| Acceptance audit | `39 / 39` checks passed | top-level release gate over the live generated artifacts |
-| Repo tests | `50 passed` | regression coverage over core build and QA paths |
-| Final clean panel rows | `141,711` | confirms delivered panel size |
-| Final clean panel columns | `1,864` | confirms delivered schema width |
-| Year coverage | `20` years, `2004` through `2023` | confirms requested panel window |
-| Distinct institutions | `10,421` `UNITID`s | confirms panel population size |
-| Always-present institutions | `4,395` | institutions observed across the full window |
-| Intermittent-gap institutions | `146` | institutions with internal reporting gaps |
-| Possible selection-risk institutions | `4,343` | makes entry, exit, and gap-related attrition visible |
-| Identifier-linkage review cases | `973` `UNITID`s with multiple observed `OPEID` values | flags continuity cases for review |
-| Raw vs clean row preservation | `141,711` raw and `141,711` clean | confirms cleaning did not drop rows |
-| Duplicate `(UNITID, year)` keys | `0` in raw wide, `0` in clean wide | confirms one-row-per-institution-year integrity |
-| Long-panel key nulls | `0` null/blank `year`, `UNITID`, `varnumber`, or `source_file` | confirms stitched long-key integrity |
-| PRCH flags evaluated | `15` observed flags | confirms panel QA covers the observed PRCH surface |
-| Suspicious PRCH flags | `0` | confirms no flagged parent-child leakage remains |
-| Dictionary lake rows | `66,702` | confirms stitched metadata coverage |
-| Dictionary code-label rows | `208,339` | confirms category/code-label coverage |
-| Dictionary duplicate/conflict/unmapped failures | `0` duplicate rows, `0` source-file conflicts, `0` varnumber collisions, `0` unmapped rows, `0` needs-review rows | confirms dictionary integrity |
-| Discrete-conflict QA | `254` grouped rows, `0` high-signal groups | confirms remaining conflicts look like expected patterns |
-
-</details>
-
-These numbers come from the current generated QA artifacts and panel files under `IPEDSDB_ROOT`. If you rebuild the pipeline, rerun:
-
-```bash
-bash Scripts/QA_QC/qc_only.sh
-```
-
-and refresh the acceptance artifacts before treating the new build as release-ready.
+These results belong to the immutable release. A later build under `Work`
+needs its own validation before it can become the current release. Measurement
+semantics absent from the source remain explicitly unknown.
 
 ## Public release checklist
 
@@ -142,7 +120,7 @@ python3 Scripts/QA_QC/19_docs_style_guard.py
 bash Scripts/QA_QC/release_gate.sh
 ```
 
-The full release gate expects a populated `IPEDSDB_ROOT`. It validates the panel contract, public-facing repository files, documentation style, acceptance audit, release manifest, checksum verification, Data Package metadata, build provenance, public bundle, repo size, staged-file policy, and tests.
+The full release gate expects a populated build workspace under `IPEDSDB_ROOT/Work`. It validates the panel contract, public-facing repository files, documentation style, acceptance audit, release manifest, checksum verification, Data Package metadata, build provenance, public bundle, repo size, staged-file policy, and tests. It does not promote a new current release automatically.
 
 For archive work, set `REQUIRE_EXTERNAL_BENCHMARKS=1` after `contracts/external_benchmarks.csv` has been filled with official benchmark rows. Without that flag, the benchmark script writes a review artifact when no external benchmarks are configured.
 
@@ -228,9 +206,32 @@ The orchestration path is:
 
 ## Local output layout
 
-![Local output layout](Artifacts/figures/local-output-layout.svg)
+The organized CIRAGO root uses this layout:
 
-The scripts create this structure automatically. If something goes wrong, the local folders show which stage ran, what it wrote, and which QA files were available.
+```text
+IPEDSDB_PANEL/
+  layout.json
+  Final/
+    panel_clean_prch_2004_2023.parquet
+    Metadata/
+    value_lineage.parquet
+    SFA_2023_exports/
+    manifest.json
+  Releases/2023-sfa-v1/
+  Sources/Raw_Access_Databases/
+  Work/{Panels,Dictionary,Checks,Cross_sections,build}/
+  Archive/pre_metadata_repair/
+```
+
+To inspect or migrate an existing flat root, preview the exact planned moves:
+
+```bash
+python Scripts/organize_data_root.py --root "$IPEDSDB_ROOT"
+```
+
+Apply that plan with `--apply`. The organization changes paths, preserves the
+release bytes and historical receipts, and writes current-path information in
+`Final/manifest.json`.
 
 ## First files to open
 
@@ -239,8 +240,8 @@ For a short review, open these five files first:
 1. `README.md`
 2. `Scripts/README.md`
 3. `Scripts/00_run_all.py`
-4. `Checks/acceptance_qc/acceptance_summary.md`
-5. `Panels/panel_clean_analysis_2004_2023.parquet`
+4. `$IPEDSDB_ROOT/Final/manifest.json`
+5. `$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet`
 
 ## What lives where
 
@@ -271,19 +272,17 @@ For a short review, open these five files first:
 Set:
 
 ```bash
-export IPEDSDB_ROOT="$HOME/ipedsdb_panel_data"
+export IPEDSDB_ROOT="/Volumes/CIRAGO/IPEDSDB_PANEL"
 ```
 
-If `IPEDSDB_ROOT` is unset, the scripts default to a sibling folder named `IPEDSDB_ROOT` next to the repository clone.
+The default data root is `/Volumes/CIRAGO/IPEDSDB_PANEL`. Set `IPEDSDB_ROOT`
+explicitly when selecting a different drive or a separate build root.
 
-Top-level folders created under `IPEDSDB_ROOT`:
-
-- `Raw_Access_Databases/`
-- `Dictionary/`
-- `Cross_sections/`
-- `Panels/`
-- `Checks/`
-- `build/`
+The organized root is identified by `layout.json` with `schema_version: 1` and
+`current_release: "2023-sfa-v1"`. Pipeline stages use `Sources` for original
+inputs and `Work` for new outputs. Analyst tools use the current release through
+`Final`. Unmarked roots retain the legacy flat layout for reproducible older
+builds; the paths in this guide describe the marked CIRAGO layout.
 
 ## First-run checklist
 
@@ -301,7 +300,7 @@ If you are unsure whether your environment is ready, run the smallest QA check:
 bash Scripts/QA_QC/qc_only.sh
 ```
 
-That does not rebuild the full panel, but it does confirm that the current generated artifacts are readable and that the QA layer still agrees with them.
+That checks a populated future build in `Work`; it is not a prerequisite for opening the already verified panel in `Final`.
 
 ## One-time setup
 
@@ -334,7 +333,7 @@ The extraction stage will stop immediately if any of those binaries are missing.
 ```bash
 cd /path/to/IPEDSDB_Panel
 source .venv/bin/activate
-export IPEDSDB_ROOT="$HOME/ipedsdb_panel_data"
+export IPEDSDB_ROOT="/Volumes/CIRAGO/IPEDSDB_PANEL"
 
 bash manual_commands.sh
 ```
@@ -352,15 +351,15 @@ What to expect from a full run:
 - the download stage writes one `manifest.csv` per year
 - the extraction stage creates one CSV per Access table
 - the dictionary and QA stages create many readable CSV summaries
-- the largest final artifacts are parquet files in `Panels/`
+- the largest final artifacts are parquet files in `Work/Panels/`
 - a full `2004:2023` run is materially heavier than a one-year smoke test
 
 If you are wondering whether the build is “stuck,” the best places to look are:
 
 - the current terminal output
-- `Checks/logs/`
-- the newest files appearing under the active year in `Raw_Access_Databases/`
-- the newest summary CSV written under `Checks/`
+- `Work/Checks/logs/`
+- the newest files appearing under the active year in `Sources/Raw_Access_Databases/`
+- the newest summary CSV written under `Work/Checks/`
 
 ### Smoke test with cleaning and QA
 
@@ -369,7 +368,7 @@ Use at least two years if you want Stage 07 cleaning and panel QA. The cleaner i
 ```bash
 cd /path/to/IPEDSDB_Panel
 source .venv/bin/activate
-export IPEDSDB_ROOT="$HOME/ipedsdb_panel_data"
+export IPEDSDB_ROOT="/Volumes/CIRAGO/IPEDSDB_PANEL"
 
 python Scripts/00_run_all.py \
   --root "$IPEDSDB_ROOT" \
@@ -401,12 +400,22 @@ python Scripts/00_run_all.py \
 
 ## Main outputs
 
-After a full run, the main files to inspect are:
+The current analysis file is:
 
 ```text
-$IPEDSDB_ROOT/Panels/2004-2023/panel_long_varnum_2004_2023.parquet
-$IPEDSDB_ROOT/Panels/panel_wide_analysis_2004_2023.parquet
-$IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023.parquet
+$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet
+```
+
+Keep it paired with `Final/Metadata` and `Final/value_lineage.parquet`.
+The full release, including its long panel and evidence, is retained under
+`Releases/2023-sfa-v1`. The SFA exports in `Final/SFA_2023_exports` are a subset.
+
+After a future run of the main pipeline, inspect its separate build outputs:
+
+```text
+$IPEDSDB_ROOT/Work/Panels/2004-2023/panel_long_varnum_2004_2023.parquet
+$IPEDSDB_ROOT/Work/Panels/panel_wide_analysis_2004_2023.parquet
+$IPEDSDB_ROOT/Work/Panels/panel_clean_analysis_2004_2023.parquet
 ```
 
 What each one means:
@@ -415,39 +424,39 @@ What each one means:
 | --- | --- |
 | `panel_long_varnum_2004_2023.parquet` | stitched long panel at the variable-row level |
 | `panel_wide_analysis_2004_2023.parquet` | wide analysis panel before PRCH cleaning |
-| `panel_clean_analysis_2004_2023.parquet` | final cleaned analysis-ready panel |
+| `panel_clean_analysis_2004_2023.parquet` | cleaned build output awaiting release validation |
 
 Supporting outputs that are often useful during debugging:
 
 ```text
-$IPEDSDB_ROOT/Dictionary/dictionary_lake.parquet
-$IPEDSDB_ROOT/Dictionary/dictionary_codes.parquet
-$IPEDSDB_ROOT/Checks/download_qc/release_inventory.csv
-$IPEDSDB_ROOT/Checks/extract_qc/table_inventory_all_years.csv
-$IPEDSDB_ROOT/Checks/dictionary_qc/dictionary_qaqc_summary.csv
-$IPEDSDB_ROOT/Checks/panel_qc/panel_qa_summary.csv
-$IPEDSDB_ROOT/Checks/panel_qc/panel_qa_coverage_matrix.csv
-$IPEDSDB_ROOT/Checks/acceptance_qc/acceptance_summary.csv
+$IPEDSDB_ROOT/Work/Dictionary/dictionary_lake.parquet
+$IPEDSDB_ROOT/Work/Dictionary/dictionary_codes.parquet
+$IPEDSDB_ROOT/Work/Checks/download_qc/release_inventory.csv
+$IPEDSDB_ROOT/Work/Checks/extract_qc/table_inventory_all_years.csv
+$IPEDSDB_ROOT/Work/Checks/dictionary_qc/dictionary_qaqc_summary.csv
+$IPEDSDB_ROOT/Work/Checks/panel_qc/panel_qa_summary.csv
+$IPEDSDB_ROOT/Work/Checks/panel_qc/panel_qa_coverage_matrix.csv
+$IPEDSDB_ROOT/Work/Checks/acceptance_qc/acceptance_summary.csv
 ```
 
 For a run-level sanity check, open these first in order:
 
-1. `Checks/download_qc/release_inventory.csv`
-2. `Checks/extract_qc/table_inventory_all_years.csv`
-3. `Checks/dictionary_qc/dictionary_qaqc_summary.csv`
-4. `Checks/panel_qc/panel_qa_coverage_matrix.csv`
-5. `Checks/acceptance_qc/acceptance_summary.md`
-6. `Panels/panel_clean_analysis_2004_2023.parquet`
+1. `Work/Checks/download_qc/release_inventory.csv`
+2. `Work/Checks/extract_qc/table_inventory_all_years.csv`
+3. `Work/Checks/dictionary_qc/dictionary_qaqc_summary.csv`
+4. `Work/Checks/panel_qc/panel_qa_coverage_matrix.csv`
+5. `Work/Checks/acceptance_qc/acceptance_summary.md`
+6. `Work/Panels/panel_clean_analysis_2004_2023.parquet`
 
 ## DuckDB, Data Wrangler, and saved SQL
 
 The wide-build stage persists a DuckDB build database here:
 
 ```text
-$IPEDSDB_ROOT/build/ipedsdb_build.duckdb
+$IPEDSDB_ROOT/Work/build/ipedsdb_build.duckdb
 ```
 
-Use the saved-query runner for repeatable inspection results without manually locating the DuckDB file or the standard artifact views.
+Use the saved-query runner for repeatable inspection results. In the organized layout its panel and dictionary views use the matched current release; optional build state and new query outputs stay in `Work`.
 
 List starter queries:
 
@@ -466,7 +475,7 @@ What the query runner does:
 - opens an in-memory DuckDB inspection session
 - attaches the persisted build database when it exists
 - exposes stable `inspect.*` views over the standard panel, dictionary, QA, and release-inventory artifacts
-- writes a timestamped result folder under `Checks/query_results/`
+- writes a timestamped result folder under `Work/Checks/query_results/`
 
 Query-result folders contain:
 
@@ -477,9 +486,9 @@ Query-result folders contain:
 
 If you use Data Wrangler, it is most useful on:
 
-- `Checks/query_results/*/result.csv`
-- QA CSV summaries in `Checks/`
-- year-level metadata CSVs in `Raw_Access_Databases/<year>/metadata/`
+- `Work/Checks/query_results/*/result.csv`
+- QA CSV summaries in `Work/Checks/`
+- year-level metadata CSVs in `Sources/Raw_Access_Databases/<year>/metadata/`
 
 It is not the main execution interface for this repo. Think of it as a convenience layer for inspection, not the source of truth for the build.
 
@@ -493,13 +502,13 @@ Repeatable inspection order:
 
 | Stage | Script | What it does | Main outputs |
 | --- | --- | --- | --- |
-| Download | `Scripts/01_download_access_databases.py` | Scrapes the NCES Access page and downloads final-only yearly archives plus companion workbooks | `Raw_Access_Databases/<year>/manifest.csv`, `Checks/download_qc/` |
+| Download | `Scripts/01_download_access_databases.py` | Scrapes the NCES Access page and downloads final-only yearly archives plus companion workbooks | `Sources/Raw_Access_Databases/<year>/manifest.csv`, `Work/Checks/download_qc/` |
 | Extract | `Scripts/02_extract_access_db.py` | Unzips the Access DB, exports each table to CSV, and classifies tables | `tables_csv/`, `metadata/table_inventory.csv`, `metadata/table_columns.csv` |
-| Dictionary | `Scripts/03_dictionary_ingest.py` | Builds dictionary lake and code-label tables from Access metadata | `Dictionary/dictionary_lake.parquet`, `Dictionary/dictionary_codes.parquet` |
-| Harmonize | `Scripts/04_harmonize.py` | Converts exported data tables into long parquet with metadata attached, failing on ambiguous dictionary mappings unless documented in `contracts/dictionary_ambiguity_overrides.csv` | `Cross_sections/panel_long_varnum_<year>.parquet`, `Checks/harmonize_qc/` |
-| Stitch | `Scripts/05_stitch_long.py` | Combines yearly long outputs into one stitched panel | `Panels/2004-2023/panel_long_varnum_2004_2023.parquet` |
-| Wide build | `Scripts/06_build_wide_panel.py` | Uses DuckDB to build the wide analysis panel and related QC | `Panels/panel_wide_analysis_2004_2023.parquet`, `Checks/wide_qc/`, `Checks/disc_qc/` |
-| Clean | `Scripts/07_clean_panel.py` | Applies PRCH child-row cleaning while preserving all `UNITID-year` rows | `Panels/panel_clean_analysis_2004_2023.parquet`, `Checks/prch_qc/` |
+| Dictionary | `Scripts/03_dictionary_ingest.py` | Builds dictionary lake and code-label tables from Access metadata | `Work/Dictionary/dictionary_lake.parquet`, `Work/Dictionary/dictionary_codes.parquet` |
+| Harmonize | `Scripts/04_harmonize.py` | Converts exported data tables into long parquet with metadata attached, failing on ambiguous dictionary mappings unless documented in `contracts/dictionary_ambiguity_overrides.csv` | `Work/Cross_sections/panel_long_varnum_<year>.parquet`, `Work/Checks/harmonize_qc/` |
+| Stitch | `Scripts/05_stitch_long.py` | Combines yearly long outputs into one stitched panel | `Work/Panels/2004-2023/panel_long_varnum_2004_2023.parquet` |
+| Wide build | `Scripts/06_build_wide_panel.py` | Uses DuckDB to build the wide analysis panel and related QC | `Work/Panels/panel_wide_analysis_2004_2023.parquet`, `Work/Checks/wide_qc/`, `Work/Checks/disc_qc/` |
+| Clean | `Scripts/07_clean_panel.py` | Applies PRCH child-row cleaning while preserving all `UNITID-year` rows | `Work/Panels/panel_clean_analysis_2004_2023.parquet`, `Work/Checks/prch_qc/` |
 | Custom extract | `Scripts/08_build_custom_panel.py` | Creates a smaller panel with selected columns, labels, and metadata | `.parquet`, `.csv`, `.dta`, or `.xlsx` plus companions |
 | Panel dictionary | `Scripts/09_build_panel_dictionary.py` | Builds a dictionary tied to actual wide-panel columns | panel-level dictionary `.csv` or `.xlsx` |
 
@@ -518,18 +527,18 @@ Most useful QA directories:
 
 | Directory | What to inspect first |
 | --- | --- |
-| `Checks/download_qc/` | `release_inventory.csv`, `missing_years.csv`, `download_failures.csv` |
-| `Checks/extract_qc/` | `table_inventory_all_years.csv`, `extract_failures.csv` |
-| `Checks/dictionary_qc/` | `dictionary_qaqc_summary.csv`, `unmapped_metadata_tables.csv`, `noncanonical_source_categories.csv` |
-| `Checks/harmonize_qc/` | yearly `harmonize_summary_*.csv`, dropped `UNITID` reports |
-| `Checks/release_qc/` | yearly release summaries confirming `final` |
-| `Checks/wide_qc/` | scalar-conflict and wide-build reports |
-| `Checks/disc_qc/` | `disc_conflicts_summary_all_years.csv` first, then year-level detail only if needed |
-| `Checks/prch_qc/` | `prch_clean_summary.csv`, `prch_clean_columns.csv`, `prch_flag_policy.csv` |
-| `Checks/panel_qc/` | `panel_qa_summary.csv`, `panel_qa_coverage_matrix.csv`, `panel_structure_summary.csv`, `identifier_linkage_summary.csv`, `classification_stability_summary.csv` |
-| `Checks/acceptance_qc/` | `acceptance_summary.csv`, `acceptance_summary.md` |
-| `Checks/query_results/` | saved-query outputs for inspection and Data Wrangler |
-| `Checks/real_parity_runs/summary/` | cross-run task-monitor CSV and Markdown summaries |
+| `Work/Checks/download_qc/` | `release_inventory.csv`, `missing_years.csv`, `download_failures.csv` |
+| `Work/Checks/extract_qc/` | `table_inventory_all_years.csv`, `extract_failures.csv` |
+| `Work/Checks/dictionary_qc/` | `dictionary_qaqc_summary.csv`, `unmapped_metadata_tables.csv`, `noncanonical_source_categories.csv` |
+| `Work/Checks/harmonize_qc/` | yearly `harmonize_summary_*.csv`, dropped `UNITID` reports |
+| `Work/Checks/release_qc/` | yearly release summaries confirming `final` |
+| `Work/Checks/wide_qc/` | scalar-conflict and wide-build reports |
+| `Work/Checks/disc_qc/` | `disc_conflicts_summary_all_years.csv` first, then year-level detail only if needed |
+| `Work/Checks/prch_qc/` | `prch_clean_summary.csv`, `prch_clean_columns.csv`, `prch_flag_policy.csv` |
+| `Work/Checks/panel_qc/` | `panel_qa_summary.csv`, `panel_qa_coverage_matrix.csv`, `panel_structure_summary.csv`, `identifier_linkage_summary.csv`, `classification_stability_summary.csv` |
+| `Work/Checks/acceptance_qc/` | `acceptance_summary.csv`, `acceptance_summary.md` |
+| `Work/Checks/query_results/` | saved-query outputs for inspection and Data Wrangler |
+| `Work/Checks/real_parity_runs/summary/` | cross-run task-monitor CSV and Markdown summaries |
 
 Run QA only against existing outputs:
 
@@ -559,8 +568,8 @@ python Scripts/QA_QC/08_acceptance_audit.py \
 It writes:
 
 ```text
-$IPEDSDB_ROOT/Checks/acceptance_qc/acceptance_summary.csv
-$IPEDSDB_ROOT/Checks/acceptance_qc/acceptance_summary.md
+$IPEDSDB_ROOT/Work/Checks/acceptance_qc/acceptance_summary.csv
+$IPEDSDB_ROOT/Work/Checks/acceptance_qc/acceptance_summary.md
 ```
 
 It checks:
@@ -603,29 +612,29 @@ The cleaned panel is row-preserving, not institution-collapsing.
 | Harmonization | no fatal `UNITID` issues and expected yearly summaries |
 | Wide build | `panel_wide_analysis_2004_2023.parquet` exists and QA files are written |
 | Final clean panel | `panel_clean_analysis_2004_2023.parquet` exists, `panel_qa_summary.csv` shows row preservation, and `panel_qa_coverage_matrix.csv` has no unexplained `suspicious` flags |
-| Acceptance audit | `Checks/acceptance_qc/acceptance_summary.csv` is all `PASS` |
+| Acceptance audit | `Work/Checks/acceptance_qc/acceptance_summary.csv` is all `PASS` |
 
 You should not need to open every QA directory when a run passes the top-level checks. In the normal case, `acceptance_qc/` and `panel_qc/` are enough to decide whether deeper inspection is necessary.
 
 For structure-sensitive work, the most informative new files are:
 
-- `Checks/panel_qc/panel_structure_summary.csv`
-- `Checks/panel_qc/entry_exit_gap_summary.csv`
-- `Checks/panel_qc/identifier_linkage_summary.csv`
-- `Checks/panel_qc/classification_stability_summary.csv`
-- `Checks/panel_qc/finance_comparability_summary.csv`
+- `Work/Checks/panel_qc/panel_structure_summary.csv`
+- `Work/Checks/panel_qc/entry_exit_gap_summary.csv`
+- `Work/Checks/panel_qc/identifier_linkage_summary.csv`
+- `Work/Checks/panel_qc/classification_stability_summary.csv`
+- `Work/Checks/panel_qc/finance_comparability_summary.csv`
 
 ## When something breaks
 
 Check these in order:
 
 1. terminal output from the failing script
-2. `Checks/download_qc/download_failures.csv`
-3. `Checks/extract_qc/extract_failures.csv`
-4. `Checks/dictionary_qc/dictionary_qaqc_summary.csv`
-5. `Checks/harmonize_qc/`
-6. `Checks/wide_qc/`
-7. `Checks/panel_qc/panel_qa_coverage_matrix.csv`
+2. `Work/Checks/download_qc/download_failures.csv`
+3. `Work/Checks/extract_qc/extract_failures.csv`
+4. `Work/Checks/dictionary_qc/dictionary_qaqc_summary.csv`
+5. `Work/Checks/harmonize_qc/`
+6. `Work/Checks/wide_qc/`
+7. `Work/Checks/panel_qc/panel_qa_coverage_matrix.csv`
 
 Failure patterns:
 
@@ -634,8 +643,8 @@ Failure patterns:
 | download failed | network access, NCES page changes, `download_failures.csv` |
 | extraction failed | `mdb-tools`, malformed zip, `extract_failures.csv` |
 | missing metadata roles | yearly `metadata/table_inventory.csv` |
-| missing `UNITID` fatal error | exported CSV table in `Raw_Access_Databases/<year>/tables_csv/` |
-| weird wide-panel behavior | `Checks/wide_qc/`, `Checks/disc_qc/disc_conflicts_summary_all_years.csv`, dictionary mapping |
+| missing `UNITID` fatal error | exported CSV table in `Sources/Raw_Access_Databases/<year>/tables_csv/` |
+| weird wide-panel behavior | `Work/Checks/wide_qc/`, `Work/Checks/disc_qc/disc_conflicts_summary_all_years.csv`, dictionary mapping |
 
 When a failure is unclear, go back to the last stage that completed and read that stage's summary CSV before opening lower-level files.
 
@@ -645,15 +654,15 @@ When a failure is unclear, go back to the last stage that completed and read tha
 
 ```bash
 python Scripts/08_build_custom_panel.py \
-  --input "$IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023.parquet" \
-  --output "$IPEDSDB_ROOT/Panels/custom_panel_2004_2023.parquet" \
+  --input "$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet" \
+  --output "$IPEDSDB_ROOT/Work/Panels/custom_panel_2004_2023.parquet" \
   --vars-file "Customize_Panel/selectedvars.txt" \
   --years "2004:2023"
 ```
 
 Stage 08 writes metadata companions for every extract and embeds labels in
 Parquet. It finds the dictionary, category codes, and column lineage in the
-input's data root, then in `IPEDSDB_ROOT`. Category codes are loaded beside the
+input's matched release in the organized layout, then in `IPEDSDB_ROOT`. Category codes are loaded beside the
 selected dictionary unless supplied explicitly. A labeled Parquet extract
 reuses its embedded definitions unless external metadata is explicitly supplied.
 Missing or conflicting definitions are recorded in the export metadata.
@@ -668,11 +677,11 @@ For a labeled Stata dataset:
 
 ```bash
 python Scripts/08_build_custom_panel.py \
-  --input "$IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023.parquet" \
-  --dictionary "$IPEDSDB_ROOT/Dictionary/dictionary_lake.parquet" \
-  --codes "$IPEDSDB_ROOT/Dictionary/dictionary_codes.parquet" \
-  --column-lineage "$IPEDSDB_ROOT/Checks/wide_qc/qc_column_lineage.csv" \
-  --output "$IPEDSDB_ROOT/Panels/custom_panel.dta" \
+  --input "$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet" \
+  --dictionary "$IPEDSDB_ROOT/Final/Metadata/dictionary_lake.parquet" \
+  --codes "$IPEDSDB_ROOT/Final/Metadata/dictionary_codes.parquet" \
+  --column-lineage "$IPEDSDB_ROOT/Final/value_lineage.parquet" \
+  --output "$IPEDSDB_ROOT/Work/Panels/custom_panel.dta" \
   --vars-file "Customize_Panel/selectedvars.txt" \
   --years "2004:2023" \
   --require-ready
@@ -741,9 +750,9 @@ table/variable matches instead of using a shared canonical source family.
 
 ```bash
 python3 Scripts/10_build_variable_browser.py \
-  --input "$IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023.parquet" \
-  --dictionary "$IPEDSDB_ROOT/Dictionary/dictionary_lake.parquet" \
-  --output "Customize_Panel/variable_browser.html"
+  --input "$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet" \
+  --dictionary "$IPEDSDB_ROOT/Final/Metadata/dictionary_lake.parquet" \
+  --output "$IPEDSDB_ROOT/Work/Customize_Panel/variable_browser.html"
 ```
 
 That writes a single static HTML file you can open locally. The browser lists columns present in the supplied panel schema, groups them into analyst-facing semantic families using dictionary metadata plus lightweight heuristics, surfaces coverage and completeness badges, and lets you:
@@ -757,18 +766,18 @@ That writes a single static HTML file you can open locally. The browser lists co
 
 ```bash
 python Scripts/09_build_panel_dictionary.py \
-  --input "$IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023.parquet" \
-  --dictionary "$IPEDSDB_ROOT/Dictionary/dictionary_lake.parquet" \
-  --output "$IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023_dictionary.csv"
+  --input "$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet" \
+  --dictionary "$IPEDSDB_ROOT/Final/Metadata/dictionary_lake.parquet" \
+  --output "$IPEDSDB_ROOT/Work/Panels/panel_clean_prch_2004_2023_dictionary.csv"
 ```
 
 For a formatted Excel workbook instead of CSV:
 
 ```bash
 python Scripts/09_build_panel_dictionary.py \
-  --input "$IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023.parquet" \
-  --dictionary "$IPEDSDB_ROOT/Dictionary/dictionary_lake.parquet" \
-  --output "$IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023_dictionary.xlsx"
+  --input "$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet" \
+  --dictionary "$IPEDSDB_ROOT/Final/Metadata/dictionary_lake.parquet" \
+  --output "$IPEDSDB_ROOT/Work/Panels/panel_clean_prch_2004_2023_dictionary.xlsx"
 ```
 
 ### Run the repo guards
@@ -794,7 +803,7 @@ tables with:
 python Scripts/QA_QC/10_release_metrics.py \
   --root "$IPEDSDB_ROOT" \
   --years "2004:2023" \
-  --out-dir "$IPEDSDB_ROOT/Checks/release_metrics"
+  --out-dir "$IPEDSDB_ROOT/Work/Checks/release_metrics"
 ```
 
 ### Build and verify the release manifest
@@ -808,7 +817,7 @@ python Scripts/QA_QC/12_build_release_manifest.py \
   --years "2004:2023"
 
 python Scripts/QA_QC/13_verify_release_manifest.py \
-  --manifest "$IPEDSDB_ROOT/Checks/release_manifest/release_manifest.csv" \
+  --manifest "$IPEDSDB_ROOT/Work/Checks/release_manifest/release_manifest.csv" \
   --root "$IPEDSDB_ROOT"
 
 python Scripts/QA_QC/16_build_datapackage.py \
@@ -835,10 +844,10 @@ YEARS="2004:2023" bash Scripts/QA_QC/release_gate.sh
 ```bash
 python Scripts/QA_QC/15_compare_release_to_baseline.py \
   --baseline-manifest "/path/to/prior/release_manifest.csv" \
-  --current-manifest "$IPEDSDB_ROOT/Checks/release_manifest/release_manifest.csv" \
+  --current-manifest "$IPEDSDB_ROOT/Work/Checks/release_manifest/release_manifest.csv" \
   --baseline-root "/path/to/prior/IPEDSDB_ROOT" \
   --current-root "$IPEDSDB_ROOT" \
-  --out-dir "$IPEDSDB_ROOT/Checks/release_compare"
+  --out-dir "$IPEDSDB_ROOT/Work/Checks/release_compare"
 ```
 
 ### Validate the panel contract
@@ -862,15 +871,15 @@ Use that exact command in this environment. Plain pytest can hang during plugin 
 
 ```bash
 python Scripts/QA_QC/03_monitored_analysis_build.py \
-  --input "$IPEDSDB_ROOT/Panels/2004-2023/panel_long_varnum_2004_2023.parquet" \
-  --dictionary "$IPEDSDB_ROOT/Dictionary/dictionary_lake.parquet"
+  --input "$IPEDSDB_ROOT/Work/Panels/2004-2023/panel_long_varnum_2004_2023.parquet" \
+  --dictionary "$IPEDSDB_ROOT/Work/Dictionary/dictionary_lake.parquet"
 ```
 
 That workflow now refreshes:
 
 ```text
-$IPEDSDB_ROOT/Checks/real_parity_runs/summary/task_monitor_summary.csv
-$IPEDSDB_ROOT/Checks/real_parity_runs/summary/task_monitor_summary.md
+$IPEDSDB_ROOT/Work/Checks/real_parity_runs/summary/task_monitor_summary.csv
+$IPEDSDB_ROOT/Work/Checks/real_parity_runs/summary/task_monitor_summary.md
 ```
 
 ## Glossary

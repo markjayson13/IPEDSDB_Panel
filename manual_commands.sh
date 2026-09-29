@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DEFAULT_IPEDSDB_ROOT="$(dirname "$ROOT")/IPEDSDB_ROOT"
+DEFAULT_IPEDSDB_ROOT="/Volumes/CIRAGO/IPEDSDB_PANEL"
 export IPEDSDB_ROOT="${IPEDSDB_ROOT:-$DEFAULT_IPEDSDB_ROOT}"
 
 usage() {
@@ -15,15 +15,18 @@ Usage:
   bash manual_commands.sh
 
 Environment:
-  IPEDSDB_ROOT  External data root (default: sibling IPEDSDB_ROOT folder)
+  IPEDSDB_ROOT  External data root (default: /Volumes/CIRAGO/IPEDSDB_PANEL)
 
 System dependency:
   mdb-tables, mdb-schema, mdb-export
 
-Outputs:
-  $IPEDSDB_ROOT/Panels/2004-2023/panel_long_varnum_2004_2023.parquet
-  $IPEDSDB_ROOT/Panels/panel_wide_analysis_2004_2023.parquet
-  $IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023.parquet
+Draft outputs for organized roots (layout.json):
+  $IPEDSDB_ROOT/Work/Panels/2004-2023/panel_long_varnum_2004_2023.parquet
+  $IPEDSDB_ROOT/Work/Panels/panel_wide_analysis_2004_2023.parquet
+  $IPEDSDB_ROOT/Work/Panels/panel_clean_analysis_2004_2023.parquet
+
+Verified analyst panels live in Final. This build does not publish to Final.
+Roots without layout.json retain the legacy Panels/ and Checks/ paths.
 
 What this wrapper does:
   1. activates .venv if present
@@ -32,7 +35,7 @@ What this wrapper does:
   4. runs cleaning and QA
 
 Best use:
-  use this when you want the repo to produce or refresh the full release-style panel
+  use this to build and check draft panels before separate verified publication
 EOF
 }
 
@@ -58,7 +61,17 @@ for bin in mdb-tables mdb-schema mdb-export; do
   fi
 done
 
-mkdir -p "$IPEDSDB_ROOT"
+python3 - "$ROOT" "$IPEDSDB_ROOT" <<'PY'
+import sys
+sys.path.insert(0, sys.argv[1] + "/Scripts")
+from access_build_utils import require_data_volume
+require_data_volume(sys.argv[2])
+PY
+
+OUTPUT_BASE="$IPEDSDB_ROOT"
+if [[ -f "$IPEDSDB_ROOT/layout.json" ]]; then
+  OUTPUT_BASE="$IPEDSDB_ROOT/Work"
+fi
 
 echo "[ipedsdb-panel] preflight passed"
 echo "[ipedsdb-panel] running full pipeline for years 2004:2023"
@@ -72,13 +85,13 @@ python3 "$ROOT/Scripts/00_run_all.py" \
 
 echo ""
 echo "[ipedsdb-panel] run complete"
-echo "Local outputs:"
-echo "  $IPEDSDB_ROOT/Panels/2004-2023/panel_long_varnum_2004_2023.parquet"
-echo "  $IPEDSDB_ROOT/Panels/panel_wide_analysis_2004_2023.parquet"
-echo "  $IPEDSDB_ROOT/Panels/panel_clean_analysis_2004_2023.parquet"
+echo "Draft outputs (Final requires separate verified publication):"
+echo "  $OUTPUT_BASE/Panels/2004-2023/panel_long_varnum_2004_2023.parquet"
+echo "  $OUTPUT_BASE/Panels/panel_wide_analysis_2004_2023.parquet"
+echo "  $OUTPUT_BASE/Panels/panel_clean_analysis_2004_2023.parquet"
 echo ""
 echo "Recommended next checks:"
-echo "  $IPEDSDB_ROOT/Checks/dictionary_qc/dictionary_qaqc_summary.csv"
-echo "  $IPEDSDB_ROOT/Checks/panel_qc/panel_qa_summary.csv"
-echo "  $IPEDSDB_ROOT/Checks/panel_qc/panel_structure_summary.csv"
-echo "  $IPEDSDB_ROOT/Checks/acceptance_qc/acceptance_summary.md"
+echo "  $OUTPUT_BASE/Checks/dictionary_qc/dictionary_qaqc_summary.csv"
+echo "  $OUTPUT_BASE/Checks/panel_qc/panel_qa_summary.csv"
+echo "  $OUTPUT_BASE/Checks/panel_qc/panel_structure_summary.csv"
+echo "  $OUTPUT_BASE/Checks/acceptance_qc/acceptance_summary.md"

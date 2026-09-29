@@ -25,12 +25,42 @@ import duckdb
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from access_build_utils import data_layout
+
 
 POLICY_SHA256 = "67fca57085ec759944152f6e6e38374fac75991ef2dbd0489d241641d310e4f3"
 TOKEN = "2004_2023"
 SCOPE_YEAR = 2023
 SCOPE_TABLES = ("SFA2223_P1", "SFA2223_P2")
 METADATA_CELL_COLUMNS = {"varTitle", "longDescription", "DataType", "format", "Fieldwidth"}
+
+
+def baseline_root(source: str | Path) -> Path:
+    """Read the preserved pre-repair baseline after data-root organization."""
+    layout = data_layout(source)
+    baseline = layout.archive / "pre_metadata_repair" if layout.organized else layout.root
+    if not baseline.is_dir():
+        raise FileNotFoundError(f"Preserved source baseline is absent: {baseline}")
+    return baseline
+
+
+def source_hash_for(hashes: dict, path: Path, source_root: str | Path) -> str | None:
+    """Read historical checksum keys after a folder-only baseline relocation."""
+    keys = {str(path)}
+    layout = data_layout(source_root)
+    if layout.organized:
+        baseline = layout.archive / "pre_metadata_repair"
+        try:
+            relative = path.relative_to(baseline)
+        except ValueError:
+            pass
+        else:
+            keys.add(str(layout.root / relative))
+    values = {hashes[key] for key in keys if key in hashes}
+    if len(values) > 1:
+        raise ValueError(f"Historical and relocated source checksums disagree: {path}")
+    return next(iter(values), None)
 
 
 def quote(value) -> str:
@@ -103,16 +133,18 @@ def write_csv(path: Path, columns: list[str], rows: list[dict]) -> None:
 
 def prepare_inputs(source: Path, output: Path, fresh_source: Path | None) -> dict:
     """Use normal full raw inputs for Stage 03 and a separate exact Stage 04 scope."""
+    raw_source = data_layout(source).raw_access
+    source = baseline_root(source)
     raw = output / "Raw_Access_Databases"
     raw.mkdir(parents=True, exist_ok=True)
     for year in range(2004, 2024):
-        link_readonly(source / "Raw_Access_Databases" / str(year), raw / str(year))
+        link_readonly(raw_source / str(year), raw / str(year))
     coverage = output / "Checks/v2/harmonize_qc"
     coverage.mkdir(parents=True, exist_ok=True)
     for path in sorted((source / "Checks/v2/harmonize_qc").glob("source_column_coverage_*.csv")):
         copy_verified(path, coverage / path.name)
     scoped = output / "scoped_stage04"
-    year_source = source / "Raw_Access_Databases" / str(SCOPE_YEAR)
+    year_source = raw_source / str(SCOPE_YEAR)
     year_target = scoped / "Raw_Access_Databases" / str(SCOPE_YEAR)
     copy_verified(year_source / "manifest.csv", year_target / "manifest.csv")
     columns, records = read_csv(year_source / "metadata/table_inventory.csv")
@@ -218,7 +250,7 @@ def staged_dictionary(args, output: Path) -> Path:
 
 
 def regenerate_scalar(args, output: Path, receipt: dict) -> None:
-    source, pipeline = Path(args.source_root), Path(args.pipeline_repo)
+    source, pipeline = baseline_root(args.source_root), Path(args.pipeline_repo)
     dictionary = staged_dictionary(args, output)
     scoped = output / "scoped_stage04"
     annual = scoped / "Cross_sections/v2"
@@ -346,12 +378,12 @@ def cache_reused_lanes(args, output: Path, receipt: dict) -> None:
     if not args.source_hashes:
         raise ValueError("Caching requires --source-hashes with an independently verified source checksum.")
     name = f"panel_long_dimensioned_{TOKEN}.parquet"
-    source = Path(args.source_root).resolve() / "Panels/v2" / name
+    source = baseline_root(args.source_root).resolve() / "Panels/v2" / name
     before = file_identity(source)
     if before != receipt.get("reused_inputs", {}).get(name):
         raise ValueError("The dimensioned source changed since staging preparation.")
     hashes = json.loads(Path(args.source_hashes).read_text())
-    expected = hashes.get(str(source))
+    expected = source_hash_for(hashes, source, args.source_root)
     if not isinstance(expected, str) or len(expected) != 64 or any(c not in "0123456789abcdef" for c in expected):
         raise ValueError("Independent dimensioned source checksum is missing or malformed.")
     cached = output / "build/local_cache" / name
@@ -422,7 +454,7 @@ def compare_panel_values(left: Path, right: Path, *, batch_rows: int = 250) -> i
 
 
 def verify_outputs(args, output: Path, receipt: dict) -> None:
-    source = Path(args.source_root)
+    source = baseline_root(args.source_root)
     for cached in receipt.get("reused_lane_cache", {}).values():
         if file_identity(Path(cached["local_path"])) != cached["local_identity"] or sha256(Path(cached["local_path"])) != cached["source_sha256"]:
             raise ValueError("A cached reused lane changed during the build.")
@@ -449,7 +481,7 @@ def verify_outputs(args, output: Path, receipt: dict) -> None:
         path = Path(original_identity["path"])
         if file_identity(path) != original_identity:
             raise ValueError(f"A reused source artifact changed during rebuild: {path}")
-        digest = external_hashes.get(str(path)) if args.source_hashes else sha256(path)
+        digest = source_hash_for(external_hashes, path, args.source_root) if args.source_hashes else sha256(path)
         if not isinstance(digest, str) or len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest):
             raise ValueError(f"Source hash receipt is incomplete for {path}")
         receipt.setdefault("reused_input_sha256", {})[label] = digest
@@ -509,7 +541,9 @@ def main() -> None:
     atomic_json(receipt_path, receipt)
     if args.phase in {"prepare", "all"}:
         receipt.update(prepare_inputs(source, output, Path(args.fresh_source) if args.fresh_source else None))
-        receipt["reused_inputs"] = {name: file_identity(source / "Panels/v2" / name)
+        receipt["baseline_root"] = str(baseline_root(source))
+        receipt["raw_source_root"] = str(data_layout(source).raw_access)
+        receipt["reused_inputs"] = {name: file_identity(baseline_root(source) / "Panels/v2" / name)
                                     for name in (f"panel_long_scalar_{TOKEN}.parquet", f"panel_long_dimensioned_{TOKEN}.parquet", f"panel_source_rows_{TOKEN}.parquet")}
         receipt["code_sha256"] = {str(path.relative_to(pipeline)): sha256(path)
                                   for path in sorted((pipeline / "Scripts").glob("*.py"))}

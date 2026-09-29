@@ -39,17 +39,19 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT, ensure_data_layout, parse_years
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, data_layout, ensure_data_layout, parse_years
 
 
 def parse_args() -> argparse.Namespace:
     data_root = Path(os.environ.get("IPEDSDB_ROOT", str(DEFAULT_IPEDSDB_ROOT)))
-    checks_root = data_root / "Checks"
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", default=str(data_root), help="External IPEDSDB_ROOT")
     p.add_argument("--years", default="2004:2023", help='Expected year span, e.g. "2004:2023"')
-    p.add_argument("--out-dir", default=str(checks_root / "acceptance_qc"), help="Acceptance output directory")
-    return p.parse_args()
+    p.add_argument("--out-dir", default=None, help="Acceptance output directory")
+    args = p.parse_args()
+    if args.out_dir is None:
+        args.out_dir = str(data_layout(args.root).checks / "acceptance_qc")
+    return args
 
 
 def build_row(

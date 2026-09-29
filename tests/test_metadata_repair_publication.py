@@ -20,6 +20,13 @@ CORE = (
 )
 
 
+def test_publication_destination_follows_layout_without_recreating_old_folder(tmp_path, monkeypatch):
+    monkeypatch.setattr(publisher, "PUBLICATION_ROOT", tmp_path)
+    assert publisher.intended_destination() == tmp_path / "Metadata_repairs/2023-sfa-v1"
+    (tmp_path / "layout.json").write_text(json.dumps({"schema_version": 1, "current_release": "2023-sfa-v1"}))
+    assert publisher.intended_destination() == tmp_path / "Releases/2023-sfa-v1"
+
+
 @pytest.fixture
 def validation_receipts(tmp_path: Path):
     digest = hashlib.sha256(b"validated data").hexdigest()

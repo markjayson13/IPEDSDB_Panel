@@ -32,7 +32,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from access_build_utils import DEFAULT_IPEDSDB_ROOT
+from access_build_utils import DEFAULT_IPEDSDB_ROOT, data_layout
 
 
 def default_code_root() -> Path:
@@ -49,7 +49,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--input", required=True, help="Stitched long parquet input")
     p.add_argument("--dictionary", required=True, help="dictionary_lake parquet")
     p.add_argument("--years", default="2004:2023", help='Year span, e.g. "2004:2023"')
-    p.add_argument("--run-dir-root", default=str(data_root / "Checks" / "real_parity_runs"), help="Durable log/telemetry directory")
+    p.add_argument("--run-dir-root", default=str(data_layout(data_root).checks / "real_parity_runs"), help="Durable log/telemetry directory")
     p.add_argument("--work-root", default="/tmp", help="Scratch root for build outputs and DuckDB state")
     p.add_argument("--label", default="analysis_2004_2023", help="Run id prefix")
     p.add_argument("--dim-sources", default="C_A,C_B,C_C,CDEP,EAP,IC_CAMPUSES,IC_PCCAMPUSES,F_FA_F,F_FA_G")
