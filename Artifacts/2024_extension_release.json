@@ -302,5 +302,15 @@
       "2024 Pell SFA2324 release status and reporting-population note"
     ],
     "codebook_manifest_sha256": "0459dfa48f8ca93e5aa2bb18b43c7c77b1ac0148fd788a0a6e0ece76cae37206"
+  },
+  "reproduction_source_snapshot": {
+    "source_commit": "799a63930f97df9a3ec35be857f340ea3743afac",
+    "archive_path": "contracts/reproduction/v2-baseline-799a639.tar.gz",
+    "archive_sha256": "53ba61017aef0985edc3743475842f801a2ec2758338e15677b67553ef7169fc",
+    "original_files_verified": 106,
+    "prepared_files_equal_to_published_pipeline": 124,
+    "fresh_checkout_tests_passed": 663,
+    "fresh_checkout_has_historical_git_objects": false,
+    "published_package_unchanged": true
   }
 }

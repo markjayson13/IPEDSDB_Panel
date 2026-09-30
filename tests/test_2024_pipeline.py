@@ -1,9 +1,11 @@
 import csv
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
 import subprocess
 import sys
+import tarfile
 
 import pandas as pd
 import pytest
@@ -111,7 +113,14 @@ def test_table_release_status_and_literal_none_are_preserved(tmp_path):
 def test_prepared_pipeline_preserves_historical_policy_bytes(tmp_path):
     output = tmp_path / "pipeline"
     receipt = prepare(output, REPOSITORY)
-    original = subprocess.check_output(["git", "show", receipt["base_commit"] + ":contracts/prch_policy.csv"], cwd=REPOSITORY)
+    archive = REPOSITORY / receipt["base_archive"]["path"]
+    manifest = json.loads(archive.with_suffix("").with_suffix(".json").read_text())
+    assert receipt["base_commit"] == manifest["source_commit"]
+    assert digest(archive) == receipt["base_archive"]["sha256"] == manifest["archive"]["sha256"]
+    with tarfile.open(archive, "r:gz") as bundle:
+        original = bundle.extractfile("contracts/prch_policy.csv").read()
+    policy_record = next(row for row in manifest["files"] if row["path"] == "contracts/prch_policy.csv")
+    assert hashlib.sha256(original).hexdigest() == policy_record["sha256"] == receipt["prch_policy_sha256"]
     assert (output / "contracts/prch_policy.csv").read_bytes().startswith(original)
     assert receipt["contract_id"] == CONTRACT_ID
     assert all(digest(output / row["path"]) == row["sha256"] for row in receipt["pipeline_scripts"])

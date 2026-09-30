@@ -43,6 +43,11 @@ instructions. See the [official 2024 SFA form](https://nces.ed.gov/ipeds/use-the
 
 ## Mapping and cleaning
 
+Fresh checkouts prepare the original v2 code from the checksum-pinned
+[source snapshot](../contracts/reproduction/README.md). This removes the
+dependency on an old local Git commit while preserving the original scripts,
+contracts, and cleaning-policy bytes.
+
 The preserved v2 pipeline is extended through the explicit, 2024-only tables
 in `contracts/extension_2024/`. It checks all 52 physical data tables and 2,655
 columns. Each scalar output has an exact table, variable name, variable number,

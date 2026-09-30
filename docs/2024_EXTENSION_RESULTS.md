@@ -71,6 +71,11 @@ definitions. The combined `.metadata.json` identifies affected variables and
 years. Native Stata validation verifies stored values and declared labels;
 these source limitations remain disclosed.
 
+Fresh-checkout reproduction is also verified: all 663 tests pass without the
+historical Git objects. The checksum-pinned source snapshot reproduces all 124
+corresponding prepared pipeline files byte for byte; the published package and
+its data checksums remain unchanged.
+
 ## Final artifact hashes
 
 All paths below are relative to `/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/`.

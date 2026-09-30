@@ -5,13 +5,14 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
 import tarfile
-import tempfile
 
 BASE_COMMIT = "799a63930f97df9a3ec35be857f340ea3743afac"
+BASE_ARCHIVE = Path("contracts/reproduction/v2-baseline-799a639.tar.gz")
+BASE_ARCHIVE_SHA256 = "53ba61017aef0985edc3743475842f801a2ec2758338e15677b67553ef7169fc"
 POLICY_SHA256 = "67fca57085ec759944152f6e6e38374fac75991ef2dbd0489d241641d310e4f3"
 
 
@@ -23,12 +24,20 @@ def digest(path: Path) -> str:
 def prepare(output: Path, repository: Path) -> dict:
     if output.exists():
         raise ValueError("Pipeline output must be a new directory")
+    repository = repository.resolve()
     patch = repository / "contracts/source_metadata_corrections/v2-pipeline.patch"
-    output.mkdir(parents=True)
-    with tempfile.TemporaryFile() as archive:
-        subprocess.run(["git", "archive", BASE_COMMIT], cwd=repository, stdout=archive, check=True)
+    # The original commit is not in the public Git history. Keep the exact
+    # reviewed source bytes available to shallow clones and source ZIP users.
+    with (repository / BASE_ARCHIVE).open("rb") as archive:
+        if hashlib.file_digest(archive, "sha256").hexdigest() != BASE_ARCHIVE_SHA256:
+            raise ValueError("Preserved v2 source archive checksum mismatch")
         archive.seek(0)
-        with tarfile.open(fileobj=archive) as bundle:
+        with tarfile.open(fileobj=archive, mode="r:gz") as bundle:
+            for member in bundle.getmembers():
+                path = PurePosixPath(member.name)
+                if path.is_absolute() or ".." in path.parts or not (member.isfile() or member.isdir()):
+                    raise ValueError(f"Unsafe preserved v2 archive member: {member.name}")
+            output.mkdir(parents=True)
             bundle.extractall(output, filter="data")
     subprocess.run(["git", "apply", str(patch)], cwd=output, check=True)
     copied = [repository / "Scripts/source_metadata_corrections.py",
@@ -39,7 +48,9 @@ def prepare(output: Path, repository: Path) -> dict:
         shutil.copy2(source, target)
     if digest(output / "contracts/prch_policy.csv") != POLICY_SHA256:
         raise ValueError("Preserved PRCH policy differs from the original verified policy")
-    receipt = {"base_commit": BASE_COMMIT, "patch_sha256": digest(patch), "prch_policy_sha256": POLICY_SHA256,
+    receipt = {"base_commit": BASE_COMMIT,
+               "base_archive": {"path": str(BASE_ARCHIVE), "sha256": BASE_ARCHIVE_SHA256},
+               "patch_sha256": digest(patch), "prch_policy_sha256": POLICY_SHA256,
                "overlay": [{"path": str(path.relative_to(repository)), "sha256": digest(path)} for path in copied],
                "pipeline_scripts": [{"path": str(path.relative_to(output)), "sha256": digest(path)}
                                     for path in sorted((output / "Scripts").rglob("*.py"))]}
