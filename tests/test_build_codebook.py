@@ -237,6 +237,24 @@ def test_dictionary_csv_does_not_fill_missing_latest_description_from_older_year
     assert row["description"] == "" and row["description_years"] == "2006"
 
 
+def test_dictionary_csv_retains_all_latest_year_variants_including_blank():
+    detail = make_detail(variable(year_scoped_definitions=[
+        {"years": [2004, 2006], "label": "A", "description": ""},
+        {"years": [2005, 2006], "label": "A", "description": "Supplied latest meaning"},
+        {"year": 2003, "label": "Earlier", "description": "An obsolete meaning"},
+    ]), [])
+    original = copy.deepcopy(detail)
+    row = build_codebook.dictionary_csv_row(detail)
+    assert row["description_years"] == "2006"
+    assert row["description"] == (
+        "Multiple source definitions for 2006; blank descriptions remain unresolved.\n"
+        "1. A: Description not supplied\n2. A: Supplied latest meaning"
+    )
+    assert detail == original
+    detail["definitions"].reverse()
+    assert build_codebook.dictionary_csv_row(detail) == row
+
+
 def test_consolidation_detail_and_csv_preserve_exact_members_scopes_and_caveats(tmp_path):
     rule = {
         "canonical_name": "CAT", "rationale": "Same source measure, relocated table; values unchanged.",

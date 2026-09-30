@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 
+from bs4 import BeautifulSoup
 import pytest
 
 DOCS = Path(__file__).parents[1] / "docs"
@@ -132,6 +133,28 @@ def test_release_interfaces_use_separate_data_and_shared_assets():
         assert 'id="download-filtered"' in page
         assert 'id="download-filtered" disabled>Save list as CSV' in page
         assert 'Other filters cover all years' in page
+
+
+@pytest.mark.parametrize("page", [DOCS / "index.html", DOCS / "provisional/index.html"])
+def test_download_accessible_names_preserve_visible_link_titles(page):
+    interface = BeautifulSoup(page.read_text(), "html.parser")
+    downloads = interface.select("a[aria-label]")
+    assert len(downloads) == (5 if page.parent.name == "provisional" else 4)
+    for link in downloads:
+        title = " ".join("".join(link.find_all(string=True, recursive=False)).split())
+        assert title
+        # Voice commands using the visible title must also match its accessible name.
+        assert link["aria-label"].startswith(title), title
+
+
+@pytest.mark.parametrize("page", [DOCS / "index.html", DOCS / "provisional/index.html"])
+def test_filter_names_use_visible_labels_without_option_text(page):
+    interface = BeautifulSoup(page.read_text(), "html.parser")
+    for control, expected in {"year-filter": "Values in year", "source-filter": "Source",
+                              "code-filter": "Category labels"}.items():
+        assert len(interface.find_all("label", attrs={"for": control})) == 1
+        label_id = interface.find("select", id=control)["aria-labelledby"]
+        assert interface.find(id=label_id).get_text(strip=True) == expected
 
 
 def test_consolidated_release_exposes_each_original_column_and_its_years():

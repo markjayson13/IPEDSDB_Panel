@@ -266,13 +266,28 @@ def summary(detail: dict, filename: str) -> dict:
 def dictionary_csv_row(detail: dict) -> dict:
     definitions = detail["definitions"]
     latest = max(definitions, key=lambda d: max(d["years"], default=-1), default={})
+    latest_year = max(latest.get("years", []), default=None)
+    candidates = [d for d in definitions if latest_year in d["years"]] if latest_year is not None else definitions
+    description = latest.get("description", "")
+    description_years = latest.get("years", [])
+    if len(candidates) > 1:
+        # A shared latest year is not permission to discard a source definition,
+        # especially a blank one. Keep every variant explicit and narrow the
+        # summary's scope to the year in which those records coexist.
+        candidates = sorted(candidates, key=lambda d: (d.get("label", ""), d.get("description", "")))
+        scope = str(latest_year) if latest_year is not None else "unspecified years"
+        description = f"Multiple source definitions for {scope}; blank descriptions remain unresolved.\n" + "\n".join(
+            f"{number}. {d.get('label') or 'Title not supplied'}: {d.get('description') or 'Description not supplied'}"
+            for number, d in enumerate(candidates, 1)
+        )
+        description_years = [latest_year] if latest_year is not None else []
     return {
         "name": detail["name"], "label": detail["label"], "storage_type": detail["storage_type"],
         "stata_name": detail["stata_name"],
         "observed_years": "; ".join(map(str, detail["observed_years"])),
         "sources": "; ".join(detail["sources"]), "metadata_status": detail["metadata_status"],
-        "null_count": detail["null_count"], "description": latest.get("description", ""),
-        "description_years": "; ".join(map(str, latest.get("years", []))),
+        "null_count": detail["null_count"], "description": description,
+        "description_years": "; ".join(map(str, description_years)),
         "issues": " | ".join(f"{issue['code']}: {issue['message']}" for issue in detail["issues"]),
     }
 

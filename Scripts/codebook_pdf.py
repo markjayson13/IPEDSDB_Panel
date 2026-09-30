@@ -19,6 +19,11 @@ from xml.sax.saxutils import escape
 PARAGRAPH_GLYPH_FONTS = {"→": "Symbol"}
 
 
+def native_stata_label(stata, export_code):
+    """Use the recorded export label, not the source category's meaning."""
+    return stata.get("value_labels", {}).get(str(export_code), "No native label assigned")
+
+
 def year_ranges(years):
     values = sorted(set(int(y) for y in years))
     groups = []
@@ -274,7 +279,8 @@ def render_pdf(directory, output=None):
         if mapping:
             story.append(p("Reversible Stata category mapping", "sub"))
             table(["Source code", "Stata code", "Native value label"],
-                  [[m["source_code"], m["export_code"], m["label"]] for m in mapping], [78, 62, 361])
+                  [[m["source_code"], m["export_code"], native_stata_label(stata, m["export_code"])]
+                   for m in mapping], [78, 62, 361])
         story.append(Spacer(1, 7))
 
     def page(canvas, doc):

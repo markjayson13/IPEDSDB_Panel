@@ -64,6 +64,26 @@ def test_pdf_refuses_incomplete_variable_inventory(codebook):
         pdf.render_pdf(codebook)
 
 
+def test_pdf_mapping_uses_exact_native_label_not_source_meaning(codebook):
+    path = codebook / "variables-001.json"
+    details = json.loads(path.read_text())
+    details["PELL"]["stata"].update({
+        "source_code_map": [
+            {"source_code": "012003", "export_code": 3, "label": "Source meaning only"},
+            {"source_code": "UNLABELED", "export_code": 4, "label": "Unverified fallback meaning"},
+        ],
+        "value_labels": {"3": "012003: 2004: January 2003"},
+    })
+    path.write_text(json.dumps(details))
+    result = pdf.render_pdf(codebook)
+    text = " ".join("\n".join(page.extract_text() for page in pypdf.PdfReader(result["path"]).pages).split())
+    assert "012003: 2004: January 2003" in text
+    assert "No native label assigned" in text
+    assert "Source meaning only" not in text
+    assert "Unverified fallback meaning" not in text
+    assert pdf.native_stata_label({"value_labels": {"3": ""}}, 3) == ""
+
+
 @pytest.mark.parametrize("has_source_records", [True, False])
 @pytest.mark.parametrize("caveats", [["Keep the later definition < 100 & its reference period."],
                                    "Keep the later definition < 100 & its reference period."])

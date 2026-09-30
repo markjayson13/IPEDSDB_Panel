@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "audited_at": "2026-09-30T09:42:48.290169+00:00",
+  "baseline_commit": "9202aada93f4ff89c9b7e7d181e54dcbd74be697",
+  "scope": "Public codebook interfaces and documentation; sealed data releases unchanged",
+  "corrections": {
+    "native_stata_labels": "Use export value labels, not source category meanings",
+    "dictionary_csv": [
+      "LINE_55",
+      "PCF_F_RV",
+      "REV_IC",
+      "SFTETOTL"
+    ],
+    "interface": [
+      "Mobile search skip link",
+      "450px download menu clipping",
+      "Accessible download and filter names",
+      "Failed and malformed detail retries",
+      "15-second index and response-body timeouts",
+      "Failed detail state cleanup"
+    ]
+  },
+  "releases": [
+    {
+      "directory": "docs/codebook",
+      "release": "full-panel-labels-v1",
+      "unchanged_dataset_fingerprints": {
+        "parquet_sha256": "f93cf45fe50e04250465a0b583a384737f4954cb7034f5a880f853d55827bb61",
+        "parquet_metadata_sha256": "d9ddbd4ca12842718cfb052369bebb1d01d556c34e2db700bb25d161a44f0b0e",
+        "stata_sha256": "37570f3a5f54a28a6ea02f1888d8e89e89cee499cc04100e36badcbd5f07386f",
+        "stata_metadata_sha256": "10e102c6751d37957744ad333ba7913d405b401becda67cab7aa9b5a52027a85"
+      },
+      "unchanged_codebook_files": [
+        "README.txt",
+        "definitions.csv.gz",
+        "index.json",
+        "value-labels.csv",
+        "variables-001.json",
+        "variables-002.json",
+        "variables-003.json",
+        "variables-004.json",
+        "variables-005.json",
+        "variables-006.json",
+        "variables-007.json",
+        "variables-008.json",
+        "variables-009.json"
+      ],
+      "changed_artifacts": [
+        {
+          "path": "docs/codebook/codebook.csv",
+          "before_sha256": "0c151b2655cd78af38bf864100fc223181863c6ca840ba6823100ebc1b1c537e",
+          "after_sha256": "b28fa09088a566f84804cbb248c2fead4ad9f96c4a2dbb346afff6d86b02e806"
+        },
+        {
+          "path": "docs/codebook/ipeds-panel-codebook.pdf",
+          "before_sha256": "7ce553e72bbbab62a0da52fbd42833e9334948531f706b1d4c234e180f416421",
+          "after_sha256": "f5388ac75905e12618b021119f4e43054b938afa597610cb093fd9c97a5b4177"
+        },
+        {
+          "path": "docs/codebook/manifest.json",
+          "before_sha256": "2e2f288bba37eabf8db403c82925ef097251169ea9260b113824185c9828fe31",
+          "after_sha256": "f5e57c89a634046256917f88f0dd4ebca346e76b6c6c2a711b7b712c7cbc8a1f"
+        }
+      ],
+      "pdf_validation": {
+        "affected_variables": [
+          "ACT",
+          "CIPCODE1",
+          "CIPCODE2",
+          "CIPCODE3",
+          "CIPCODE4",
+          "CIPCODE5",
+          "CIPCODE6",
+          "FYBEG",
+          "FYEND",
+          "STABBR"
+        ],
+        "native_labels_checked": 3279,
+        "missing_labels": []
+      }
+    },
+    {
+      "directory": "docs/provisional/codebook",
+      "release": "2024-extension-v1",
+      "unchanged_dataset_fingerprints": {
+        "parquet_sha256": "7b9935cebf6b09a504c34679eefbbeaeebf18d696db9afd3ff0e1367b9026ba4",
+        "parquet_metadata_sha256": "1fb24e02074a60839cbb14a731b744d856cd9b0c1e03bd9c6ddeba8f83597471",
+        "stata_sha256": "1be8f6b3353eafec93891e7a492fcce7c9534f8a073a333c0c1352f53f0fc51d",
+        "stata_metadata_sha256": "04ac2566f4665ef54ba38d913b4afea67a0f2b31b60d9aa504498706a44b155f"
+      },
+      "unchanged_codebook_files": [
+        "README.txt",
+        "column-crosswalk.csv",
+        "definitions.csv.gz",
+        "index.json",
+        "value-labels.csv",
+        "variables-001.json",
+        "variables-002.json",
+        "variables-003.json",
+        "variables-004.json",
+        "variables-005.json",
+        "variables-006.json",
+        "variables-007.json",
+        "variables-008.json",
+        "variables-009.json",
+        "variables-010.json"
+      ],
+      "changed_artifacts": [
+        {
+          "path": "docs/provisional/codebook/codebook.csv",
+          "before_sha256": "d1063d95191d8d69c6f190c5edefd357ca00583539882cc076b4e321605a2325",
+          "after_sha256": "e0e68dbcacfb7b790904bdd060a5b6bec7caa1030d4e6507287e73419c6e8b2a"
+        },
+        {
+          "path": "docs/provisional/codebook/ipeds-panel-codebook.pdf",
+          "before_sha256": "b5986a2a4fc1ee35cab4a8c1def69e9b00b7e745d64c877f917fea116c785913",
+          "after_sha256": "e48c2274c45e89483e9185b55cadbeb08242523ef57bee019452717977f75421"
+        },
+        {
+          "path": "docs/provisional/codebook/manifest.json",
+          "before_sha256": "0459dfa48f8ca93e5aa2bb18b43c7c77b1ac0148fd788a0a6e0ece76cae37206",
+          "after_sha256": "dcbdc8263416e4973c18556d8fd5352d48aa8faf2dc052e3a25605f67556039a"
+        }
+      ],
+      "pdf_validation": {
+        "affected_variables": [
+          "ACT",
+          "CIPCODE1",
+          "CIPCODE2",
+          "CIPCODE3",
+          "CIPCODE4",
+          "CIPCODE5",
+          "CIPCODE6",
+          "FYBEG",
+          "FYEND",
+          "STABBR"
+        ],
+        "native_labels_checked": 3333,
+        "missing_labels": []
+      }
+    }
+  ],
+  "source_url_checks": {
+    "checked_at": "2026-09-30T09:38:38.498140+00:00",
+    "method": "HEAD",
+    "request_timeout_seconds": 30,
+    "max_concurrency": 4,
+    "results": [
+      {
+        "url": "https://nces.ed.gov/ipeds/complete-data-files/C2024_B.zip",
+        "status": 200,
+        "final_url": "https://nces.ed.gov/ipeds/complete-data-files/C2024_B.zip",
+        "curl_exit": 0,
+        "bytes_downloaded": 0,
+        "seconds": 0.602738,
+        "error": null
+      },
+      {
+        "url": "https://nces.ed.gov/ipeds/complete-data-files/DRVC2024.zip",
+        "status": 200,
+        "final_url": "https://nces.ed.gov/ipeds/complete-data-files/DRVC2024.zip",
+        "curl_exit": 0,
+        "bytes_downloaded": 0,
+        "seconds": 0.565582,
+        "error": null
+      },
+      {
+        "url": "https://nces.ed.gov/ipeds/complete-data-files/DRVEF122024.zip",
+        "status": 200,
+        "final_url": "https://nces.ed.gov/ipeds/complete-data-files/DRVEF122024.zip",
+        "curl_exit": 0,
+        "bytes_downloaded": 0,
+        "seconds": 0.56377,
+        "error": null
+      },
+      {
+        "url": "https://nces.ed.gov/ipeds/complete-data-files/EFFY2024_HS.zip",
+        "status": 200,
+        "final_url": "https://nces.ed.gov/ipeds/complete-data-files/EFFY2024_HS.zip",
+        "curl_exit": 0,
+        "bytes_downloaded": 0,
+        "seconds": 0.602739,
+        "error": null
+      },
+      {
+        "url": "https://nces.ed.gov/ipeds/complete-data-files/EFIA2024.zip",
+        "status": 200,
+        "final_url": "https://nces.ed.gov/ipeds/complete-data-files/EFIA2024.zip",
+        "curl_exit": 0,
+        "bytes_downloaded": 0,
+        "seconds": 0.537726,
+        "error": null
+      },
+      {
+        "url": "https://nces.ed.gov/ipeds/complete-data-files/FLAGS2024.zip",
+        "status": 200,
+        "final_url": "https://nces.ed.gov/ipeds/complete-data-files/FLAGS2024.zip",
+        "curl_exit": 0,
+        "bytes_downloaded": 0,
+        "seconds": 0.532341,
+        "error": null
+      },
+      {
+        "url": "https://nces.ed.gov/ipeds/complete-data-files/HD2024.zip",
+        "status": 200,
+        "final_url": "https://nces.ed.gov/ipeds/complete-data-files/HD2024.zip",
+        "curl_exit": 0,
+        "bytes_downloaded": 0,
+        "seconds": 0.606294,
+        "error": null
+      },
+      {
+        "url": "https://nces.ed.gov/ipeds/complete-data-files/IC2024.zip",
+        "status": 200,
+        "final_url": "https://nces.ed.gov/ipeds/complete-data-files/IC2024.zip",
+        "curl_exit": 0,
+        "bytes_downloaded": 0,
+        "seconds": 0.605857,
+        "error": null
+      },
+      {
+        "url": "https://nces.ed.gov/ipeds/complete-data-files/SFA2324.zip",
+        "status": 200,
+        "final_url": "https://nces.ed.gov/ipeds/complete-data-files/SFA2324.zip",
+        "curl_exit": 0,
+        "bytes_downloaded": 0,
+        "seconds": 0.516597,
+        "error": null
+      },
+      {
+        "url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2024-25_Provisional.zip",
+        "status": 200,
+        "final_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2024-25_Provisional.zip",
+        "curl_exit": 0,
+        "bytes_downloaded": 0,
+        "seconds": 0.517473,
+        "error": null
+      },
+      {
+        "url": "https://nces.ed.gov/ipeds/use-the-data/download-survey-material/2024/student%20financial%20aid/package_7_16.pdf",
+        "status": 200,
+        "final_url": "https://nces.ed.gov/ipeds/use-the-data/download-survey-material/2024/student%20financial%20aid/package_7_16.pdf",
+        "curl_exit": 0,
+        "bytes_downloaded": 0,
+        "seconds": 0.629178,
+        "error": null
+      }
+    ]
+  },
+  "browser_checks": {
+    "width_450_dropdown_bounds": {
+      "left": 89,
+      "right": 434
+    },
+    "horizontal_overflow": false,
+    "mobile_skip_link": "Search visible and focused; variable URL preserved",
+    "malformed_shard_retry": "Fresh response renders FYBEG and its native label",
+    "http_503_index_retry": "Reload restored interactive codebook",
+    "stalled_shard_body": "15-second error; retry restored UPGRNTN2023 with P1/P2 correction",
+    "stalled_index": "15-second error; reload restored interactive codebook"
+  },
+  "automated_checks": {
+    "python_full_suite_before_two_additional_scope_checks": 675,
+    "published_content_checks": 8,
+    "javascript_behavior_checks": 11
+  },
+  "known_source_metadata_gaps_per_release": 10
+}

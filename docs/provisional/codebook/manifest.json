@@ -17,8 +17,8 @@
     },
     {
       "path": "codebook.csv",
-      "size_bytes": 3137255,
-      "sha256": "d1063d95191d8d69c6f190c5edefd357ca00583539882cc076b4e321605a2325"
+      "size_bytes": 3140284,
+      "sha256": "e0e68dbcacfb7b790904bdd060a5b6bec7caa1030d4e6507287e73419c6e8b2a"
     },
     {
       "path": "column-crosswalk.csv",
@@ -37,8 +37,8 @@
     },
     {
       "path": "ipeds-panel-codebook.pdf",
-      "size_bytes": 12665368,
-      "sha256": "b5986a2a4fc1ee35cab4a8c1def69e9b00b7e745d64c877f917fea116c785913"
+      "size_bytes": 12677580,
+      "sha256": "e48c2274c45e89483e9185b55cadbeb08242523ef57bee019452717977f75421"
     },
     {
       "path": "value-labels.csv",

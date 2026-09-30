@@ -29,6 +29,10 @@ Both interfaces use the same compact search and reference layout.
 - Keyboard users can press `/` to search and use arrow keys between reference
   tabs. Printing includes all four sections and the release identity.
 
+The skip link also opens search from the phone's variable view. Interrupted
+reference-file requests have a time limit and can be retried; a failed detail
+file does not prevent searches for other variables.
+
 The searchable interface and full downloadable PDF use the same generated
 metadata. The PDF has an alphabetical linked index and variable bookmarks.
 Dictionary and value-label CSV downloads are provided; large CSVs use gzip
@@ -65,6 +69,41 @@ the data/metadata hashes they describe. The external copy belongs in
 `$IPEDSDB_ROOT/Final/Codebook/`; it is separate from the immutable data releases.
 Regenerate and replace that documentation copy when a new panel release is
 published. Do not overwrite the immutable release directories.
+
+## Documentation corrections
+
+The public CSV summaries and PDFs were corrected after the dataset releases.
+The Stata mapping tables now display the exact native value labels, including
+source-code prefixes. This affects `ACT`, `CIPCODE1` through `CIPCODE6`,
+`FYBEG`, `FYEND`, and `STABBR` in both codebooks. The labels in the data exports
+were already correct.
+
+For `LINE_55`, `PCF_F_RV`, `REV_IC`, and `SFTETOTL`, the dictionary CSV now
+retains every distinct definition recorded for the latest year, including
+missing descriptions. The full definitions download and source JSON retain
+the original records.
+
+These documentation corrections change the public PDF, dictionary CSV and
+codebook checksums. They do not change the dataset release identity, panel
+values, native Stata labels, or original source metadata. Codebooks archived
+inside sealed CIRAGO releases retain their original bytes; use the public
+downloads for the corrected presentation. Their recorded data fingerprints
+still identify the same datasets.
+The [documentation audit](../Artifacts/codebook_documentation_audit.json)
+records the before/after file hashes, unchanged dataset fingerprints, source-link
+checks and observed browser recovery behavior.
+
+Interface regression checks use Node 24 and no npm packages:
+
+```sh
+node --test tests/test_codebook_browser.cjs
+.venv/bin/python -m pytest -q tests/test_build_codebook.py \
+  tests/test_codebook_pdf.py tests/test_published_codebook.py \
+  tests/test_published_codebook_content.py
+```
+
+CI runs these interaction checks alongside the complete Python suite. Browser
+checks separately cover responsive layout, keyboard access and request recovery.
 
 ## Meaning and limitations
 

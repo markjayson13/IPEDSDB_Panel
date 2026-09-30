@@ -78,9 +78,17 @@
     return details;
   }
   async function fetchJson(url) {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`The codebook file could not be loaded (HTTP ${response.status}).`);
-    return response.json();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) throw new Error(`The codebook file could not be loaded (HTTP ${response.status}).`);
+      // Keep the timeout active while the response body is being read, too.
+      return await response.json();
+    } catch (error) {
+      if (controller.signal.aborted) throw new Error('The codebook request timed out. Please try again.');
+      throw error;
+    } finally { clearTimeout(timeout); }
   }
   function downloadPath(name) {
     if (typeof name !== 'string' || !/^[a-zA-Z0-9._-]+$/.test(name)) return null;
@@ -329,20 +337,28 @@
     const loading = el('div', 'detail-placeholder');
     loading.append(el('h2', '', name), el('p', '', 'Loading definitions and source records…'));
     detail.replaceChildren(loading);
+    let request;
     try {
       if (!/^variables-\d+\.json$/.test(item.detail_file)) throw new Error('The variable reference file is invalid.');
-      if (!cache.has(item.detail_file)) cache.set(item.detail_file, fetchJson(`./codebook/${item.detail_file}`).catch((error) => { cache.delete(item.detail_file); throw error; }));
-      const shard = await cache.get(item.detail_file);
+      if (!cache.has(item.detail_file)) cache.set(item.detail_file, fetchJson(`./codebook/${item.detail_file}`));
+      request = cache.get(item.detail_file);
+      const shard = await request;
       if (token !== state.token) return;
-      if (!Object.prototype.hasOwnProperty.call(shard, name)) throw new Error('The variable detail is missing from this release.');
-      state.detail = shard[name];
+      if (!shard || typeof shard !== 'object' || Array.isArray(shard) || !Object.prototype.hasOwnProperty.call(shard, name)) throw new Error('The variable detail is missing from this release.');
+      const record = shard[name];
+      if (!record || record.name !== name || !Array.isArray(record.definitions) || !Array.isArray(record.source_records) || !Array.isArray(record.codes)) throw new Error('The variable detail does not match this release.');
+      state.detail = record;
       renderDetail(state.detail);
       detail.scrollTop = 0;
       if (options.focus) byId('detail-heading').focus({ preventScroll: true });
       if (options.openMobile && isMobile()) detail.scrollIntoView({ block: 'start' });
       announce(`Showing ${name}. ${state.detail.label || ''}`);
     } catch (error) {
+      // Do not leave the retry button attached to a cached invalid response, or
+      // evict a newer request that replaced this one while it was in flight.
+      if (request && cache.get(item.detail_file) === request) cache.delete(item.detail_file);
       if (token !== state.token) return;
+      state.detail = null;
       const failed = el('div', 'empty-results');
       failed.append(button('← Back to variables', 'mobile-back', backToResults), el('strong', '', `Could not load ${name}`), el('p', '', error.message), button('Try again', '', () => selectVariable(name, options)));
       detail.replaceChildren(failed);
@@ -492,7 +508,7 @@
     const map = stata.source_code_map || [];
     if (map.length) {
       panel.append(el('p', 'scope-note', stata.storage_conversion === 'integer_code_strings_to_numeric' ? 'Canonical integer strings become the same numeric codes in Stata. This mapping preserves the original tokens; Parquet values are unchanged.' : 'Original string categories are represented by assigned numeric Stata codes. Use this mapping to recover the original tokens; the assigned numbers are not the original panel codes.'));
-      panel.append(table(['Original panel code', 'Stata code', 'Stata value label'], map.map((item) => [item.source_code, item.export_code, item.label]), ['code-cell', 'code-cell', '']));
+      panel.append(table(['Original panel code', 'Stata code', 'Stata value label'], map.map((item) => [item.source_code, item.export_code, (stata.value_labels || {})[String(item.export_code)] ?? 'No native value label assigned']), ['code-cell', 'code-cell', '']));
     } else if (stata.storage_conversion === 'integer_code_strings_to_numeric') {
       panel.append(el('p', 'scope-note', 'Canonical integer strings become the same numeric codes in Stata. Original Parquet values are unchanged.'));
     }
@@ -693,11 +709,20 @@
     previous.records.forEach(([record, wasOpen]) => { record.open = wasOpen; });
     if (previous.codeSearch) { previous.codeSearch.value = previous.query; previous.codeSearch.dispatchEvent(new Event('input')); }
   });
+  const skipLink = document.querySelector('.skip-link');
+  skipLink.addEventListener('click', (event) => {
+    const search = byId('search');
+    if (search.disabled) return;
+    event.preventDefault();
+    byId('explorer').classList.remove('detail-open');
+    search.focus();
+    search.scrollIntoView({ block: 'nearest' });
+  });
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && downloadMenu.open) {
       downloadMenu.open = false; downloadMenu.querySelector('summary').focus(); return;
     }
-    if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && !['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+    if (event.key === '/' && !byId('search').disabled && !event.ctrlKey && !event.metaKey && !event.altKey && !['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
       event.preventDefault(); byId('explorer').classList.remove('detail-open'); byId('search').focus();
     }
     if (event.key === 'Escape' && isMobile() && byId('explorer').classList.contains('detail-open')) backToResults();

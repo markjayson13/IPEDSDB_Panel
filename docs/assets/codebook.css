@@ -279,10 +279,12 @@ main { max-width: 1800px; margin: 0 auto; padding: 0 28px; }
   .site-footer { display: block; font-size: 11px; line-height: 1.7; }
   .site-footer > span { display: block; margin-bottom: 5px; }
 }
+@media (max-width: 480px) {
+  .header-actions { justify-content: space-between; width: 100%; }
+}
 @media (max-width: 440px) {
   .site-header { gap: 0; }
   .header-identity { width: 100%; padding-top: 5px; }
-  .header-actions { justify-content: space-between; width: 100%; }
   .download-panel { width: 330px; }
   main { padding: 0 12px; }
   .site-header { padding-left: 12px; padding-right: 12px; }

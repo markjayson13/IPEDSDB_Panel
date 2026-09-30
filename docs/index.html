@@ -25,11 +25,11 @@
         <div class="download-panel">
           <p class="download-heading">Download reference files</p>
           <p class="download-explanation">Definitions and labels only; these files contain no institution-level data.</p>
-          <a href="./codebook/codebook.csv" aria-label="Download variable dictionary CSV for 2004-2023" download="ipeds-2004-2023-dictionary.csv">Variable dictionary <span>Names, labels, coverage and storage · CSV</span></a>
-          <a href="./codebook/definitions.csv.gz" aria-label="Download compressed definitions CSV for 2004-2023" download="ipeds-2004-2023-definitions.csv.gz">Definitions by year <span>Full source definitions · Compressed CSV</span></a>
-          <a href="./codebook/value-labels.csv" aria-label="Download category-label CSV for 2004-2023" download="ipeds-2004-2023-value-labels.csv">Category labels <span>Original codes and year-specific meanings · CSV</span></a>
+          <a href="./codebook/codebook.csv" aria-label="Variable dictionary, CSV for 2004-2023" download="ipeds-2004-2023-dictionary.csv">Variable dictionary <span>Names, labels, coverage and storage · CSV</span></a>
+          <a href="./codebook/definitions.csv.gz" aria-label="Definitions by year, compressed CSV for 2004-2023" download="ipeds-2004-2023-definitions.csv.gz">Definitions by year <span>Full source definitions · Compressed CSV</span></a>
+          <a href="./codebook/value-labels.csv" aria-label="Category labels, CSV for 2004-2023" download="ipeds-2004-2023-value-labels.csv">Category labels <span>Original codes and year-specific meanings · CSV</span></a>
 
-          <a href="./codebook/manifest.json" aria-label="Download codebook checksums JSON for 2004-2023" download="ipeds-2004-2023-codebook-manifest.json">File checksums <span>Release identity and SHA-256 · JSON</span></a>
+          <a href="./codebook/manifest.json" aria-label="File checksums, JSON for 2004-2023" download="ipeds-2004-2023-codebook-manifest.json">File checksums <span>Release identity and SHA-256 · JSON</span></a>
         </div>
       </details>
     </nav>
@@ -69,9 +69,9 @@
         <button class="button secondary" id="download-filtered" disabled>Save list as CSV <span id="download-matching-count">CSV</span></button>
       </div>
       <div class="filter-toolbar">
-        <label>Values in year <select id="year-filter" disabled><option value="">All years</option></select></label>
-        <label>Source <select id="source-filter" disabled><option value="">All sources</option></select></label>
-        <label>Category labels <select id="code-filter" disabled><option value="">Any</option><option value="coded">Documented</option><option value="uncoded">Not documented</option></select></label>
+        <label for="year-filter"><span id="year-filter-label">Values in year</span> <select id="year-filter" aria-labelledby="year-filter-label" disabled><option value="">All years</option></select></label>
+        <label for="source-filter"><span id="source-filter-label">Source</span> <select id="source-filter" aria-labelledby="source-filter-label" disabled><option value="">All sources</option></select></label>
+        <label for="code-filter"><span id="code-filter-label">Category labels</span> <select id="code-filter" aria-labelledby="code-filter-label" disabled><option value="">Any</option><option value="coded">Documented</option><option value="uncoded">Not documented</option></select></label>
         <label class="check-filter"><input type="checkbox" id="gap-filter" disabled> Known metadata gaps</label>
         <button class="reset-button" id="reset-filters" disabled>Reset</button>
       </div>
