@@ -121,8 +121,17 @@ def test_release_interfaces_use_separate_data_and_shared_assets():
     assert 'src="../assets/codebook.js"' in extension
     assert 'href="./codebook/ipeds-panel-codebook.pdf"' in extension
     assert 'href="../"' in extension
-    assert "2004-2024 · Mixed final/provisional" in extension
-    assert "unchanged 2004-2023 final codebook" in extension
+    assert 'href="./" aria-current="page">2004-2024' in extension
+    assert 'href="./" aria-current="page">2004-2023' in final
+    assert "Includes provisional 2024 data" in extension
+    assert 'id="download-crosswalk" href="./codebook/column-crosswalk.csv"' in extension
+    for page in (final, extension):
+        assert 'href="#search"' in page
+        assert 'id="navigation-notice"' in page
+        assert 'id="search-status"' in page
+        assert 'id="download-filtered"' in page
+        assert 'id="download-filtered" disabled>Save list as CSV' in page
+        assert 'Other filters cover all years' in page
 
 
 def test_consolidated_release_exposes_each_original_column_and_its_years():

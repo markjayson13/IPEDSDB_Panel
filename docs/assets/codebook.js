@@ -22,7 +22,9 @@
     }
     return ranges.join(', ') || 'Not supplied';
   }
-  const state = { index: null, matches: [], selected: null, detail: null, limit: 100, tab: 'definition', token: 0 };
+  const state = { index: null, matches: [], selected: null, detail: null, limit: 100, tab: 'definition', token: 0, aliases: new Map() };
+  const tabNames = ['definition', 'codes', 'sources', 'stata'];
+  let searchTimer;
   const cache = new Map();
   const controls = ['search', 'year-filter', 'source-filter', 'code-filter', 'gap-filter', 'reset-filters', 'download-filtered'];
   const selectedYear = () => Number(byId('year-filter').value) || null;
@@ -37,6 +39,21 @@
   }
   function addField(dl, name, value) {
     dl.append(el('dt', '', name), el('dd', value === null || value === undefined || value === '' ? 'blank-value' : '', values(value)));
+  }
+  function addSourceField(dl, name, value) {
+    if (typeof value === 'string' && /^https?:\/\//i.test(value)) {
+      try {
+        const url = new URL(value);
+        if (url.protocol === 'http:' || url.protocol === 'https:') {
+          const link = el('a', 'source-link', value);
+          link.href = url.href;
+          const field = el('dd'); field.append(link);
+          dl.append(el('dt', '', name), field);
+          return;
+        }
+      } catch (_) { /* Preserve malformed source text without creating a link. */ }
+    }
+    addField(dl, name, value);
   }
   function table(headers, rows, classes = []) {
     const wrap = el('div', 'data-table-wrap');
@@ -69,6 +86,67 @@
     if (typeof name !== 'string' || !/^[a-zA-Z0-9._-]+$/.test(name)) return null;
     return `./codebook/${name}`;
   }
+  // RFC 4180 field quoting, including embedded commas, newlines and doubled quotes.
+  function parseCsv(text) {
+    const rows = []; let row = [], field = '', quoted = false, closed = false;
+    text = text.replace(/^\uFEFF/, '');
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (quoted) {
+        if (char === '"' && text[i + 1] === '"') { field += '"'; i++; }
+        else if (char === '"') { quoted = false; closed = true; }
+        else field += char;
+      } else if (char === '"') {
+        if (field || closed) throw new Error('Invalid quoted crosswalk field.');
+        quoted = true;
+      } else if (char === ',' || char === '\r' || char === '\n') {
+        row.push(field); field = ''; closed = false;
+        if (char !== ',') {
+          rows.push(row); row = [];
+          if (char === '\r' && text[i + 1] === '\n') i++;
+        }
+      } else {
+        if (closed) throw new Error('Invalid text after a quoted crosswalk field.');
+        field += char;
+      }
+    }
+    if (quoted) throw new Error('Unclosed crosswalk field.');
+    if (field || closed || row.length) { row.push(field); rows.push(row); }
+    return rows;
+  }
+  async function loadAliases() {
+    const filename = (state.index.downloads || {}).column_crosswalk;
+    if (!filename) return;
+    const note = byId('search-status') || el('p', 'search-note');
+    note.textContent = 'Loading original column names…'; note.setAttribute('role', 'status');
+    if (!note.isConnected) { note.id = 'alias-search-note'; byId('search').closest('.search-toolbar').after(note); }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    try {
+      const path = downloadPath(filename);
+      if (!path) throw new Error('Invalid crosswalk filename.');
+      const response = await fetch(path, { signal: controller.signal });
+      if (!response.ok) throw new Error('Crosswalk unavailable.');
+      const rows = parseCsv(await response.text());
+      const headers = rows.shift() || [];
+      const canonical = headers.indexOf('canonical_name'), original = headers.indexOf('original_column');
+      if (canonical < 0 || original < 0 || !rows.length) throw new Error('Invalid crosswalk columns.');
+      const names = new Set(state.index.variables.map((item) => item.name));
+      const aliases = new Map(), owners = new Map();
+      rows.forEach((row) => {
+        if (row.length !== headers.length || !names.has(row[canonical]) || !row[original]) throw new Error('Invalid crosswalk record.');
+        if (owners.has(row[original]) && owners.get(row[original]) !== row[canonical]) throw new Error('Ambiguous original column.');
+        owners.set(row[original], row[canonical]);
+        if (!aliases.has(row[canonical])) aliases.set(row[canonical], []);
+        aliases.get(row[canonical]).push(row[original]);
+      });
+      state.aliases = aliases;
+      note.textContent = 'Original column names are searchable.';
+      if (byId('search').value.trim()) applyFilters();
+    } catch (_) {
+      note.textContent = 'Original column lookup is unavailable. Search still covers current names, labels and sources.';
+    } finally { clearTimeout(timeout); }
+  }
   function configureDownloads() {
     const mappings = { dictionary: 'codebook.csv', definitions: 'definitions.csv.gz', value_labels: 'value-labels.csv', pdf: 'ipeds-panel-codebook.pdf' };
     Object.entries(mappings).forEach(([key, fallback]) => {
@@ -79,7 +157,8 @@
       document.querySelectorAll('a').forEach((link) => {
         if (oldPaths.includes(link.getAttribute('href'))) {
           link.href = path;
-          if (filename.endsWith('.gz') && !link.textContent.includes('(gzip)')) link.append(document.createTextNode(' (gzip)'));
+          link.download = `${state.index.release}-${filename}`;
+          if (filename.endsWith('.gz') && !/gzip|compressed/i.test(link.textContent)) link.append(document.createTextNode(' (gzip)'));
         }
       });
     });
@@ -95,16 +174,17 @@
     content.append(el('p', '', `Release: ${index.release}. Panel keys: ${(index.panel_keys || []).join(' + ')}.`));
     (index.notes || []).forEach((note) => content.append(el('p', '', note)));
     if (index.downloads && index.downloads.column_crosswalk) {
-      const link = el('a', 'text-link', 'Download the original-to-canonical column crosswalk (CSV)');
+      const link = byId('download-crosswalk') || el('a', 'text-link', 'Original column names (CSV)');
       link.href = `./codebook/${index.downloads.column_crosswalk}`;
-      link.download = '';
-      content.append(link);
+      link.download = `${index.release}-${index.downloads.column_crosswalk}`;
+      link.hidden = false;
+      if (!link.isConnected) content.append(link);
     }
     const gapVariables = index.variables.filter((item) => item.has_issues);
     if (gapVariables.length) {
       const notice = el('div', 'gap-callout');
       notice.append(el('strong', '', `${number(gapVariables.length)} variables have documented metadata gaps.`));
-      notice.append(el('p', '', 'Use the Metadata gaps filter to inspect them. An undocumented meaning stays undocumented; a label from a different year is not evidence for that observation.'));
+      notice.append(el('p', '', 'Use the Metadata gaps filter to find these variables. Labels from another year do not resolve a missing definition.'));
       content.append(notice);
     }
     const hashes = el('details', 'technical-details');
@@ -122,6 +202,7 @@
     byId('list-range').textContent = state.matches.length ? `Showing ${number(Math.min(state.limit, state.matches.length))} of ${number(state.matches.length)}` : 'No matching variables';
     byId('show-more').hidden = state.matches.length <= state.limit;
     byId('download-filtered').disabled = !state.matches.length;
+    if (byId('download-matching-count')) byId('download-matching-count').textContent = number(state.matches.length);
     if (!state.matches.length) {
       const empty = el('div', 'empty-results');
       empty.append(el('strong', '', 'No matching variables'), el('p', '', 'Try a shorter search or broaden the source and year filters.'), button('Clear all filters', '', resetFilters));
@@ -141,25 +222,56 @@
       if (item.has_issues) { const dot = el('span', 'gap-dot'); dot.title = 'Documented metadata gap'; dot.setAttribute('aria-hidden', 'true'); icons.append(dot); }
       top.append(icons);
       row.append(top, el('span', 'variable-label', item.label || 'Label not supplied'));
+      const query = byId('search').value.trim().toLocaleLowerCase();
+      const alias = (state.aliases.get(item.name) || []).find((name) => name.toLocaleLowerCase() === query);
+      if (alias) row.append(el('span', 'variable-alias', `Previously ${alias}`));
       fragment.append(row);
     });
     list.append(fragment);
   }
-  function applyFilters() {
+  function navigationNotice(message = '') {
+    let notice = byId('navigation-notice');
+    if (!notice) {
+      notice = el('div', 'navigation-notice'); notice.id = 'navigation-notice'; notice.setAttribute('role', 'status');
+      byId('load-error').after(notice);
+    }
+    notice.hidden = !message;
+    notice.replaceChildren();
+    if (message) notice.append(el('p', '', message), button('Clear filters and browse variables', 'reset-button', resetFilters));
+  }
+  function applyFilters(options = {}) {
     if (!state.index) return;
+    clearTimeout(searchTimer);
+    if (!options.keepNotice) navigationNotice();
     const query = byId('search').value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
     const year = selectedYear();
     const source = byId('source-filter').value;
     const codes = byId('code-filter').value;
     const gaps = byId('gap-filter').checked;
     state.matches = state.index.variables.filter((item) => {
-      const text = `${item.name} ${item.label} ${(item.sources || []).join(' ')}`.toLocaleLowerCase();
+      const text = `${item.name} ${item.label} ${(item.sources || []).join(' ')} ${(state.aliases.get(item.name) || []).join(' ')}`.toLocaleLowerCase();
       return query.every((word) => text.includes(word)) && (!year || (item.observed_years || []).includes(year)) &&
         (!source || (item.sources || []).includes(source)) && (!codes || (codes === 'coded' ? item.has_codes : !item.has_codes)) && (!gaps || item.has_issues);
     });
+    const exactQuery = byId('search').value.trim().toLocaleLowerCase();
+    if (exactQuery) {
+      const rank = (item) => item.name.toLocaleLowerCase() === exactQuery ? 0 :
+        (state.aliases.get(item.name) || []).some((alias) => alias.toLocaleLowerCase() === exactQuery) ? 1 : 2;
+      state.matches.sort((a, b) => rank(a) - rank(b));
+    }
     state.limit = 100;
+    let selectedFirst = false;
+    if (state.selected) {
+      const selectedPosition = state.matches.findIndex((item) => item.name === state.selected);
+      if (selectedPosition >= state.limit) {
+        state.matches.unshift(state.matches.splice(selectedPosition, 1)[0]);
+        selectedFirst = true;
+      }
+    }
+    document.querySelector('.list-caption').textContent = selectedFirst ? 'Selected variable first' : 'Name and label';
     renderList();
     byId('variable-list').scrollTop = 0;
+    if (options.select === false) return;
     if (state.selected && state.matches.some((item) => item.name === state.selected)) {
       if (state.detail) renderDetail(state.detail);
     } else if (state.matches.length) {
@@ -170,11 +282,13 @@
       state.token++;
       byId('variable-detail').setAttribute('aria-busy', 'false');
       const empty = el('div', 'detail-placeholder');
-      empty.append(el('h2', '', 'Broaden your search.'), el('p', '', 'No variables match all the active filters. Clear a filter to continue exploring.'));
+      empty.append(el('h2', '', 'No matching variables'), el('p', '', 'Clear a filter or try a different variable name.'));
       byId('variable-detail').replaceChildren(empty);
     }
+    if (options.sync !== false) updateLink(state.selected, true);
   }
   function resetFilters() {
+    byId('explorer').classList.remove('detail-open');
     byId('search').value = '';
     byId('year-filter').value = '';
     byId('source-filter').value = '';
@@ -185,10 +299,11 @@
   }
   function updateLink(name, replace = false) {
     const parameters = new URLSearchParams();
-    parameters.set('variable', name);
+    if (name) parameters.set('variable', name);
     if (selectedYear()) parameters.set('year', String(selectedYear()));
-    const hash = `#${parameters.toString()}`;
-    if (location.hash !== hash) history[replace ? 'replaceState' : 'pushState'](null, '', hash);
+    if (name && state.tab !== 'definition') parameters.set('tab', state.tab);
+    const hash = parameters.size ? `#${parameters.toString()}` : '';
+    if (location.hash !== hash) history[replace ? 'replaceState' : 'pushState'](null, '', `${location.pathname}${location.search}${hash}`);
   }
   function backToResults() {
     byId('explorer').classList.remove('detail-open');
@@ -199,10 +314,12 @@
   async function selectVariable(name, options = {}) {
     const item = state.index.variables.find((candidate) => candidate.name === name);
     if (!item) return;
+    navigationNotice();
     const changed = state.selected !== name;
     state.selected = name;
     state.detail = null;
-    if (changed) state.tab = 'definition';
+    if (options.tab && tabNames.includes(options.tab)) state.tab = options.tab;
+    else if (changed) state.tab = 'definition';
     const token = ++state.token;
     byId('variable-list').querySelectorAll('.variable-item').forEach((row) => row.setAttribute('aria-current', String(row.dataset.name === name)));
     if (options.navigate) updateLink(name);
@@ -252,19 +369,19 @@
   function renderDefinition(detail, panel) {
     const issue = renderIssues(detail);
     if (issue) panel.append(issue);
-    panel.append(el('h3', '', 'Definitions by year'), el('p', 'section-intro', 'Each definition applies only to its listed years. “Not supplied” means the source does not provide that text.'));
+    panel.append(el('h3', '', selectedYear() ? `Definition · ${selectedYear()}` : 'Definitions by year'));
     const definitions = (detail.definitions || []).filter(inYear);
     if (definitions.length) {
       definitions.forEach((definition) => {
         const block = el('section', 'definition-block');
-        block.append(el('span', 'year-tag', yearsLabel(selectedYear() ? [selectedYear()] : definition.years)));
-        block.append(el('h4', '', definition.label || 'Label not supplied'));
+        if (!selectedYear()) block.append(el('span', 'year-tag', yearsLabel(definition.years)));
+        if (!selectedYear() || definitions.length > 1) block.append(el('h4', '', definition.label || 'Label not supplied'));
         block.append(el('p', definition.description ? 'data-description' : 'blank-value', definition.description || 'Description not supplied'));
         panel.append(block);
       });
-    } else panel.append(el('p', 'blank-value', detail.description || 'No definition is supplied for this year selection.'));
+    } else panel.append(el('p', 'blank-value', selectedYear() ? `No definition is supplied for ${selectedYear()}.` : detail.description || 'No definition is supplied.'));
     const measurement = el('section', 'subsection');
-    measurement.append(el('h3', '', 'Measurement context'), el('p', 'section-intro', 'Unknown fields are not inferred from a variable name. Consult source reference periods before comparing years.'));
+    measurement.append(el('h3', '', 'Measurement metadata · full release'), el('p', 'section-intro', 'This summary covers all years. Year-specific reporting periods and populations are in Sources.'));
     const semantics = detail.semantic_metadata || {};
     const grid = el('dl', 'semantic-grid');
     ['units', 'currency', 'price_basis', 'reference_period'].forEach((key) => {
@@ -274,8 +391,10 @@
       let text = 'Not supplied';
       if (group && typeof group === 'object') {
         text = group.value !== null && group.value !== undefined && group.value !== '' ? values(group.value) :
-          (group.values && group.values.length ? group.values.map(values).join('; ') : 'Unknown in source metadata');
-        if (group.status && group.status !== 'complete') text += ` · ${readable(group.status)}`;
+          (group.values && group.values.length ? group.values.map(values).join('; ') : 'Not supplied');
+        if (group.status && group.status !== 'complete' && text !== 'Not supplied') {
+          text += group.status === 'unknown' ? ' · Not documented for every source record' : ` · ${readable(group.status)}`;
+        }
       } else if (group) text = values(group);
       item.append(el('dd', '', text));
       grid.append(item);
@@ -285,12 +404,12 @@
     panel.append(measurement);
   }
   function renderCodes(detail, panel) {
-    panel.append(el('h3', '', 'Category meanings'), el('p', 'section-intro', 'These are original panel codes, with meanings restricted to the documented years. Stata may represent string categories with different numeric codes; see the Stata tab.'));
+    panel.append(el('h3', '', 'Category meanings'), el('p', 'section-intro', 'Original panel codes and their documented years. The Stata tab lists any numeric codes assigned during export.'));
     const issue = renderIssues(detail);
     if (issue) panel.append(issue);
     const records = (detail.codes || []).filter(inYear);
     if (!records.length) {
-      panel.append(el('p', 'blank-value', 'No category labels are documented for this year selection. This does not establish that every value is continuous or uncoded.'));
+      panel.append(el('p', 'blank-value', 'No category labels are documented for this year selection.'));
     } else {
       const label = el('label', 'table-search');
       label.append(document.createTextNode('Find a code'));
@@ -309,7 +428,7 @@
     }
     if ((detail.code_provenance || []).length) {
       const source = el('section', 'subsection');
-      source.append(el('h3', '', 'Codebook evidence'), el('p', '', 'Some meanings use verified, same-year source dictionaries. Original records and the evidence for each addition are retained.'));
+      source.append(el('h3', '', 'Codebook evidence'), el('p', '', 'Verified additions retain their same-year sources and original records.'));
       const scoped = detail.code_provenance.filter(inYear);
       source.append(makeTechnical('Inspect code-label source evidence', scoped));
       if (detail.original_codes && detail.original_codes.length) source.append(makeTechnical('Preserved original code-label records', detail.original_codes.filter(inYear)));
@@ -317,7 +436,7 @@
     }
   }
   function renderSources(detail, panel) {
-    panel.append(el('h3', '', 'Source records'), el('p', 'section-intro', 'The physical table identifies the resolved source. Where a documented correction applies, the original dictionary table remains recorded separately.'));
+    panel.append(el('h3', '', 'Source records'), el('p', 'section-intro', 'Physical source tables, reporting periods and release status. Corrections retain the original dictionary reference.'));
     if (detail.column_consolidation) {
       const rule = detail.column_consolidation;
       panel.append(el('h3', '', 'Consolidated source columns'), el('p', '', rule.rationale || 'Verified source-table moves are represented by one column. Original values and year-specific definitions are retained.'));
@@ -336,19 +455,29 @@
       const fields = el('dl', 'record-fields');
       const definition = Number.isInteger(record.definition_index) ? (detail.definitions || [])[record.definition_index] || {} : {};
       const entries = [
-        ['Source component', record.source_file], ['Physical table', record.table], ['Original table', record.original_table],
-        ['Original variable', record.varname], ['Variable number', record.varnumber],
-        ['Source title', record.title || definition.label], ['Reference period', record.reference_period], ['Imputation variable', record.imputationvar]
+        ['Reporting period', record.source_table_reference_period || record.reference_period],
+        ['Reporting population', record.reporting_population_note],
+        ['Release status', record.release_type], ['Release date', record.source_release_date],
+        ['Physical table', record.table], ['Original dictionary table', record.original_table], ['Source component', record.source_file],
+        ['Original variable', record.varname], ['Source title', record.title || definition.label],
+        ['Source flag variable', record.imputationvar], ['Flag availability', record.imputation_flag_availability],
+        ['Source download', record.source_url], ['Reporting instructions', record.reporting_population_source]
       ];
-      entries.forEach(([name, value]) => addField(fields, name, value));
-      const excluded = new Set(['years', 'source_file', 'table', 'original_table', 'varname', 'varnumber', 'title', 'description', 'definition_index', 'reference_period', 'imputationvar', 'correction_id', 'correction_reason']);
-      Object.entries(record).forEach(([key, value]) => { if (!excluded.has(key) && value !== null && value !== '') addField(fields, readable(key), value); });
+      entries.forEach(([name, value]) => {
+        if (value !== undefined && value !== null && value !== '') addSourceField(fields, name, value);
+      });
       card.append(fields);
       if (record.correction_id || record.correction_reason) {
         const note = el('div', 'correction-note');
         note.append(el('strong', '', record.correction_id || 'Documented correction'), el('p', '', record.correction_reason || 'See the preserved verification evidence in this record.'));
         card.append(note);
       }
+      const evidence = el('details', 'source-evidence');
+      evidence.append(el('summary', '', 'Full source record and verification evidence'));
+      const provenance = el('dl', 'record-fields');
+      Object.entries(record).forEach(([key, value]) => addSourceField(provenance,
+        key === 'academic_year_label' ? 'Release designation' : readable(key), value));
+      evidence.append(provenance); card.append(evidence);
       panel.append(card);
     });
   }
@@ -376,6 +505,8 @@
     const container = byId('variable-detail');
     container.replaceChildren();
     container.append(button('← Back to variables', 'mobile-back', backToResults));
+    const releaseContext = el('p', 'reference-context', `${yearsLabel(state.index.years)} · ${state.index.release}. ${document.querySelector('.release-status strong').textContent}`);
+    container.append(releaseContext);
     const header = el('header');
     const top = el('div', 'detail-header-top');
     const badges = el('div', 'detail-kicker');
@@ -383,7 +514,7 @@
     if (!detail.sources || !detail.sources.length) badges.append(el('span', 'pill', 'Panel variable'));
     if (detail.has_issues) badges.append(el('span', 'pill warning', 'Metadata gaps'));
     const actions = el('div', 'detail-actions');
-    const copy = button('Copy link ↗', '', async () => {
+    const copy = button('Copy link', '', async () => {
       updateLink(detail.name, true);
       try { await navigator.clipboard.writeText(location.href); copy.textContent = 'Link copied'; announce('Variable link copied.'); }
       catch (_) {
@@ -391,36 +522,47 @@
         actions.append(field); field.focus(); field.select(); copy.textContent = 'Select and copy';
       }
     });
-    actions.append(copy, button('Print variable', '', () => {
-      const codeSearch = container.querySelector('.table-search input');
-      const previousCodeSearch = codeSearch ? codeSearch.value : '';
-      if (codeSearch) { codeSearch.value = ''; codeSearch.dispatchEvent(new Event('input')); }
-      const restore = [];
-      container.querySelectorAll('.record-card').forEach((record) => { restore.push([record, record.open]); record.open = true; });
-      window.print();
-      restore.forEach(([record, wasOpen]) => { record.open = wasOpen; });
-      if (codeSearch) { codeSearch.value = previousCodeSearch; codeSearch.dispatchEvent(new Event('input')); }
-    }));
+    actions.append(copy, button('Print variable', '', () => window.print()));
     top.append(badges, actions);
     const heading = el('h2', 'detail-name', detail.name); heading.id = 'detail-heading'; heading.tabIndex = -1;
-    header.append(top, heading, el('p', 'detail-label', detail.label || 'Label not supplied'));
+    const scopedLabels = [...new Set((detail.definitions || []).filter(inYear).map((record) => record.label).filter(Boolean))];
+    const visibleLabel = selectedYear() && scopedLabels.length === 1 ? scopedLabels[0] : detail.label;
+    header.append(top, heading, el('p', 'detail-label', visibleLabel || 'Label not supplied'));
     const facts = el('dl', 'facts');
     const observed = (detail.observed_years || []).length;
-    [['Observed years', yearsLabel(detail.observed_years)], ['Parquet storage', detail.storage_type || 'Not supplied'], ['Missing observations', detail.null_count === null || detail.null_count === undefined ? 'Not supplied' : number(detail.null_count)], ['Coverage', `${observed} year${observed === 1 ? '' : 's'} with values`]].forEach(([label, value]) => {
+    const hasCount = Number.isInteger(detail.null_count) && Number.isInteger(state.index.row_count);
+    [['Years with values', observed ? yearsLabel(detail.observed_years) : 'No reported values'],
+      ['Parquet storage', detail.storage_type || 'Not supplied'],
+      ['Missing rows · full release', hasCount ? `${number(detail.null_count)} / ${number(state.index.row_count)}` : 'Not supplied'],
+      ['Reported rows · full release', hasCount ? number(state.index.row_count - detail.null_count) : 'Not supplied']].forEach(([label, value]) => {
       const group = el('div'); addField(group, label, value); facts.append(group);
     });
     header.append(facts); container.append(header);
-    if (selectedYear()) container.append(el('p', 'scope-note', `Viewing definitions, category meanings, and sources for ${selectedYear()}. Variable coverage, gaps, and Stata export labels describe the full release.`));
+    const yearControl = el('label', 'detail-year-control', 'Values in year');
+    const yearSelect = el('select'); yearSelect.id = 'detail-year-filter';
+    const allYears = el('option', '', 'All years'); allYears.value = ''; yearSelect.append(allYears);
+    (detail.observed_years || []).forEach((year) => { const option = el('option', '', year); option.value = year; yearSelect.append(option); });
+    yearSelect.value = byId('year-filter').value;
+    yearSelect.addEventListener('change', () => {
+      byId('year-filter').value = yearSelect.value;
+      applyFilters({ select: false });
+      renderDetail(detail); updateLink(detail.name, true);
+      byId('detail-year-filter').focus({ preventScroll: true });
+      announce(selectedYear() ? `Showing ${detail.name} definitions and sources for ${selectedYear()}.` : `Showing ${detail.name} for all years.`);
+    });
+    yearControl.append(yearSelect); container.append(yearControl);
+    if (selectedYear()) container.append(el('p', 'scope-note', `Definitions, codes and sources: ${selectedYear()}. Counts, measurement summary, gaps and Stata labels cover the full release.`));
     const tabs = el('div', 'detail-tabs'); tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', 'Variable reference sections');
     const panels = [];
     const sections = [['definition', 'Definition', renderDefinition], ['codes', 'Category labels', renderCodes], ['sources', 'Sources', renderSources], ['stata', 'Stata', renderStata]];
-    const activate = (key, focus = false) => {
+    const activate = (key, focus = false, navigate = false) => {
       state.tab = key;
       tabs.querySelectorAll('button').forEach((tab) => { const selected = tab.dataset.tab === key; tab.setAttribute('aria-selected', String(selected)); tab.tabIndex = selected ? 0 : -1; if (selected && focus) tab.focus(); });
       panels.forEach((panel) => { panel.hidden = panel.dataset.tab !== key; });
+      if (navigate) updateLink(detail.name);
     };
     sections.forEach(([key, title, renderer]) => {
-      const tab = button(title, '', () => activate(key)); tab.dataset.tab = key; tab.id = `tab-${key}`; tab.setAttribute('role', 'tab'); tab.setAttribute('aria-controls', `panel-${key}`);
+      const tab = button(title, '', () => activate(key, false, true)); tab.dataset.tab = key; tab.id = `tab-${key}`; tab.setAttribute('role', 'tab'); tab.setAttribute('aria-controls', `panel-${key}`);
       tabs.append(tab);
       const panel = el('section', 'tab-panel'); panel.id = `panel-${key}`; panel.dataset.tab = key; panel.dataset.printTitle = title; panel.setAttribute('role', 'tabpanel'); panel.setAttribute('aria-labelledby', tab.id); panel.tabIndex = 0;
       renderer(detail, panel); panels.push(panel);
@@ -432,44 +574,67 @@
       else if (event.key === 'Home') position = 0;
       else if (event.key === 'End') position = keys.length - 1;
       else return;
-      event.preventDefault(); activate(keys[position], true);
+      event.preventDefault(); activate(keys[position], true, true);
     });
     container.append(tabs, ...panels);
     activate(state.tab);
   }
   function exportResults() {
+    applyFilters();
+    if (!state.matches.length) { announce('No matching variables to download.'); return; }
     const quote = (value) => {
       let text = String(value ?? '');
       // Prevent spreadsheet formula interpretation when opening the reference CSV.
       if (/^[=+@\t\r]/.test(text) || /^-\D/.test(text)) text = `'${text}`;
       return `"${text.replaceAll('"', '""')}"`;
     };
-    const rows = [['variable', 'label', 'storage_type', 'stata_name', 'observed_years', 'sources', 'metadata_status', 'has_category_labels', 'has_metadata_gaps', 'missing_observations', 'release', 'selected_year_filter']];
+    const rows = [['variable', 'label', 'storage_type', 'stata_name', 'observed_years', 'sources', 'metadata_status', 'has_category_labels', 'has_metadata_gaps', 'missing_rows_full_release', 'release', 'selected_year_filter']];
     state.matches.forEach((item) => rows.push([item.name, item.label, item.storage_type, item.stata_name, yearsLabel(item.observed_years), (item.sources || []).join('; '), item.metadata_status, item.has_codes, item.has_issues, item.null_count, state.index.release, selectedYear() || 'all']));
     const csv = '\uFEFF' + rows.map((row) => row.map(quote).join(',')).join('\r\n') + '\r\n';
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-    const link = el('a'); link.href = url; link.download = 'ipeds-codebook-search-results.csv'; document.body.append(link); link.click(); link.remove();
+    const link = el('a'); link.href = url; link.download = `${state.index.release}-matching-variables.csv`; document.body.append(link); link.click(); link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     announce(`Exported metadata summaries for ${number(state.matches.length)} variables.`);
   }
   function readLink() {
     if (!state.index) return false;
+    if (location.hash && !location.hash.includes('=')) return false;
+    clearTimeout(searchTimer);
     const parameters = new URLSearchParams(location.hash.slice(1));
     const name = parameters.get('variable');
-    if (!name) { if (isMobile()) byId('explorer').classList.remove('detail-open'); return false; }
-    const item = state.index.variables.find((variable) => variable.name === name);
-    if (!item) { announce(`Variable ${name} is not in this release.`); return false; }
     // A deep link is self-contained, including when reached through browser Back.
     // Unrelated search and source filters must not hide its selected variable.
     byId('search').value = '';
     byId('source-filter').value = '';
     byId('code-filter').value = '';
     byId('gap-filter').checked = false;
+    byId('year-filter').value = '';
+    if (!name) {
+      byId('explorer').classList.remove('detail-open');
+      applyFilters();
+      return true;
+    }
+    const item = state.index.variables.find((variable) => variable.name === name);
+    if (!item) {
+      state.selected = null; state.detail = null; state.token++;
+      applyFilters({ select: false, sync: false, keepNotice: true });
+      navigationNotice(`“${name}” is not a variable in this release. Check its spelling or switch to the other release.`);
+      const empty = el('div', 'detail-placeholder');
+      empty.append(el('h2', '', 'Variable not found'), el('p', '', 'Choose a variable from the results or clear the link to start again.'), button('Browse variables', '', resetFilters));
+      byId('variable-detail').replaceChildren(empty);
+      byId('variable-detail').setAttribute('aria-busy', 'false');
+      byId('explorer').classList.remove('detail-open');
+      return true;
+    }
     const year = parameters.get('year');
     if (year && state.index.years.includes(Number(year)) && (item.observed_years || []).includes(Number(year))) byId('year-filter').value = year;
-    else byId('year-filter').value = '';
-    applyFilters();
-    selectVariable(name, { navigate: false, focus: false, openMobile: true });
+    const tab = tabNames.includes(parameters.get('tab')) ? parameters.get('tab') : 'definition';
+    state.selected = name;
+    applyFilters({ select: false, sync: false });
+    selectVariable(name, { navigate: false, focus: false, openMobile: true, tab });
+    if (year && !selectedYear()) navigationNotice(`Year “${year}” is not available in the reported-value coverage for ${name}. Showing all documented years.`);
+    if (parameters.get('tab') && !tabNames.includes(parameters.get('tab'))) navigationNotice('That reference section does not exist. Showing the Definition tab.');
+    updateLink(name, true);
     return true;
   }
   async function load() {
@@ -483,7 +648,8 @@
       (index.sources || []).forEach((source) => { const option = el('option', '', source); option.value = source; byId('source-filter').append(option); });
       controls.forEach((id) => { byId(id).disabled = false; });
       byId('variable-list').setAttribute('aria-busy', 'false');
-      if (!readLink()) applyFilters();
+      if (!readLink()) applyFilters({ sync: false });
+      loadAliases();
     } catch (error) {
       const box = byId('load-error'); box.hidden = false;
       box.replaceChildren(el('p', '', 'The interactive codebook could not be loaded.'), el('p', '', `${error.message} The PDF and CSV downloads remain available above.`), button('Reload codebook', 'retry-button', () => location.reload()));
@@ -492,14 +658,45 @@
       byId('result-count').textContent = 'Unavailable';
     }
   }
-  byId('search').addEventListener('input', applyFilters);
-  ['year-filter', 'source-filter', 'code-filter', 'gap-filter'].forEach((id) => byId(id).addEventListener('change', applyFilters));
+  byId('search').addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => applyFilters(), 120); });
+  ['year-filter', 'source-filter', 'code-filter', 'gap-filter'].forEach((id) => byId(id).addEventListener('change', () => applyFilters()));
   byId('reset-filters').addEventListener('click', resetFilters);
   byId('download-filtered').addEventListener('click', exportResults);
   byId('download-filtered').title = 'Download a CSV metadata summary for all matching variables';
-  byId('show-more').addEventListener('click', () => { const position = byId('variable-list').scrollTop; state.limit += 100; renderList(); byId('variable-list').scrollTop = position; });
+  byId('show-more').addEventListener('click', () => {
+    const list = byId('variable-list'), firstNew = state.limit, position = list.scrollTop;
+    state.limit += 100; renderList();
+    const next = list.children[firstNew];
+    if (next) { next.focus({ preventScroll: true }); next.scrollIntoView({ block: 'nearest' }); }
+    else { list.scrollTop = position; byId('search').focus({ preventScroll: true }); }
+    announce(`Showing ${number(Math.min(state.limit, state.matches.length))} of ${number(state.matches.length)} variables.`);
+  });
   window.addEventListener('hashchange', readLink);
+  const downloadMenu = document.querySelector('.download-menu');
+  document.addEventListener('pointerdown', (event) => {
+    if (downloadMenu.open && !downloadMenu.contains(event.target)) downloadMenu.open = false;
+  });
+  let printState;
+  window.addEventListener('beforeprint', () => {
+    if (printState) return;
+    const container = byId('variable-detail');
+    const codeSearch = container.querySelector('.table-search input');
+    printState = { codeSearch, query: codeSearch ? codeSearch.value : '', records: [] };
+    if (codeSearch) { codeSearch.value = ''; codeSearch.dispatchEvent(new Event('input')); }
+    container.querySelectorAll('.record-card, .source-evidence').forEach((record) => {
+      printState.records.push([record, record.open]); record.open = true;
+    });
+  });
+  window.addEventListener('afterprint', () => {
+    if (!printState) return;
+    const previous = printState; printState = null;
+    previous.records.forEach(([record, wasOpen]) => { record.open = wasOpen; });
+    if (previous.codeSearch) { previous.codeSearch.value = previous.query; previous.codeSearch.dispatchEvent(new Event('input')); }
+  });
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && downloadMenu.open) {
+      downloadMenu.open = false; downloadMenu.querySelector('summary').focus(); return;
+    }
     if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && !['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
       event.preventDefault(); byId('explorer').classList.remove('detail-open'); byId('search').focus();
     }

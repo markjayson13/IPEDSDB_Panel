@@ -6,6 +6,29 @@ the former Pages landing page and variable-browser snapshot. It describes
 definitions, category codes, Stata names and encodings, source table references,
 documented corrections, and unresolved source gaps.
 
+The [2004-2024 codebook](https://markjayson13.github.io/IPEDSDB_Panel/provisional/)
+describes the separately published extension: 2,676 variables, including 95
+consolidated variables. Its release tab identifies the provisional 2024 sources.
+Both interfaces use the same compact search and reference layout.
+
+## Using the reference
+
+- Search by variable name, label or source. The extension also recognizes the
+  204 original column names in its downloadable crosswalk.
+- `Values in year` requires a nonmissing value in that year. All-null variables
+  remain searchable under `All years`. Source, category-label and metadata-gap
+  filters cover the complete release.
+- Variable links preserve the selected year and reference section. On phones,
+  a year selector remains available inside the variable view.
+- Source records lead with reporting period, population and release status.
+  Original table references, corrections and verification evidence remain
+  accessible below the summary.
+- `Save list as CSV` downloads summaries of the matching variables, not panel
+  observations. Missing-row counts describe the full release. Reference-table
+  and PDF downloads use release-specific filenames.
+- Keyboard users can press `/` to search and use arrow keys between reference
+  tabs. Printing includes all four sections and the release identity.
+
 The searchable interface and full downloadable PDF use the same generated
 metadata. The PDF has an alphabetical linked index and variable bookmarks.
 Dictionary and value-label CSV downloads are provided; large CSVs use gzip

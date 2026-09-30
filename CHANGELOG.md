@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Redesign both public codebooks as compact reference tools, with original-column lookup, persistent year/section links, clearer source records, mobile year controls, and release-specific downloads.
 - Include a checksum-pinned historical pipeline source snapshot so fresh clones can reproduce the metadata repair and extension without an unavailable local Git commit.
 - Add a separate 2024 extension workflow with frozen official sources, exact source mappings, preserved historical values, native Stata checks, and a versioned codebook.
 - Preserve actual item and revision flags in keyed, labeled source supplements.
