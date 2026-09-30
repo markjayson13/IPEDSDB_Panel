@@ -51,11 +51,12 @@ def main() -> None:
             bad_patterns.append(rel)
 
     rows.sort(reverse=True)
-    # The complete user codebook includes every historical definition. This
-    # single documentation asset has a bounded allowance; data limits stay put.
+    # The two complete codebooks include every historical definition. Only
+    # these named documentation assets have a larger allowance; data limits stay put.
     too_large = [(size, rel) for size, rel in rows
                  if size > (max(threshold_bytes, 16 * 1024 * 1024)
-                            if rel == "docs/codebook/ipeds-panel-codebook.pdf" else threshold_bytes)]
+                            if rel in {"docs/codebook/ipeds-panel-codebook.pdf",
+                                       "docs/provisional/codebook/ipeds-panel-codebook.pdf"} else threshold_bytes)]
 
     print(f"Tracked files scanned: {len(rows)}")
     print(f"Max allowed size: {args.max_file_size_mb:.2f} MB")

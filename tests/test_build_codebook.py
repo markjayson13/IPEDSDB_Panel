@@ -142,6 +142,47 @@ def test_published_manifest_binds_metadata_to_data_before_writing(tmp_path):
     assert not output.exists()
 
 
+def test_explicit_candidate_uses_only_its_manifest_and_records_provisional_status(tmp_path):
+    candidate = tmp_path / "Provisional"
+    candidate.mkdir()
+    stem = "Provisional/panel_clean_prch_2004_2024"
+    artifacts = []
+    for ext in ("parquet", "dta"):
+        data = tmp_path / f"{stem}.{ext}"
+        data.write_bytes(f"candidate {ext}".encode())
+        record = metadata(variable(source_metadata=[{
+            "year": 2024, "source_file": "SFA", "access_table_name": "SFA2324",
+            "varname": "V", "release_type": "Provisional", "source_release_date": "2025-12-09",
+            "source_member_sha256": "b" * 64,
+        }]))
+        record["data_sha256"] = sha256(data)
+        companion = data.with_name(data.name + ".metadata.json")
+        companion.write_text(json.dumps(record))
+        artifacts.extend({"path": str(p.relative_to(tmp_path)), "sha256": sha256(p)} for p in (data, companion))
+    manifest = candidate / "manifest.json"
+    manifest.write_text(json.dumps({"artifacts": artifacts, "release_name": "2024-extension-v1",
+                                    "source_release_status": "Mixed final/provisional"}))
+    output = tmp_path / "Codebook"
+    build(tmp_path, output, manifest_path=manifest, panel_relative=stem)
+    index = json.loads((output / "index.json").read_text())
+    assert index["release"] == "2024-extension-v1"
+    assert index["release_status"] == "Mixed final/provisional"
+    assert index["data_directory"] == "Provisional"
+    assert any(note.startswith("The full dataset has 1 variables.") for note in index["notes"])
+    assert not any("2,721" in note for note in index["notes"])
+    detail = json.loads((output / "variables-001.json").read_text())["V"]
+    assert detail["source_records"][0]["source_release_date"] == "2025-12-09"
+    assert detail["source_records"][0]["source_member_sha256"] == "b" * 64
+    assert not (tmp_path / "Final").exists()
+
+
+def test_candidate_options_must_be_paired_and_paths_stay_relative(tmp_path):
+    with pytest.raises(ValueError, match="both"):
+        build(tmp_path, tmp_path / "out", manifest_path=tmp_path / "manifest.json")
+    with pytest.raises(ValueError, match="safe relative stem"):
+        build(tmp_path, tmp_path / "out", manifest_path=tmp_path / "manifest.json", panel_relative="../other")
+
+
 def test_stata_identity_and_coverage_mismatch_rejected():
     index, details = parquet_codebook(metadata(variable()))
     with pytest.raises(ValueError, match="identities differ"):
@@ -194,6 +235,57 @@ def test_dictionary_csv_does_not_fill_missing_latest_description_from_older_year
     ]), [])
     row = build_codebook.dictionary_csv_row(detail)
     assert row["description"] == "" and row["description_years"] == "2006"
+
+
+def test_consolidation_detail_and_csv_preserve_exact_members_scopes_and_caveats(tmp_path):
+    rule = {
+        "canonical_name": "CAT", "rationale": "Same source measure, relocated table; values unchanged.",
+        "members": [
+            {"column": "CAT__OLD__00000001__A", "years": [2004, 2006]},
+            {"column": "CAT__NEW__00000001__B", "years": [2023, 2024]},
+        ],
+        "caveats": ["Code 1 changes meaning in 2024; keep year-specific labels.",
+                    "Do not infer coverage in 2005.\nReference periods remain distinct."],
+    }
+    v = variable(name="CAT", observed_years=[2004, 2006, 2023, 2024], column_consolidation=rule,
+                 year_scoped_definitions=[
+                     {"year": 2004, "label": "Earlier", "description": "Earlier definition"},
+                     {"year": 2024, "label": "Later", "description": "Later definition"},
+                 ], resolved_value_label_records=[
+                     {"year": 2004, "codevalue": "1", "valuelabel": "Earlier meaning", "source_file": "OLD"},
+                     {"year": 2024, "codevalue": "1", "valuelabel": "Later meaning", "source_file": "NEW"},
+                 ])
+    original = copy.deepcopy(v)
+    data = {**metadata(v), "column_count": 2, "variables": [v, variable(name="UNMERGED")]}
+    index, details = parquet_codebook(data)
+    write_assets(index, details, tmp_path)
+
+    saved = json.loads((tmp_path / "index.json").read_text())
+    item = next(row for row in saved["variables"] if row["name"] == "CAT")
+    detail = json.loads((tmp_path / item["detail_file"]).read_text())["CAT"]
+    assert detail["column_consolidation"] == rule
+    assert [(row["code"], row["label"], row["years"]) for row in detail["codes"]] == [
+        ("1", "Earlier meaning", [2004]), ("1", "Later meaning", [2024]),
+    ]
+    assert "column_consolidation" not in details["UNMERGED"]
+    assert v == original
+    with (tmp_path / saved["downloads"]["column_crosswalk"]).open(encoding="utf-8-sig", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    assert len(rows) == 2
+    assert {row["canonical_name"] for row in rows} == {"CAT"}
+    assert [(row["original_column"], json.loads(row["years"])) for row in rows] == [
+        (member["column"], member["years"]) for member in rule["members"]
+    ]
+    assert all(row["rationale"] == rule["rationale"] for row in rows)
+    assert all(json.loads(row["caveats"]) == rule["caveats"] for row in rows)
+
+
+def test_unconsolidated_codebook_does_not_advertise_a_column_crosswalk(tmp_path):
+    index, details = parquet_codebook(metadata(variable()))
+    write_assets(index, details, tmp_path)
+    saved = json.loads((tmp_path / "index.json").read_text())
+    assert "column_crosswalk" not in saved["downloads"]
+    assert not (tmp_path / "column-crosswalk.csv").exists()
 
 
 def test_shard_boundaries_keep_all_variables_and_gzip_csv_is_lossless(tmp_path, monkeypatch):

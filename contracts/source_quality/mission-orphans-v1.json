@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "policy_id": "mission-orphans-v1",
+  "action": "quarantine_from_2024_extension",
+  "reason": "Institution identity is unverified; these source records contain only a mission URL and are absent from the corresponding HD and FLAGS institution universes.",
+  "identity_claim": "Source provenance is verified. These records are not asserted to be confirmed fake institutions.",
+  "authorization": {
+    "status": "explicit_user_authorization",
+    "date": "2026-09-29",
+    "instruction": "Quarantine both 2019 and 2024 records from the new extension; preserve Final and original sources."
+  },
+  "required_nonnull_fields": [
+    "UNITID",
+    "year",
+    "MISSIONURL"
+  ],
+  "require_all_other_columns_null": true,
+  "records": [
+    {
+      "UNITID": 111111,
+      "year": 2019,
+      "MISSIONURL": "www.rti.ortg",
+      "evidence": {
+        "source_table": "IC2019Mission",
+        "audit_receipt_name": "2019-mission-audit/audit_summary.json",
+        "audit_receipt_sha256": "3caaafc690de1ed39fb33bd04fe0bac683caf0fbf89e253b83d788f2663e2913",
+        "original_database_sha256": "6e51f6db586bd8f064525bbdccdb7f3604eda714894595a6c8ea4957b25069af",
+        "original_archive_sha256": "5128168127fab451df3bba2fd14dd3b91ac90c4eeae9fc6fced79b1f7d5d1160",
+        "fresh_mission_csv_sha256": "5d49b6d883d7fa9c4cd54541d451079c2f2a71069bcd86feb41ffa76164b9d67",
+        "cached_mission_csv_sha256": "1e9176407db46275f49105efcd4e4456913de84bec0c203906b8295c9767611a",
+        "target_row_exactly_matches_cached_source": true,
+        "absent_from": [
+          "HD2019",
+          "FLAGS2019"
+        ],
+        "final_panel_nonnull_fields": [
+          "UNITID",
+          "year",
+          "MISSIONURL"
+        ],
+        "serialization_note": "Fresh mission export differs from cached serialization only by CRLF versus LF in one unrelated record; target row values match exactly."
+      }
+    },
+    {
+      "UNITID": 111111,
+      "year": 2024,
+      "MISSIONURL": "rti.org/about/offices_and_divisions/institutional_research_assessment%_and_analytics/about_us/mission_statements/usc_campus_mission_111111111111111111111111111111111111111111111111111111112222statements.php",
+      "evidence": {
+        "source_table": "IC2024Mission",
+        "audit_receipt_name": "2024_mission_orphan_source_audit.json",
+        "audit_receipt_sha256": "4686c6e763d1d94324c02cfb528d52669907e41bc8af2bbed610c920be7df974",
+        "original_database_sha256": "98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5",
+        "fresh_mission_csv_sha256": "dbb7609b9bbda75511b78413a731cc537fa152a1035cea812ea569e4bb7f495c",
+        "cached_mission_csv_sha256": "dbb7609b9bbda75511b78413a731cc537fa152a1035cea812ea569e4bb7f495c",
+        "verified_source_bundle_manifest_sha256": "36cf60a0d74c4cc0cf4ca58143040b3fc21cd453c6e672cbd9c4f52cad487f18",
+        "absent_from": [
+          "HD2024",
+          "FLAGS2024"
+        ]
+      }
+    }
+  ]
+}

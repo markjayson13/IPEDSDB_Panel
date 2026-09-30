@@ -1,0 +1,123 @@
+{
+  "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+  "review_basis": "Authorized integration audit using exact physical source columns, official exact-year metadata, preserved historical analysis identities, and source-specific PRCH definitions. No claim of separate manual author review.",
+  "source_database_sha256": "98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5",
+  "original_inputs": [
+    {
+      "file": "schema.sql",
+      "sha256": "d4403670a7823c11293aa88559f2c7b1636806908bdfb588d7046b6e1e8372af"
+    },
+    {
+      "file": "varTable24.csv",
+      "sha256": "391c7d0d8da641dffae5121cabfff22e41a8430195cc35cfa968783c607d2758"
+    },
+    {
+      "file": "valueSets24.csv",
+      "sha256": "e45824f0cd34f6a9f2c261bd83f8792f2e14fa47f4a93dc8582b592070876f22"
+    },
+    {
+      "file": "tables24.csv",
+      "sha256": "5f1395f06d70a4f5a3a768498dc7233245f32258bc0bcc19a1b86f2daf41d12c"
+    },
+    {
+      "file": "FLAGS2024.csv",
+      "sha256": "443e0a327aad3774712f14f9bbd9ca07a245b39868359a9f49dfcbaf49f81ff2"
+    }
+  ],
+  "physical_data_tables": 52,
+  "physical_data_columns": 2655,
+  "scalar_mapping_decisions": {
+    "same_source_variable_identity": 1465,
+    "exact_2023_number_name_relocated": 562,
+    "new_2024_identity": 64
+  },
+  "partial_child_without_reported_form": {
+    "UNITID": 475477,
+    "flag_fields": [
+      {
+        "UNITID": "475477",
+        "PRCH_F": "3",
+        "FORM_F": "-1",
+        "STAT_F": "5"
+      }
+    ],
+    "source_code_definitions": [
+      {
+        "VarName": "FORM_F",
+        "Codevalue": "3",
+        "ValueLabel": "Private for-profit institutions"
+      },
+      {
+        "VarName": "FORM_F",
+        "Codevalue": "-1",
+        "ValueLabel": "Not reported"
+      },
+      {
+        "VarName": "PRCH_F",
+        "Codevalue": "3",
+        "ValueLabel": "Partial child record - reports revenues/expenses. Assets/liabilties reported with parent"
+      }
+    ],
+    "variable_definitions": [
+      {
+        "VarName": "F3EQUITR",
+        "VarNumber": "66387",
+        "TableName": "DRVF2024",
+        "LongDescription": "Equity ratio for private-for profit institutions using Private for-profit standards is derived as follows:\r\nTotal liabilities (F3A02) is subtracted from total assets (F3A01). This amount is then divided by total assets (F3A01)\r\nLiabilities are debts and obligations of the institution owed to outsiders or claims or rights, expressed in monetary terms, of an institution\u2019s creditors. Two types of liabilities are often defined, short-term and long term. Short-term liabilities are those that will be satisfied or paid within one year. Long-term liabilities are those which will not be satisfied within a year. Liabilities include: 1) accounts payable; 2) deferred revenues and refundable advances; 3) Post-retirement and post-employment obligations; 4) other accrued liabilities; 5) annuity and life income obligations and other amounts held for the benefits of others; 6) bonds, notes, and capital leases payable and other long-term debt, including current portions; 7) government grants refundable under student loan programs; and 8) other liabilities (those liabilities not falling in one or more of the above seven categories). The exact categories of liabilities that must be used are not specified and the above are examples only. \r\nAssets  Physical items (tangible) or rights (intangible) that have value and that are owned by the institution. Assets are useful to the institution because they are a source of future services or because they can be used to secure future benefits.  Assets are usually divided into two categories, current and fixed. Current assets are those that can be readily turned into cash. Fixed assets are those which cannot readily be turned into cash without disrupting the operation of the institution. Fixed assets include intangible assets consisting of certain nonmaterial rights and benefits of an institution, such as patents, copyrights, trademarks and goodwill. Categories of assets include the following items: 1) cash, cash equivalents, and temporary investments; 2) receivables (net of allowance for uncollectible accounts); 3) inventories, prepaid expenses, and deferred charges; 4) amounts held by trustees for construction and debt services; 5) long-term investments; 6) plant, property, and equipment; and 7) other assets (those assets not falling in one ore more of the above six categories). The exact categories of assets that must be used are not specified and the above are examples only."
+      },
+      {
+        "VarName": "F3SALRPC",
+        "VarNumber": "67045",
+        "TableName": "DRVF2024",
+        "LongDescription": "Salaries and wage expenses as a percent of total expenses for private not-for-profit institutions is derived as follows:\r\nTotal Salaries and wage expenses (F3E072) divided by total expenses (F3E071).\r\nSalaries and wages are the amounts paid as compensation for services to all employees--faculty, staff, part time, full time, regular employees, and student employees. This includes regular or periodic payment to a person for the regular or periodic performance of work or a service and payment to a person for more sporadic performance of work or a service (overtime, extra compensation, summer compensation, bonuses, sick or annual leave, etc.).\r\nEmployee Fringe Benefits include all employee fringe benefits such as retirement plans, social security taxes, medical/dental plans, guaranteed disability income protection plans, tuition plans, housing plans, unemployment compensation plans, group life insurance plans, worker\u2019s compensation plans, other in-kind benefits with cash options, and all other costs of employee benefits.\r\nTotal expenses include expenses from salaries, wages, employee fringe benefits,operations of plant, depreciation, interest and other expenses."
+      }
+    ],
+    "source_rows": [
+      {
+        "physical_table": "F2324_F1A",
+        "mdb_export_sha256": "27a6582b6c2cddbf2bc2af4cb1e961aa797e86fd0aa9d44293541b6e5baed429",
+        "matched_rows": 0,
+        "nonempty_source_cells": []
+      },
+      {
+        "physical_table": "F2324_F2",
+        "mdb_export_sha256": "42f2591bd34f20ef998c993f2c5ee13eeb343fbc72a91e0cdb5b12f466ddb6b7",
+        "matched_rows": 0,
+        "nonempty_source_cells": []
+      },
+      {
+        "physical_table": "F2324_F3",
+        "mdb_export_sha256": "bf40e833142ef6f754433e680e6a0a862903dbba048c2bb324e174e19d8ca2c6",
+        "matched_rows": 0,
+        "nonempty_source_cells": []
+      },
+      {
+        "physical_table": "DRVF2024",
+        "mdb_export_sha256": "f3069078d4b9408226f5990131ef90cf70b1f3b266f67001a87ef95506b25953",
+        "matched_rows": 1,
+        "nonempty_source_cells": [
+          {
+            "UNITID": "475477",
+            "F3SALRPC": "64",
+            "F3EQUITR": "48"
+          }
+        ]
+      }
+    ],
+    "decision": "For the explicitly scoped FORM_F=-1 and PRCH_F=3 combination, apply the union of already verified balance-sheet section targets across finance forms. F3EQUITR=48 is nulled because it depends on assets/liabilities; F3SALRPC=64 is retained because it depends on salary/expense amounts. Do not infer or replace FORM_F. The original cells remain in raw source and value lineage."
+  },
+  "cost_policy": "Every observed 2024 PRCH_COS value is -2. Separate exact 2024 retain rules apply for all observed STAT_COS predicates. Former SFA Cost fields are not included in 2024 SFA child targets.",
+  "historical_family_reuse_guard": "35 returning SFA-family IDs also occurred in retired 2004-2008 SFA columns. Bind 2024 to the unique exact 2023 variable-number/name counterpart, explicitly preserving the 2023 analysis column. A canonical family identity alone is not sufficient.",
+  "prch_target_comparison": {
+    "unchanged_components": "Every surviving 2023 component target retained except reviewed SFA-Cost move.",
+    "sfa_removed_cost_columns": 254,
+    "sfa_added_count": "SCFA2ND",
+    "sfa_participation_context_retained": [
+      "PARTVT",
+      "PO9",
+      "DOD"
+    ],
+    "sole_sfa_child_unitid": 440916,
+    "sole_child_rows_in_sfa_and_sfav": 0
+  }
+}

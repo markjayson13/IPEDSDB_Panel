@@ -14,6 +14,7 @@ Writes:
 from __future__ import annotations
 
 import argparse
+import json
 from datetime import datetime, timezone
 import os
 import sys
@@ -28,7 +29,8 @@ from export_metadata import build_export_metadata, discover_export_metadata as d
 from export_integrity import (apply_observation_validation, assert_source_unchanged,
                               export_code_provenance, promote_package, require_export_ready,
                               scan_panel, source_fingerprint, validate_observed_codes)
-from panel_export import prepare_format_metadata, write_excel, write_sidecars, write_stata, write_stream
+from panel_export import (prepare_format_metadata, preserve_stata_encoding,
+                          write_excel, write_sidecars, write_stata, write_stream)
 from scoped_export_metadata import apply_year_scoped_metadata, year_scope_enabled
 from export_metadata_supplement import apply_export_metadata_supplement
 
@@ -101,6 +103,7 @@ def main() -> None:
     ap.add_argument("--vars-file", default=None, help="File with varnames (one per line or comma-separated)")
     ap.add_argument("--all-vars", action="store_true", help="Export every column in source order")
     ap.add_argument("--year-scoped-labels", action="store_true", help="Render changing historical meanings with explicit year ranges; retain source gaps as failures")
+    ap.add_argument("--stata-reference-metadata", help="Published .dta.metadata.json whose aliases and category numbers must remain stable")
     ap.add_argument("--years", default=None, help='Optional year filter, e.g. "2004:2023" or "2004,2006"')
     ap.add_argument("--format", choices=["parquet", "csv", "dta", "xlsx"], default=None, help="Default: infer from output extension")
     ap.add_argument("--dictionary", help="dictionary_lake.parquet; auto-discovered beside the input data root")
@@ -125,6 +128,10 @@ def main() -> None:
         raise ValueError("Use an output extension .parquet, .csv, .dta, or .xlsx, or specify --format.")
     if suffix_format in {"parquet", "csv", "dta", "xlsx"} and fmt != suffix_format:
         raise ValueError("--format must match the output extension.")
+    stata_reference = Path(args.stata_reference_metadata) if args.stata_reference_metadata else None
+    if stata_reference and fmt != "dta":
+        raise ValueError("--stata-reference-metadata is only supported for Stata exports")
+    reference_identity = source_fingerprint(stata_reference) if stata_reference else None
     if out_path.resolve() == input_path.resolve() or (input_path.is_dir() and input_path.resolve() in out_path.resolve().parents):
         raise ValueError("Output must not overwrite or become part of the source dataset.")
 
@@ -226,9 +233,28 @@ def main() -> None:
                           "Stata uses numeric system missing and empty strings; CSV uses unquoted empty fields; "
                           "Excel uses blank cells. No missing-reason codes are invented.",
     })
+    analysis_provenance = (schema.metadata or {}).get(b"ipeds:analysis_provenance")
+    if analysis_provenance is not None:
+        metadata["analysis_provenance"] = json.loads(analysis_provenance)
+        if not isinstance(metadata["analysis_provenance"], dict):
+            raise ValueError("Source analysis provenance must be a JSON object")
+    consolidation = (schema.metadata or {}).get(b"ipeds:column_consolidation")
+    if consolidation is not None:
+        metadata["column_consolidation"] = json.loads(consolidation)
+        if not isinstance(metadata["column_consolidation"], dict):
+            raise ValueError("Source column consolidation must be a JSON object")
+        groups = {group["canonical_name"]: group
+                  for group in metadata["column_consolidation"].get("groups", [])}
+        for variable in metadata["variables"]:
+            if variable["name"] in groups:
+                variable["column_consolidation"] = groups[variable["name"]]
     for var in metadata["variables"]:
         var["null_count"] = scan["null_counts"][var["name"]]
     prepare_format_metadata(metadata, selected_schema, fmt)
+    if stata_reference:
+        metadata["stata_encoding_reference"] = {
+            "path": str(stata_reference.resolve()), "sha256": reference_identity["sha256"],
+            **preserve_stata_encoding(metadata, json.loads(stata_reference.read_text()))}
     if args.require_metadata:
         require_export_ready(metadata)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -246,6 +272,8 @@ def main() -> None:
         if rows != row_count:
             raise ValueError("Source row count changed during export; rerun against a stable input.")
         assert_source_unchanged(input_path, source_identity)
+        if stata_reference:
+            assert_source_unchanged(stata_reference, reference_identity)
         for kind, path in (("dictionary", dictionary), ("codes", codes), ("lineage", lineage)):
             if path:
                 assert_source_unchanged(path, metadata_identities[kind])

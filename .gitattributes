@@ -1,2 +1,5 @@
 *.pdf binary
 *.gz binary
+# Preserve the hash-bound CSV's CRLF and valid unified-diff context lines.
+contracts/extension_2024/retained_all_null_columns.csv whitespace=cr-at-eol
+contracts/extension_2024/v2-extension.patch whitespace=-blank-at-eol

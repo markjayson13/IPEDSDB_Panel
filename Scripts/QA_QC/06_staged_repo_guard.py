@@ -74,9 +74,10 @@ def main() -> int:
             blocked.append((rel, "forbidden_basename"))
         if rel.endswith(forbid_suffixes):
             blocked.append((rel, "forbidden_suffix"))
-        # Match the tracked-file guard's single, bounded documentation allowance.
+        # Match the tracked-file guard's two bounded documentation allowances.
         file_limit = (max(threshold_bytes, 16 * 1024 * 1024)
-                      if rel == "docs/codebook/ipeds-panel-codebook.pdf" else threshold_bytes)
+                      if rel in {"docs/codebook/ipeds-panel-codebook.pdf",
+                                 "docs/provisional/codebook/ipeds-panel-codebook.pdf"} else threshold_bytes)
         if path.is_file() and path.stat().st_size > file_limit:
             too_large.append((path.stat().st_size, rel))
 

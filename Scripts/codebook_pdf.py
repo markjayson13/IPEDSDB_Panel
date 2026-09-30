@@ -15,6 +15,10 @@ import re
 from xml.sax.saxutils import escape
 
 
+# Vera lacks this glyph; the standard PDF Symbol font renders and encodes it.
+PARAGRAPH_GLYPH_FONTS = {"→": "Symbol"}
+
+
 def year_ranges(years):
     values = sorted(set(int(y) for y in years))
     groups = []
@@ -58,7 +62,7 @@ def write_manifest(directory, index):
         f"Release: {index['release']}\n"
         f"Dataset: {index['row_count']:,} institution-year rows, {index['column_count']:,} variables.\n\n"
         "Start with ipeds-panel-codebook.pdf, or use the searchable interface:\n"
-        "https://markjayson13.github.io/IPEDSDB_Panel/\n\n"
+        f"{index.get('codebook_url', 'https://markjayson13.github.io/IPEDSDB_Panel/')}\n\n"
         "codebook.csv gives one row per variable. Each description applies only\n"
         "to its description_years. definitions.csv.gz contains the full history;\n"
         "decompress it before opening the CSV. value-labels.csv gives source\n"
@@ -106,7 +110,8 @@ def render_pdf(directory, output=None):
     # Fail rather than render a missing-glyph box in authoritative definitions.
     all_text = json.dumps([index, variables], ensure_ascii=False)
     cmap = pdfmetrics.getFont("Codebook").face.charToGlyph
-    missing = sorted({c for c in all_text if ord(c) >= 32 and ord(c) not in cmap})
+    missing = sorted({c for c in all_text if ord(c) >= 32 and ord(c) not in cmap
+                      and c not in PARAGRAPH_GLYPH_FONTS})
     if missing:
         raise ValueError(f"PDF font lacks source characters: {missing!r}")
 
@@ -122,7 +127,10 @@ def render_pdf(directory, output=None):
 
     def p(text, kind="body"):
         text = "Not supplied" if text is None or text == "" else str(text)
-        return Paragraph(escape(text).replace("\n", "<br/>"), styles[kind])
+        markup = escape(text).replace("\n", "<br/>")
+        for glyph, font in PARAGRAPH_GLYPH_FONTS.items():
+            markup = markup.replace(glyph, f'<font name="{font}">{glyph}</font>')
+        return Paragraph(markup, styles[kind])
 
     story = []
 
@@ -159,18 +167,22 @@ def render_pdf(directory, output=None):
 
     story += [Spacer(1, 35), p("IPEDSDB Panel", "small"), p("User codebook", "title"),
               p(f"{year_ranges(index['years'])} | {index['row_count']:,} institution-year rows | {index['column_count']:,} variables"),
-              p(f"Labeled release: {index['release']}"), Spacer(1, 18)]
+              p(f"Labeled release: {index['release']}"),
+              p(f"Source release status: {index.get('release_status', 'See source metadata')}"), Spacer(1, 18)]
     heading("How to use this codebook", "guide")
     guides = [
-        "Use the PDF bookmarks or alphabetical variable index to find a field. The online codebook provides search and year filters at https://markjayson13.github.io/IPEDSDB_Panel/.",
+        f"Use the PDF bookmarks or alphabetical variable index to find a field. The online codebook provides search and year filters at {index.get('codebook_url', 'https://markjayson13.github.io/IPEDSDB_Panel/')}",
         "The panel key is UNITID plus year. It is an unbalanced panel: institution coverage differs by year. Year identifies an IPEDS release; survey, academic, fiscal and financial-aid reference periods can differ. Use the source-specific reference period where supplied.",
         "Observed years are years with at least one nonmissing panel value. A missing observation is not evidence of zero. Null counts cover the full panel. Negative source codes remain distinct from nulls; consult their variable- and year-specific meanings.",
         "Definitions and code labels apply only to the years listed. Changes in titles, source tables or definitions do not establish that a variable is comparable over time. Unspecified units, currency, price basis or reference periods are recorded as unknown.",
         "The companion Parquet retains source values and embedded metadata. The Stata file has native variable and category labels. Canonical integer strings preserve their numeric codes; other categorical strings use the reversible mappings printed below. Ordinary string nulls become empty strings in Stata. Use the original Parquet when that distinction matters.",
         "The full file has more than Stata/BE's 2,048-variable limit. Load a selected varlist from the full DTA, or use Stata/SE or MP. Source variable names and Stata export names are both recorded here.",
-        "This codebook describes the published dataset; it does not include institution-level data. The data files live in Final/ under the external IPEDSDB_PANEL data root. Keep their matching metadata and checksums together.",
+        f"This codebook describes the identified dataset; it does not include institution-level data. The data directory recorded by its manifest is {index.get('data_directory', 'Final')}/. Keep the data, matching metadata and checksums together.",
     ]
     story.extend(p(x) for x in guides)
+    if index.get("release_notes"):
+        heading("Release notes", "release-notes")
+        story.extend(p(note) for note in index["release_notes"])
     heading("Known source gaps", "gaps")
     story.append(p("The published metadata is incomplete. No missing description or unknown category meaning has been guessed. The affected fields and observation counts follow; other measurement attributes can also be unspecified."))
     for issue in index.get("issues", []):
@@ -219,18 +231,35 @@ def render_pdf(directory, output=None):
             table(["Code", "Meaning", "Release years / source"],
                   [[c["code"], c.get("label") or "Meaning not supplied", year_ranges(c["years"])+" / "+", ".join(c.get("sources", []))] for c in v["codes"]], [60, 303, 138])
         records = v.get("source_records", [])
+        consolidation = v.get("column_consolidation")
+        if consolidation:
+            story.append(p("Consolidated source columns", "sub"))
+            story.append(p(consolidation.get("rationale", "Verified source-table moves; source values remain unchanged."), "small"))
+            for member in consolidation["members"]:
+                story.append(p(f"{member['column']}: {year_ranges(member['years'])}", "small"))
+            caveats = consolidation.get("caveats", [])
+            for note in caveats if isinstance(caveats, list) else [caveats]:
+                if note:
+                    story.append(p(note, "small"))
         if records:
             story.append(p("Source identity and reference period", "sub"))
             # Compact records without erasing physical table identity or year scope.
             for r in records:
                 text = f"{year_ranges(r['years'])}: {r.get('table') or 'Table not supplied'}.{r.get('varname') or v['name']} | number {r.get('varnumber') or 'not supplied'} | source {r.get('source_file') or 'not supplied'}"
-                period = r.get("reference_period") or r.get("source_table_reference_period")
-                if period:
-                    text += f" | period: {period}"
+                if r.get("reference_period"):
+                    text += f" | reference period: {r['reference_period']}"
+                elif r.get("source_table_reference_period"):
+                    text += f" | table coverage period: {r['source_table_reference_period']}"
+                if r.get("release_type"):
+                    text += f" | release: {r['release_type']}"
+                if r.get("source_release_date"):
+                    text += f" | release date: {r['source_release_date']}"
                 if r.get("imputationvar"):
                     text += f" | dictionary imputation flag: {r['imputationvar']}"
                 if r.get("imputation_flag_availability"):
                     text += f" | flag availability: {r['imputation_flag_availability']}"
+                if r.get("reporting_population_note"):
+                    text += f" | reporting population: {r['reporting_population_note']}"
                 story.append(p(text, "small"))
             corrections = defaultdict(list)
             for r in records:

@@ -380,6 +380,9 @@ def test_full_year_scoped_export_preserves_order_and_reexports_embedded_labels(e
     # No 2022 institution-name definition is needed for a wholly missing year.
     table = table.set_column(3, "INSTNM", pa.array([None, "A", "B", "C", None, ""]))
     table = table.select(["CONTROL", "UNITID", "INSTNM", "year"])
+    provenance = {"policy_id": "mission-orphans-v1", "excluded_keys": [{"UNITID": 111111, "year": 2019}],
+                  "reason": "Exact reviewed source records excluded from this analysis input"}
+    table = table.replace_schema_metadata({b"ipeds:analysis_provenance": json.dumps(provenance).encode()})
     pq.write_table(table, fixture["panel"])
     output = fixture["root"] / "full.parquet"
     result = run_script(
@@ -393,6 +396,8 @@ def test_full_year_scoped_export_preserves_order_and_reexports_embedded_labels(e
     assert actual.column_names == table.column_names
     assert actual.to_pydict() == table.to_pydict()
     metadata = read_metadata(output)
+    assert metadata["analysis_provenance"] == provenance
+    assert json.loads(actual.schema.metadata[b"ipeds:analysis_provenance"]) == provenance
     assert metadata["metadata_scope_policy"] == "explicit_year_scopes"
     variables = {v["name"]: v for v in metadata["variables"]}
     assert variables["INSTNM"]["observed_years"] == [2023]
@@ -413,6 +418,7 @@ def test_full_year_scoped_export_preserves_order_and_reexports_embedded_labels(e
         assert reader.value_labels()["CONTROL"][1] == "2022: Older label; 2023: Public"
         assert reader.read().columns.tolist() == table.column_names
     assert read_metadata(dta)["metadata_scope_policy"] == "explicit_year_scopes"
+    assert read_metadata(dta)["analysis_provenance"] == provenance
 
 
 def test_all_vars_rejects_a_simultaneous_variable_selection(export_fixture: dict) -> None:

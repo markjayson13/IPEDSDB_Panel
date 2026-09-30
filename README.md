@@ -8,7 +8,8 @@ If you are new to the repo, start with this:
 
 - the repo holds the code, docs, and small tracked artifacts
 - `IPEDSDB_ROOT` holds the real downloads, outputs, and QA files
-- `Final/` contains the current panel and its matching metadata
+- `Final/` contains the final-only 2004-2023 panel and its matching metadata
+- `Provisional/` contains the separately verified 2004-2024 extension
 - `bash manual_commands.sh` starts a new build under `Work/`
 - `Releases/` retains complete versioned releases and their evidence
 
@@ -19,6 +20,30 @@ This repository is code-first and data-outside-git by design:
 - Release policy: `Final` Access releases only
 - Upstream input: annual IPEDS Access databases, not flat component files
 - Current final output: `Final/panel_clean_prch_2004_2023.parquet`
+
+The [2024 extension workflow](docs/2024_EXTENSION.md) reuses the verified
+historical panel and runs only the new year. Its source tables have mixed
+final/provisional status, recorded individually. It preserves `Final/` and
+publishes separately; the default final-only pipeline remains unchanged.
+
+Use `Provisional/panel_clean_prch_2004_2024.parquet` or its labeled `.dta`
+for the extension: 147,782 rows and 2,676 columns. Verified source-table moves
+are consolidated into 95 canonical variables; a downloadable column crosswalk
+and the source-preserving panel retain the original 2,785 columns. Different or
+unresolved measures remain separate. It quarantines the two reviewed
+mission-only records and preserves every other historical observation. See
+[validation results and checksums](docs/2024_EXTENSION_RESULTS.md) and the
+[2004-2024 interactive codebook](https://markjayson13.github.io/IPEDSDB_Panel/provisional/),
+which includes a downloadable PDF. Original source metadata gaps remain disclosed.
+
+Stata/BE users should load selected variables because its limit is 2,048 columns;
+loading all 2,676 columns requires Stata/SE or MP. See the
+[official edition limits](https://www.stata.com/products/which-stata-is-right-for-me/).
+For example:
+
+```stata
+use UNITID year UPGRNTN UPGRNTT ANYAIDN FTE using "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/panel_clean_prch_2004_2024.dta", clear
+```
 
 ## Quickstart
 
@@ -66,8 +91,9 @@ to `Work` and do not replace `Final` automatically.
 
 | Goal | Start here |
 | --- | --- |
-| Open the current full dataset | `$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet` |
-| Open the full labeled Stata dataset | `$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.dta` |
+| Open the final-only 2004-2023 dataset | `$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.parquet` |
+| Open the final-only 2004-2023 Stata dataset | `$IPEDSDB_ROOT/Final/panel_clean_prch_2004_2023.dta` |
+| Open the verified mixed final/provisional extension | `$IPEDSDB_ROOT/Provisional/panel_clean_prch_2004_2024.parquet` or `.dta` |
 | Open the validated 2023 SFA exports | `$IPEDSDB_ROOT/Final/SFA_2023_exports/` |
 | Run the whole pipeline | `bash manual_commands.sh` |
 | Test the setup without a full historical build | `python Scripts/00_run_all.py --years "2022:2023" --run-cleaning --run-qaqc` |
@@ -81,7 +107,7 @@ to `Work` and do not replace `Final` automatically.
 | Search the published panel codebook | [Interactive codebook](https://markjayson13.github.io/IPEDSDB_Panel/) |
 | Rebuild the codebook and PDF | [Codebook build instructions](docs/CODEBOOK.md) |
 | Pull only a subset of variables | `python Scripts/08_build_custom_panel.py ...` |
-| Understand the current dataset's sources | open `Final/manifest.json`, `Final/Metadata/`, and the evidence in `Releases/2023-sfa-v1/` |
+| Understand the final-only dataset's sources | open `Final/manifest.json`, `Final/Metadata/`, and the evidence in `Releases/2023-sfa-v1/` |
 | Inspect what the repo is doing | `manual_commands.sh` -> `Scripts/00_run_all.py` -> stage scripts in `Scripts/01-09` |
 
 ## At a glance
@@ -101,13 +127,15 @@ The organized data root separates everyday analysis from build products:
 
 | Folder | Purpose |
 | --- | --- |
-| `Final/` | current full panel, matched metadata, lineage, and validated SFA exports |
+| `Final/` | final-only 2004-2023 panel, matched metadata, lineage, and validated SFA exports |
+| `Provisional/` | separately verified 2004-2024 analysis extension, labels, codebook, and source evidence |
 | `Releases/2023-sfa-v1/` | complete immutable corrected release with verification evidence |
 | `Sources/Raw_Access_Databases/` | original downloaded releases and extracted source tables |
 | `Work/` | new dictionaries, intermediate tables, panels, QA, and build state |
 | `Archive/pre_metadata_repair/` | retained pre-repair panels, dictionaries, QA, and build files |
 
-Use `Final` for current analysis. Use `manual_commands.sh` for a future build
+Use `Provisional` for the latest 2004-2024 extension or `Final` for final-only
+2004-2023 analysis. Use `manual_commands.sh` for a future final-only build
 and inspect its outputs in `Work/Checks`. The archive preserves the earlier
 folder relationships so its relative links continue to resolve.
 

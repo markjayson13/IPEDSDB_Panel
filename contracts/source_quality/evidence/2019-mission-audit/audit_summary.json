@@ -1,0 +1,127 @@
+{
+  "status": "verified",
+  "created_utc": "2026-09-30T01:53:10.565944+00:00",
+  "scope": "Fresh read-only exports of 3 original 2019 Access tables; targeted Final observation only",
+  "target": {
+    "UNITID": 111111,
+    "year": 2019
+  },
+  "conclusion": "The original 2019 Access database contains one UNITID 111111 mission row with MISSIONURL www.rti.ortg and no corresponding HD2019 or FLAGS2019 row. Final preserves this source row with only UNITID, year, and MISSIONURL non-null.",
+  "original_archive": {
+    "path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2019/downloads/IPEDS_2019-20_Final.zip",
+    "sha256": "5128168127fab451df3bba2fd14dd3b91ac90c4eeae9fc6fced79b1f7d5d1160",
+    "bytes": 59495137,
+    "manifest_sha256_matches": true,
+    "source_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2019-20_Final.zip"
+  },
+  "original_database": {
+    "path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2019/extracted_db/.versions/5128168127fab451df3bba2fd14dd3b91ac90c4eeae9fc6fced79b1f7d5d1160-f7e81e3dc0f8494c97da5c9826064544/IPEDS201920.accdb",
+    "sha256": "6e51f6db586bd8f064525bbdccdb7f3604eda714894595a6c8ea4957b25069af",
+    "bytes": 536383488,
+    "archive_member": "IPEDS201920.accdb",
+    "archive_member_sha256": "6e51f6db586bd8f064525bbdccdb7f3604eda714894595a6c8ea4957b25069af",
+    "exactly_matches_archive_member": true,
+    "manifest_sha256_matches": true
+  },
+  "exporter": {
+    "path": "/opt/homebrew/bin/mdb-export",
+    "sha256": "378d637294fc7d0202f9441776bd6f548e47ac4970bdc4bc3664297167b6780a",
+    "version": "mdbtools v1.0.1"
+  },
+  "tables": {
+    "IC2019Mission": {
+      "command": [
+        "/opt/homebrew/bin/mdb-export",
+        "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2019/extracted_db/.versions/5128168127fab451df3bba2fd14dd3b91ac90c4eeae9fc6fced79b1f7d5d1160-f7e81e3dc0f8494c97da5c9826064544/IPEDS201920.accdb",
+        "IC2019Mission"
+      ],
+      "fresh_path": "/private/tmp/ipeds-2024-extension/2019-mission-audit/IC2019Mission.fresh.csv",
+      "fresh_sha256": "5d49b6d883d7fa9c4cd54541d451079c2f2a71069bcd86feb41ffa76164b9d67",
+      "cached_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2019/tables_csv/IC2019Mission.csv",
+      "cached_sha256": "1e9176407db46275f49105efcd4e4456913de84bec0c203906b8295c9767611a",
+      "byte_identical": false,
+      "all_parsed_fields_and_rows_exactly_equal": false,
+      "all_parsed_values_equal_after_crlf_to_lf_normalization": true,
+      "serialization_differences": [
+        {
+          "unitid": "457244",
+          "field": "mission",
+          "difference": "CRLF versus LF only"
+        }
+      ],
+      "row_count": 6281,
+      "column_count": 3,
+      "target_row_count": 1,
+      "target_rows": [
+        {
+          "unitid": "111111",
+          "missionURL": "www.rti.ortg",
+          "mission": ""
+        }
+      ],
+      "target_rows_match_cached": true,
+      "cached_export_manifest_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2019/tables_csv/IC2019Mission.csv.export-manifest.json"
+    },
+    "HD2019": {
+      "command": [
+        "/opt/homebrew/bin/mdb-export",
+        "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2019/extracted_db/.versions/5128168127fab451df3bba2fd14dd3b91ac90c4eeae9fc6fced79b1f7d5d1160-f7e81e3dc0f8494c97da5c9826064544/IPEDS201920.accdb",
+        "HD2019"
+      ],
+      "fresh_path": "/private/tmp/ipeds-2024-extension/2019-mission-audit/HD2019.fresh.csv",
+      "fresh_sha256": "d3e3b50df8f516f4232e196114f77f388174c85e8fcad43862199329fe9747cd",
+      "cached_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2019/tables_csv/HD2019.csv",
+      "cached_sha256": "d3e3b50df8f516f4232e196114f77f388174c85e8fcad43862199329fe9747cd",
+      "byte_identical": true,
+      "all_parsed_fields_and_rows_exactly_equal": true,
+      "all_parsed_values_equal_after_crlf_to_lf_normalization": true,
+      "serialization_differences": [],
+      "row_count": 6559,
+      "column_count": 73,
+      "target_row_count": 0,
+      "target_rows": [],
+      "target_rows_match_cached": true,
+      "cached_export_manifest_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2019/tables_csv/HD2019.csv.export-manifest.json"
+    },
+    "FLAGS2019": {
+      "command": [
+        "/opt/homebrew/bin/mdb-export",
+        "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2019/extracted_db/.versions/5128168127fab451df3bba2fd14dd3b91ac90c4eeae9fc6fced79b1f7d5d1160-f7e81e3dc0f8494c97da5c9826064544/IPEDS201920.accdb",
+        "FLAGS2019"
+      ],
+      "fresh_path": "/private/tmp/ipeds-2024-extension/2019-mission-audit/FLAGS2019.fresh.csv",
+      "fresh_sha256": "ae77132906d71a948bcc1308594bad873c2e6fbc7448fbe12379a38ce0300948",
+      "cached_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2019/tables_csv/FLAGS2019.csv",
+      "cached_sha256": "ae77132906d71a948bcc1308594bad873c2e6fbc7448fbe12379a38ce0300948",
+      "byte_identical": true,
+      "all_parsed_fields_and_rows_exactly_equal": true,
+      "all_parsed_values_equal_after_crlf_to_lf_normalization": true,
+      "serialization_differences": [],
+      "row_count": 6559,
+      "column_count": 95,
+      "target_row_count": 0,
+      "target_rows": [],
+      "target_rows_match_cached": true,
+      "cached_export_manifest_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2019/tables_csv/FLAGS2019.csv.export-manifest.json"
+    }
+  },
+  "final_panel_observation": {
+    "path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Final/panel_clean_prch_2004_2023.parquet",
+    "row_count": 1,
+    "column_count": 2721,
+    "non_null_cell_count": 3,
+    "non_null_values": {
+      "year": 2019,
+      "UNITID": 111111,
+      "MISSIONURL": "www.rti.ortg"
+    },
+    "file_identity": [
+      16777252,
+      298312,
+      330734354,
+      1790722593356979685
+    ]
+  },
+  "all_read_source_file_identities_unchanged": true,
+  "writes": "Only this audit directory; no source or Final files modified"
+}

@@ -22,6 +22,7 @@ audit_pack/
 
 # Organized external data layout (never repository inputs)
 /Final/
+/Provisional/
 /Releases/
 /Sources/
 /Work/

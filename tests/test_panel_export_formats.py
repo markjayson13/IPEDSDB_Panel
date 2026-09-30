@@ -6,7 +6,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
-from panel_export import dictionary_rows, prepare_format_metadata, stata_names, write_stata
+from panel_export import dictionary_rows, prepare_format_metadata, preserve_stata_encoding, stata_names, write_stata
 from export_integrity import PACKAGE_SUFFIXES, assert_source_unchanged, promote_package, source_fingerprint, require_export_ready
 
 
@@ -15,6 +15,44 @@ def metadata_for(schema, label="Test label", values=None):
         {"name": f.name, "label": label, "description": "Test definition", "value_labels": values or []}
         for f in schema
     ]}
+
+
+def test_extension_keeps_published_stata_category_numbers(tmp_path):
+    table = pa.table({"FISCAL_END": ["Jun-30", "Sep-30", "Apr-30", None]})
+    old = metadata_for(table.schema, values=[{"value": x, "label": x} for x in ["Jun-30", "Sep-30"]])
+    old["format"] = "dta"
+    prepare_format_metadata(old, table.schema, "dta")
+    new = metadata_for(table.schema, values=[{"value": x, "label": x} for x in ["Jun-30", "Sep-30", "Apr-30"]])
+    prepare_format_metadata(new, table.schema, "dta")
+    receipt = preserve_stata_encoding(new, old)
+    assert receipt["new_string_categories"] == {"FISCAL_END": 1}
+    assert {r["source_code"]: r["export_code"] for r in new["variables"][0]["stata_source_code_map"]} == {
+        "Jun-30": 1, "Sep-30": 2, "Apr-30": 3}
+    output = tmp_path / "extension.dta"
+    write_stata(table, output, new)
+    result = pd.read_stata(output, convert_categoricals=False)
+    assert result["FISCAL_END"].iloc[:3].tolist() == [1, 2, 3]
+    assert pd.isna(result["FISCAL_END"].iloc[3])
+
+
+@pytest.mark.parametrize("failure", ["duplicate", "storage", "missing", "alias"])
+def test_stata_encoding_reference_rejects_incompatible_changes(failure):
+    import copy
+    schema = pa.schema([("CODE", pa.string())])
+    old = metadata_for(schema, values=[{"value": "AA", "label": "One"}, {"value": "BB", "label": "Two"}])
+    old["format"] = "dta"
+    prepare_format_metadata(old, schema, "dta")
+    new = copy.deepcopy(old)
+    if failure == "duplicate":
+        old["variables"][0]["stata_source_code_map"][1]["export_code"] = 1
+    elif failure == "storage":
+        new["variables"][0]["stata_storage_conversion"] = "none"
+    elif failure == "missing":
+        new["variables"][0]["stata_source_code_map"].pop()
+    else:
+        new["variables"][0]["export_name"] = "OTHER"
+    with pytest.raises(ValueError):
+        preserve_stata_encoding(new, old)
 
 
 def test_stata_aliases_are_stable_unique_and_labels_remain_full(tmp_path: Path) -> None:

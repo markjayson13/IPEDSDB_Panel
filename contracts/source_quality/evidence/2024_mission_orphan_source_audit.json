@@ -1,0 +1,38 @@
+{
+  "status": "source_provenance_verified_institution_validity_unresolved",
+  "verified_at_utc": "2026-09-30T01:47:30.409998+00:00",
+  "unitid": 111111,
+  "source_row": {
+    "UNITID": "111111",
+    "MISSIONURL": "rti.org/about/offices_and_divisions/institutional_research_assessment%_and_analytics/about_us/mission_statements/usc_campus_mission_111111111111111111111111111111111111111111111111111111112222statements.php",
+    "MISSION": ""
+  },
+  "row_source_table": "IC2024Mission",
+  "source_status": "Provisional/final (institutions are not  allowed to revise these data)",
+  "source_release_date": "September 2025",
+  "release_universe": {
+    "HD2024": {
+      "rows": 6072,
+      "contains_unitid": false
+    },
+    "FLAGS2024": {
+      "rows": 6072,
+      "contains_unitid": false
+    }
+  },
+  "hashes": {
+    "effective_mission_csv_sha256": "dbb7609b9bbda75511b78413a731cc537fa152a1035cea812ea569e4bb7f495c",
+    "fresh_access_mission_export_sha256": "dbb7609b9bbda75511b78413a731cc537fa152a1035cea812ea569e4bb7f495c",
+    "access_database_sha256": "98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5"
+  },
+  "official_lookup": {
+    "url": "https://nces.ed.gov/collegenavigator/?id=111111",
+    "http_status": 200,
+    "page_title": "College Navigator - Institution Not Found",
+    "visible_result": "The selected institution could not be found",
+    "caveat": "This result alone does not prove a test row; College Navigator also excludes some closed or nonparticipating institutions."
+  },
+  "source_preserved": true,
+  "spine_exclusion_applied": false,
+  "cleaning_effect": "No observed PRCH flag and neither mission field is a policy target. Pell fields are absent for this ID."
+}

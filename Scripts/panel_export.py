@@ -134,6 +134,59 @@ def prepare_format_metadata(metadata: dict, schema: pa.Schema, fmt: str) -> None
             metadata["readiness_status"] = "incomplete"
 
 
+def preserve_stata_encoding(metadata: dict, reference: dict) -> dict:
+    """Keep a published export's aliases and reversible category numbers.
+
+    New tokens receive unused numbers after the historical maximum. Source
+    meanings may have additional year scopes, but historical codes never move.
+    """
+    if reference.get("format") != "dta":
+        raise ValueError("Stata encoding reference must be Stata export metadata")
+    rows = reference.get("variables", [])
+    old = {v["name"]: v for v in rows}
+    if len(old) != len(rows):
+        raise ValueError("Duplicate variables in Stata encoding reference")
+    preserved, extended = [], {}
+    for var in metadata["variables"]:
+        previous = old.get(var["name"])
+        if previous is None:
+            continue
+        name = var["name"]
+        if previous.get("export_name") != var["export_name"]:
+            raise ValueError(f"{name}: historical Stata alias would change")
+        conversion = previous.get("stata_storage_conversion", "none")
+        if conversion != var.get("stata_storage_conversion", "none"):
+            raise ValueError(f"{name}: historical Stata storage conversion would change")
+        if conversion != "string_categories_to_numeric":
+            preserved.append(name)
+            continue
+        records = previous.get("stata_source_code_map", [])
+        codes = {row["source_code"]: row["export_code"] for row in records}
+        if (not records or len(codes) != len(records) or
+                any(not isinstance(k, str) or type(v) is not int or not 1 <= v <= 2147483620
+                    for k, v in codes.items()) or len(set(codes.values())) != len(codes)):
+            raise ValueError(f"{name}: invalid historical Stata category mapping")
+        current = {row["source_code"]: row["label"] for row in var["stata_source_code_map"]}
+        if not set(codes).issubset(current):
+            raise ValueError(f"{name}: extension lost historical Stata category definitions")
+        new_tokens = sorted(set(current) - set(codes))
+        next_code = max(codes.values()) + 1
+        codes.update({token: next_code + offset for offset, token in enumerate(new_tokens)})
+        if max(codes.values()) > 2147483620 or len(codes) > 65536:
+            raise ValueError(f"{name}: extended category mapping exceeds Stata limits")
+        var["stata_source_code_map"] = [
+            {"source_code": token, "export_code": code, "label": current[token]}
+            for token, code in sorted(codes.items(), key=lambda item: item[1])]
+        var["stata_value_labels"] = {
+            row["export_code"]: f"{row['source_code']}: {row['label']}"
+            for row in var["stata_source_code_map"]}
+        preserved.append(name)
+        extended[name] = len(new_tokens)
+    return {"historical_variables_preserved": len(preserved),
+            "new_string_categories": extended,
+            "rule": "Preserve historical aliases, conversions and category numbers; append new tokens."}
+
+
 def annotated_schema(schema: pa.Schema, metadata: dict) -> pa.Schema:
     from export_metadata import encode_embedded_variable_metadata
 

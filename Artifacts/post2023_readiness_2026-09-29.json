@@ -1,0 +1,1592 @@
+{
+  "schema_version": 1,
+  "audit_date_local": "2026-09-29",
+  "timezone": "America/Los_Angeles",
+  "created_utc": "2026-09-30T00:46:10.748828+00:00",
+  "repository_commit": "53dbcf313d7afe574eb4479ce43b3f910fe2dadc",
+  "scope": "Post-2023 official source and pipeline readiness audit. No extended panel constructed or published; existing CIRAGO IPEDS and downstream FSA files not modified.",
+  "recommendation": "Build a separately identified 2004-2024 candidate with component-specific final/provisional provenance and reviewed v2 contract changes; preserve existing Final. Defer complete 2025 SFA/Pell extension pending source release.",
+  "ordinary_and_range_archive_sha256_equal": true,
+  "results": {
+    "release_inventory": [
+      {
+        "year": 2004,
+        "academic_year_label": "2004-05",
+        "release_type": "Final",
+        "release_date_text": "April 2020",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2004-05_Final.zip",
+        "access_filename": "IPEDS_2004-05_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS200405Tablesdoc.xlsx",
+        "doc_filename": "IPEDS200405Tablesdoc.xlsx"
+      },
+      {
+        "year": 2005,
+        "academic_year_label": "2005-06",
+        "release_type": "Final",
+        "release_date_text": "April 2020",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2005-06_Final.zip",
+        "access_filename": "IPEDS_2005-06_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS200506Tablesdoc.xlsx",
+        "doc_filename": "IPEDS200506Tablesdoc.xlsx"
+      },
+      {
+        "year": 2006,
+        "academic_year_label": "2006-07",
+        "release_type": "Final",
+        "release_date_text": "August 2018",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2006-07_Final.zip",
+        "access_filename": "IPEDS_2006-07_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS200607Tablesdoc.xlsx",
+        "doc_filename": "IPEDS200607Tablesdoc.xlsx"
+      },
+      {
+        "year": 2007,
+        "academic_year_label": "2007-08",
+        "release_type": "Final",
+        "release_date_text": "July 2017",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2007-08_Final.zip",
+        "access_filename": "IPEDS_2007-08_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS200708Tablesdoc.xlsx",
+        "doc_filename": "IPEDS200708Tablesdoc.xlsx"
+      },
+      {
+        "year": 2008,
+        "academic_year_label": "2008-09",
+        "release_type": "Final",
+        "release_date_text": "July 2017",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2008-09_Final.zip",
+        "access_filename": "IPEDS_2008-09_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS200809Tablesdoc.xlsx",
+        "doc_filename": "IPEDS200809Tablesdoc.xlsx"
+      },
+      {
+        "year": 2009,
+        "academic_year_label": "2009-10",
+        "release_type": "Final",
+        "release_date_text": "July 2017",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2009-10_Final.zip",
+        "access_filename": "IPEDS_2009-10_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS200910Tablesdoc.xlsx",
+        "doc_filename": "IPEDS200910Tablesdoc.xlsx"
+      },
+      {
+        "year": 2010,
+        "academic_year_label": "2010-11",
+        "release_type": "Final",
+        "release_date_text": "May 2020",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2010-11_Final.zip",
+        "access_filename": "IPEDS_2010-11_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS201011Tablesdoc.xlsx",
+        "doc_filename": "IPEDS201011Tablesdoc.xlsx"
+      },
+      {
+        "year": 2011,
+        "academic_year_label": "2011-12",
+        "release_type": "Final",
+        "release_date_text": "April 2016",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2011-12_Final.zip",
+        "access_filename": "IPEDS_2011-12_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS201112Tablesdoc.xlsx",
+        "doc_filename": "IPEDS201112Tablesdoc.xlsx"
+      },
+      {
+        "year": 2012,
+        "academic_year_label": "2012-13",
+        "release_type": "Final",
+        "release_date_text": "April 2016",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2012-13_Final.zip",
+        "access_filename": "IPEDS_2012-13_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS201213Tablesdoc.xlsx",
+        "doc_filename": "IPEDS201213Tablesdoc.xlsx"
+      },
+      {
+        "year": 2013,
+        "academic_year_label": "2013-14",
+        "release_type": "Final",
+        "release_date_text": "April 2016",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2013-14_Final.zip",
+        "access_filename": "IPEDS_2013-14_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS201314Tablesdoc.xlsx",
+        "doc_filename": "IPEDS201314Tablesdoc.xlsx"
+      },
+      {
+        "year": 2014,
+        "academic_year_label": "2014-15",
+        "release_type": "Final",
+        "release_date_text": "April 2017",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2014-15_Final.zip",
+        "access_filename": "IPEDS_2014-15_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS201415Tablesdoc.xlsx",
+        "doc_filename": "IPEDS201415Tablesdoc.xlsx"
+      },
+      {
+        "year": 2015,
+        "academic_year_label": "2015-16",
+        "release_type": "Final",
+        "release_date_text": "August 2018",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2015-16_Final.zip",
+        "access_filename": "IPEDS_2015-16_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS201516Tablesdoc.xlsx",
+        "doc_filename": "IPEDS201516Tablesdoc.xlsx"
+      },
+      {
+        "year": 2016,
+        "academic_year_label": "2016-17",
+        "release_type": "Final",
+        "release_date_text": "January 2019",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2016-17_Final.zip",
+        "access_filename": "IPEDS_2016-17_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS201617Tablesdoc.xlsx",
+        "doc_filename": "IPEDS201617Tablesdoc.xlsx"
+      },
+      {
+        "year": 2017,
+        "academic_year_label": "2017-18",
+        "release_type": "Final",
+        "release_date_text": "December 2019",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2017-18_Final.zip",
+        "access_filename": "IPEDS_2017-18_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS201718Tablesdoc.xlsx",
+        "doc_filename": "IPEDS201718Tablesdoc.xlsx"
+      },
+      {
+        "year": 2018,
+        "academic_year_label": "2018-19",
+        "release_type": "Final",
+        "release_date_text": "March 2021",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2018-19_Final.zip",
+        "access_filename": "IPEDS_2018-19_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS201819Tablesdoc.xlsx",
+        "doc_filename": "IPEDS201819Tablesdoc.xlsx"
+      },
+      {
+        "year": 2019,
+        "academic_year_label": "2019-20",
+        "release_type": "Final",
+        "release_date_text": "December 2021",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2019-20_Final.zip",
+        "access_filename": "IPEDS_2019-20_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS201920Tablesdoc.xlsx",
+        "doc_filename": "IPEDS201920Tablesdoc.xlsx"
+      },
+      {
+        "year": 2020,
+        "academic_year_label": "2020-21",
+        "release_type": "Final",
+        "release_date_text": "January 2022",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2020-21_Final.zip",
+        "access_filename": "IPEDS_2020-21_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS202021Tablesdoc.xlsx",
+        "doc_filename": "IPEDS202021Tablesdoc.xlsx"
+      },
+      {
+        "year": 2021,
+        "academic_year_label": "2021-22",
+        "release_type": "Final",
+        "release_date_text": "January 2024",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2021-22_Final.zip",
+        "access_filename": "IPEDS_2021-22_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS202122Tablesdoc.xlsx",
+        "doc_filename": "IPEDS202122Tablesdoc.xlsx"
+      },
+      {
+        "year": 2022,
+        "academic_year_label": "2022-23",
+        "release_type": "Final",
+        "release_date_text": "January 2025",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2022-23_Final.zip",
+        "access_filename": "IPEDS_2022-23_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS202223Tablesdoc.xlsx",
+        "doc_filename": "IPEDS202223Tablesdoc.xlsx"
+      },
+      {
+        "year": 2023,
+        "academic_year_label": "2023-24",
+        "release_type": "Final",
+        "release_date_text": "March 2026",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2023-24_Final.zip",
+        "access_filename": "IPEDS_2023-24_Final.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS202324Tablesdoc.xlsx",
+        "doc_filename": "IPEDS202324Tablesdoc.xlsx"
+      },
+      {
+        "year": 2024,
+        "academic_year_label": "2024-25",
+        "release_type": "Provisional",
+        "release_date_text": "March 2026",
+        "access_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2024-25_Provisional.zip",
+        "access_filename": "IPEDS_2024-25_Provisional.zip",
+        "doc_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS202425Tablesdoc.xlsx",
+        "doc_filename": "IPEDS202425Tablesdoc.xlsx"
+      }
+    ],
+    "download_receipt": [
+      {
+        "url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2024-25_Provisional.zip",
+        "final_url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2024-25_Provisional.zip",
+        "file": "IPEDS_2024-25_Provisional.zip",
+        "size_bytes": 67487516,
+        "sha256": "ef134955ba5003a07d37e46fae6286a76dca4c15767c3c4cd9086b1887896713",
+        "retrieved_utc": "2026-09-30T00:42:08.026190+00:00",
+        "last_modified": "Mon, 02 Mar 2026 18:54:04 GMT"
+      },
+      {
+        "url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS202425Tablesdoc.xlsx",
+        "final_url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS202425Tablesdoc.xlsx",
+        "file": "IPEDS202425Tablesdoc.xlsx",
+        "size_bytes": 1290324,
+        "sha256": "e5c2197f55fb3f8853b866cde05d6d0be167c37480f9d0825ff4b7d60aaf5f6e",
+        "retrieved_utc": "2026-09-30T00:42:10.707454+00:00",
+        "last_modified": "Mon, 02 Mar 2026 18:53:02 GMT"
+      }
+    ],
+    "archive_receipt": {
+      "url": "https://nces.ed.gov/ipeds/tablefiles/zipfiles/IPEDS_2024-25_Provisional.zip",
+      "file": "audited-IPEDS_2024-25_Provisional.zip",
+      "size_bytes": 67487516,
+      "sha256": "ef134955ba5003a07d37e46fae6286a76dca4c15767c3c4cd9086b1887896713",
+      "retrieved_utc": "2026-09-30T00:38:25.786589+00:00",
+      "etag": "\"1dcaa75f4a9a91c\"",
+      "last_modified": "Mon, 02 Mar 2026 18:54:04 GMT",
+      "zip_crc": "all members passed",
+      "members": [
+        "IPEDS202425.accdb",
+        "ReadMe2024-25.docx",
+        "IPEDS202425Tablesdoc.xlsx"
+      ],
+      "download": "verified HTTP ranges with If-Range and exact lengths"
+    },
+    "standalone-doc-receipt": {
+      "url": "https://nces.ed.gov/ipeds/tablefiles/tableDocs/IPEDS202425Tablesdoc.xlsx",
+      "path": "/private/tmp/ipeds-post2023-audit-20260929/standalone-IPEDS202425Tablesdoc.xlsx",
+      "size_bytes": 1290324,
+      "sha256": "e5c2197f55fb3f8853b866cde05d6d0be167c37480f9d0825ff4b7d60aaf5f6e",
+      "retrieved_utc": "2026-09-30T00:34:10.291551+00:00"
+    },
+    "access_audit": {
+      "database": {
+        "file": "IPEDS202425.accdb",
+        "size_bytes": 618156032,
+        "sha256": "98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5"
+      },
+      "physical_table_count": 56,
+      "metadata_whitespace_normalizations": [
+        {
+          "varnumber": "83012",
+          "raw_varname": "OMASSC4 ",
+          "normalized_varname": "OMASSC4"
+        }
+      ],
+      "variable_definition_count": 2599,
+      "table_matching_classifications": {
+        "consistent": 2599
+      },
+      "sfa_definition_count": 112,
+      "sfa_table_matching_classifications": {
+        "consistent": 112
+      },
+      "sfa_exceptions": [],
+      "pell_metadata": [
+        {
+          "SurveyOrder": "40",
+          "SurveyNumber": "7",
+          "Survey": "Student Financial Aid",
+          "TableNumber": "70",
+          "TableName": "SFA2324",
+          "TableTitle": "Financial aid for all undergraduates and full-time, first-time, degree/certificate-seeking undergraduate students, 2023-24",
+          "VarNumber": "70306",
+          "VarOrder": "57",
+          "VarName": "UPGRNTN",
+          "ImputationVar": "XUPGRNTN",
+          "VarTitle": "Number of undergraduate students awarded Federal Pell grants",
+          "DataType": "N",
+          "FieldWidth": "6",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "39",
+          "SectionNumber": "4",
+          "LongDescription": "Number of undergraduate students who were awarded Pell grants\r\n\r\nPell Grant program (Higher Education Act of 1965, Title IV, Part A, Subpart I, as amended.) -  Provides grant assistance to eligible undergraduate postsecondary students with demonstrated financial need to help meet education expenses.",
+          "VarSource": "IPEDS, Winter 2024-25, Student Financial Aid component",
+          "FileTitle": "Financial aid for all undergraduates and full-time, first-time, degree/certificate-seeking undergraduate students, 2023-24",
+          "SectionTitle": "Financial aid: All undergraduates"
+        },
+        {
+          "SurveyOrder": "40",
+          "SurveyNumber": "7",
+          "Survey": "Student Financial Aid",
+          "TableNumber": "70",
+          "TableName": "SFA2324",
+          "TableTitle": "Financial aid for all undergraduates and full-time, first-time, degree/certificate-seeking undergraduate students, 2023-24",
+          "VarNumber": "70421",
+          "VarOrder": "61",
+          "VarName": "UPGRNTT",
+          "ImputationVar": "XUPGRNTT",
+          "VarTitle": "Total amount of Federal Pell grant aid awarded to undergraduate students",
+          "DataType": "N",
+          "FieldWidth": "10",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "39",
+          "SectionNumber": "4",
+          "LongDescription": "Total amount of Pell grant aid awarded to undergraduate students\r\n\r\nPell Grant program (Higher Education Act of 1965, Title IV, Part A, Subpart I, as amended.) Provides grant assistance to eligible undergraduate postsecondary students with demonstrated financial need to help meet education expenses.\r\n\r\nUndergraduate - A student enrolled in a 4- or 5-year bachelor's degree program, an associate's degree program, or a vocational or technical program below the baccalaureate",
+          "VarSource": "IPEDS, Winter 2024-25, Student Financial Aid component",
+          "FileTitle": "Financial aid for all undergraduates and full-time, first-time, degree/certificate-seeking undergraduate students, 2023-24",
+          "SectionTitle": "Financial aid: All undergraduates"
+        }
+      ],
+      "pell_table_audit": [
+        {
+          "varnumber": "70306",
+          "raw_varname": "UPGRNTN",
+          "varname": "UPGRNTN",
+          "declared_table": "SFA2324",
+          "physical_tables": "SFA2324",
+          "classification": "consistent",
+          "imputationvar": "XUPGRNTN",
+          "imputation_flag_tables": ""
+        },
+        {
+          "varnumber": "70421",
+          "raw_varname": "UPGRNTT",
+          "varname": "UPGRNTT",
+          "declared_table": "SFA2324",
+          "physical_tables": "SFA2324",
+          "classification": "consistent",
+          "imputationvar": "XUPGRNTT",
+          "imputation_flag_tables": ""
+        }
+      ],
+      "access_vs_separate_workbook_identity_equal": true,
+      "sfa_rows": 5575,
+      "sfa_unique_unitid": 5575,
+      "sfa_missing_unitid": 0,
+      "sfa_duplicate_unitid": 0,
+      "sfa_unitids_absent_from_hd": [],
+      "hd_rows": 6072,
+      "hd_missing_opeid": 1,
+      "pell_raw_summary": {
+        "UPGRNTN": {
+          "nonmissing": 5575,
+          "missing": 0,
+          "negative": 0,
+          "zero": 101,
+          "sum": 5486771,
+          "min": 0.0,
+          "max": 77828.0
+        },
+        "UPGRNTT": {
+          "nonmissing": 5575,
+          "missing": 0,
+          "negative": 0,
+          "zero": 101,
+          "sum": 29140280733,
+          "min": 0.0,
+          "max": 271452991.0
+        }
+      },
+      "prch_codes": {
+        "PRCH_C": {
+          "-2": 6061,
+          "2": 7,
+          "1": 4
+        },
+        "PRCH_E12": {
+          "-2": 6070,
+          "1": 1,
+          "2": 1
+        },
+        "PRCH_COS": {
+          "-2": 6072
+        },
+        "PRCH_SFA": {
+          "-2": 6070,
+          "1": 1,
+          "2": 1
+        },
+        "PRCH_GR": {
+          "-2": 6072
+        },
+        "PRCH_GR2": {
+          "-2": 6072
+        },
+        "PRCH_OM": {
+          "-2": 6072
+        },
+        "PRCH_ADM": {
+          "-2": 6072
+        },
+        "PRCH_HR": {
+          "-2": 5967,
+          "2": 75,
+          "1": 30
+        },
+        "PRCH_EF": {
+          "-2": 6070,
+          "1": 1,
+          "2": 1
+        },
+        "PRCH_F": {
+          "-2": 5175,
+          "3": 295,
+          "5": 243,
+          "2": 209,
+          "1": 149,
+          "6": 1
+        },
+        "PRCHTP_F": {
+          "-2": 5178,
+          "2": 359,
+          "1": 281,
+          "5": 242,
+          "3": 12
+        },
+        "PRCH_AL": {
+          "-2": 5716,
+          "2": 269,
+          "1": 87
+        }
+      },
+      "table_documentation": [
+        {
+          "ID": "16",
+          "Surveyorder": "110",
+          "SurveyNumber": "19",
+          "Survey": "Cost",
+          "YearCoverage": "Academic year 2024-25",
+          "TableName": "COST1_2024",
+          "Tablenumber": "201",
+          "TableTitle": "Application fees, tuition and required fees, food and housing for undergraduate and graduate students",
+          "Description": "This file contains information on student charges for Cost of Attendance estimates used to calculate an Average Net Price (ANP) for first-time, full-time undergraduate students to meet requirements of the Higher Education Act of 1965 (HEA), as amended. This file also contains information on tuition and fees and other student charges for other groups of students. \r\n\r\nFor institutions that offer primarily academic programs measured in credit hoursand  have a predominant calendar system of semester, quarter, trimester, or 4-1-4 or other academic calendar system report student charges for the full academic year. Student charges on this data file includes:\r\n\r\nCost of attendance for full-time, first-time undergraduate students for the full academic year. Cost of attendance includes amounts for published tuition and required fees, books and supplies, food and housing  and other expenses. Estimates for books and supplies, room and board and other expenses are those from the Cost of Attendance report used by the financial aid office in determining financial need.\r\n\r\nAverage tuition and required fees for the full academic year for both full-time undergraduate and graduate ; per credit hour charges for both part-time undergraduate and graduate students. Student charges for graduates do not include Doctor's-Professional practice students.\r\n\r\nAverage tuition and required fees for students in (Selected Doctor's-Professional Practice)  programs including Chiropractic (D.C. or D.C.M.), Dentistry (D.D.S. or D.M.D.), Law (L.L.B. or J.D.), Medicine (M.D.), Optometry (O.D.), Osteopathic Medicine (D.O), Pharmacy (Pharm.D.), Podiatry (D.P.M., Pod.D., D.P.), or, Veterinary Medicine (D.V.M.).  \r\n\r\nFor institutions that measure programs in clock hours or have primarily occupational programs measured in credit hours report student charges data by the full length PROGRAM, this data file includes:\r\n\r\nThe number of programs offered\r\n\r\nCost of attendance for the largest progam by program. Cost of attendance includes amounts for published tuition and required fees, books and supplies, food and housing  and other expenses. Estimates for books and supplies, room and board and other expenses are those from the Cost of Attendance report used by the financial aid office in determining financial need.\r\n\r\nTuition and fees and costs of books and supplies by length of program for the second through sixth largest programs by enrollment.\r\n\r\nInformation on application fees, institutionally-controlled housing,  and food and meal plans are available for all institutitons.",
+          "Release": "Provisional",
+          "Release_date": "December 2025"
+        },
+        {
+          "ID": "25",
+          "Surveyorder": "110",
+          "SurveyNumber": "19",
+          "Survey": "Cost",
+          "YearCoverage": "Academic year 2024-25",
+          "TableName": "COST2_2024_FinancialAid",
+          "Tablenumber": "202",
+          "TableTitle": "Financial aid for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "Description": "This table contains financial aid data required for calculating the average net price of attendance, including the number of students awarded financial aid living on-campus, off-campus (with family) and off-campus (not with family); the total amount of grant or scholarship aid awarded from the federal government, state/local government, or the institution  for the following two groups: (1) full-time, first-time degree/certificate-seeking undergraduate students who were awarded grant and scholarship aid; and (2) full-time, first-time degree/certificate-seeking undergraduate students who were awarded Title IV federal student aid. For public institutions, group 1 and group 2 include only students who pay the in-district or in-state.",
+          "Release": "Provisional",
+          "Release_date": "December 2025"
+        },
+        {
+          "ID": "42",
+          "Surveyorder": "110",
+          "SurveyNumber": "19",
+          "Survey": "Cost",
+          "YearCoverage": "Academic year 2024-25",
+          "TableName": "COST2_2024_NetPrice",
+          "Tablenumber": "204",
+          "TableTitle": "Average net price for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "Description": "This table contains the total cost of attendance and average net price at each institution for the following two groups: (1) full-time, first-time degree/certificate-seeking undergraduate students who were awarded grant and scholarship aid; and (2) full-time, first-time degree/certificate-seeking undergraduate students who were awarded Title IV federal student aid. For public institutions, group 1 and group 2 include only students who pay the in-district or in-state tuition rate.",
+          "Release": "Provisional",
+          "Release_date": "December 2025"
+        },
+        {
+          "ID": "52",
+          "Surveyorder": "40",
+          "SurveyNumber": "7",
+          "Survey": "Student Financial Aid",
+          "YearCoverage": "July 1, 2023 - June 30, 2024",
+          "TableName": "SFA2324",
+          "Tablenumber": "70",
+          "TableTitle": "Student financial aid: 2023-24",
+          "Description": "This file contains data on the number of full-time, first-time degree/certificate-seeking undergraduate students and all undergraduate students who were awarded different types of student financial aid, including grants and loans, from different sources at each institution. Sources and types of aid reported for full-time, first-time degree/certificate-seeking undergraduate students include Federal Pell grants, other federal grants, state/local grants, grants from the institution, federal and nonfederal student loans.  Beginning with academic year 2021-22 all undergraduates were disaggregated by degree/certificate seeking status.  Federal Pell grants and federal loans were reported for degree/certificate-seeking undergraduate students. Total grants or scholarships were reported for both degree/certificate-seeking and non-degree/non-certificate-seeking undergraduates. In academic year 2022-23, both Federal Pell grants and federal loans were reported for non-degree/non-certificate-seeking undergraduates. Included are the total and average dollar amounts of aid awarded to these students. ",
+          "Release": "Provisional",
+          "Release_date": "December 2025"
+        },
+        {
+          "ID": "11",
+          "Surveyorder": "40",
+          "SurveyNumber": "7",
+          "Survey": "Student Financial Aid",
+          "YearCoverage": "July 1, 2023 - June 30, 2024",
+          "TableName": "SFAV2324",
+          "Tablenumber": "72",
+          "TableTitle": "Military Servicemembers and Veteran's Benefits, 2023-24",
+          "Description": "This file contains data for students receiving military, service members and veteran's benefits Data includes number of students receiving benefits/assistance, and total dollar amount of benefits/assistance received through the institution. Types of benefits/assistance are Post-9/11 GI Bill Benefits and the Department of Defense Tuition Assistance Program.  Data are available for both undergraduate and graduate students.\n\n",
+          "Release": "Provisional",
+          "Release_date": "December 2025"
+        }
+      ],
+      "physical_columns_without_exact_definition": {
+        "CUSTOMCGIDS2024": [
+          "CGCITY",
+          "SECTOR",
+          "CYACTIVE",
+          "MATCH"
+        ],
+        "NEWVARIABLES24": [
+          "SURVEYORDER",
+          "SURVEYNUMBER",
+          "SURVEY",
+          "TABLENAME",
+          "VARNUMBER",
+          "VARNAME",
+          "VARTITLE",
+          "FILENUMBER",
+          "SECTIONNUMBER"
+        ]
+      },
+      "release_readme_imputation_paragraphs": [
+        "Because Microsoft Access has a variable limit for each table, the item imputation status flag variables are not included in this database. The item status flag variables are associated with all continuous variables in the database and indicate for each variable what values are reported, implied, or imputed and which variables may not be applicable for an institution. IPEDS is a mandatory survey for institutions participating in Title IV federal financial aid programs and response rates are nearly 100 percent, so most variables do not contain imputed values. Survey record response status variables are included in the database."
+      ]
+    },
+    "access_vs_csv_parity": {
+      "access_rows": 5575,
+      "csv_rows": 5575,
+      "unitid_sets_equal": true,
+      "common_nonkey_columns": 91,
+      "compared_cells": 507325,
+      "mismatches_by_column": {},
+      "access_only_columns": [],
+      "csv_only_columns": [
+        "XAGRNT_A",
+        "XAGRNT_N",
+        "XAGRNT_P",
+        "XAGRNT_T",
+        "XAIDFSIN",
+        "XAIDFSIP",
+        "XANYAIDN",
+        "XANYAIDP",
+        "XFGRNT_A",
+        "XFGRNT_N",
+        "XFGRNT_P",
+        "XFGRNT_T",
+        "XFLOAN_A",
+        "XFLOAN_N",
+        "XFLOAN_P",
+        "XFLOAN_T",
+        "XIGRNT_A",
+        "XIGRNT_N",
+        "XIGRNT_P",
+        "XIGRNT_T",
+        "XLOAN_A",
+        "XLOAN_N",
+        "XLOAN_P",
+        "XLOAN_T",
+        "XOFGRT_A",
+        "XOFGRT_N",
+        "XOFGRT_P",
+        "XOFGRT_T",
+        "XOLOAN_A",
+        "XOLOAN_N",
+        "XOLOAN_P",
+        "XOLOAN_T",
+        "XPGRNT_A",
+        "XPGRNT_N",
+        "XPGRNT_P",
+        "XPGRNT_T",
+        "XSCFA1N",
+        "XSCFA1P",
+        "XSCFA2",
+        "XSCFA2DG",
+        "XSCFA2ND",
+        "XSCFY1N",
+        "XSCFY1P",
+        "XSCFY2",
+        "XSCFY2DG",
+        "XSCFY2ND",
+        "XSCUGDGSK",
+        "XSCUGFFN",
+        "XSCUGFFP",
+        "XSCUGNDGS",
+        "XSCUGRAD",
+        "XSGRNT_A",
+        "XSGRNT_N",
+        "XSGRNT_P",
+        "XSGRNT_T",
+        "XUAGRNTA",
+        "XUAGRNTN",
+        "XUAGRNTP",
+        "XUAGRNTT",
+        "XUDGAGRNTA",
+        "XUDGAGRNTN",
+        "XUDGAGRNTP",
+        "XUDGAGRNTT",
+        "XUDGFLOANA",
+        "XUDGFLOANN",
+        "XUDGFLOANP",
+        "XUDGFLOANT",
+        "XUDGPGRNTA",
+        "XUDGPGRNTN",
+        "XUDGPGRNTP",
+        "XUDGPGRNTT",
+        "XUFLOANA",
+        "XUFLOANN",
+        "XUFLOANP",
+        "XUFLOANT",
+        "XUNDAGRNTA",
+        "XUNDAGRNTN",
+        "XUNDAGRNTP",
+        "XUNDAGRNTT",
+        "XUNDFLOANA",
+        "XUNDFLOANN",
+        "XUNDFLOANP",
+        "XUNDFLOANT",
+        "XUNDPGRNTA",
+        "XUNDPGRNTN",
+        "XUNDPGRNTP",
+        "XUNDPGRNTT",
+        "XUPGRNTA",
+        "XUPGRNTN",
+        "XUPGRNTP",
+        "XUPGRNTT"
+      ],
+      "pell": {
+        "UPGRNTN": {
+          "compared_cells": 5575,
+          "mismatches": 0
+        },
+        "UPGRNTT": {
+          "compared_cells": 5575,
+          "mismatches": 0
+        }
+      },
+      "csv_zip_sha256": "1cbcfb3194e68ce1fbca17812327c37c3a20c4cd03654c934dd50d02b18060bc",
+      "comparison": "align exact UNITID; trim strings; compare numeric lexical variants via Decimal; preserve blank vs nonblank"
+    },
+    "identifier_and_flag_checks": {
+      "raw_padding_removed": 6072,
+      "missing_opeid_after_trim": 1,
+      "zero_placeholder_count": 0,
+      "valid_8_digit_count": 6034,
+      "nonempty_other_formats": {
+        "-2": 37
+      },
+      "nonempty_duplicate_opeid_rows": 116,
+      "pell_imputation_codes": {
+        "XUPGRNTN": {
+          "R": 5548,
+          "C": 12,
+          "Z": 7,
+          "P": 7,
+          "N": 1
+        },
+        "XUPGRNTT": {
+          "R": 5558,
+          "Z": 7,
+          "P": 7,
+          "C": 2,
+          "N": 1
+        }
+      },
+      "valid_opeid_duplicate_rows": 79,
+      "valid_opeid_shared_groups": 39,
+      "valid_opeid_distinct": 5994
+    },
+    "category_code_checks": {
+      "scope": "All valueSets24 categories with downloaded original Access HD, FLAGS, SFA, and COST tables",
+      "category_variables_checked": 166,
+      "nonblank_cells_checked": 1001670,
+      "unknown_code_findings": []
+    },
+    "fall_revision_checks": [
+      {
+        "table": "IC2024",
+        "rows": 5963,
+        "shared_nonkey_columns": 109,
+        "access_vs_original_mismatches": {},
+        "access_vs_final_revision_mismatches": {
+          "DISAB": 1,
+          "DISABPCT": 3,
+          "DISTCRS": 1,
+          "DISTPGS": 2,
+          "DSTNCED1": 1,
+          "DSTNCED2": 1,
+          "DSTNCED3": 1,
+          "DSTNGC": 1,
+          "DSTNGN": 1,
+          "DSTNGP": 1,
+          "DSTNUGC": 1,
+          "DSTNUGN": 1,
+          "DSTNUGP": 3,
+          "LIBRES6": 1
+        },
+        "access_vs_final_changed_cells": 19,
+        "csv_zip_sha256": "6dffa230ee9d58322b33d694e28ef640200987e91a675109597c04cc3b1cd2e0",
+        "url": "https://nces.ed.gov/ipeds/complete-data-files/IC2024.zip"
+      },
+      {
+        "table": "C2024_B",
+        "rows": 5827,
+        "shared_nonkey_columns": 40,
+        "access_vs_original_mismatches": {},
+        "access_vs_final_revision_mismatches": {
+          "CS2MORM": 8,
+          "CS2MORT": 16,
+          "CS2MORW": 15,
+          "CSAIANM": 6,
+          "CSAIANT": 8,
+          "CSAIANW": 6,
+          "CSASIAM": 10,
+          "CSASIAT": 15,
+          "CSASIAW": 12,
+          "CSBKAAM": 10,
+          "CSBKAAT": 17,
+          "CSBKAAW": 17,
+          "CSGUGAG": 2,
+          "CSGUGTOT": 15,
+          "CSGUGUN": 18,
+          "CSGUKN": 20,
+          "CSGUTOT": 7,
+          "CSGUTOTAG": 5,
+          "CSGUTOTUN": 6,
+          "CSGUUGAG": 6,
+          "CSGUUGTT": 8,
+          "CSGUUGUN": 7,
+          "CSHISPM": 17,
+          "CSHISPT": 20,
+          "CSHISPW": 18,
+          "CSNHPIM": 2,
+          "CSNHPIT": 3,
+          "CSNHPIW": 4,
+          "CSNRALM": 8,
+          "CSNRALT": 12,
+          "CSNRALW": 11,
+          "CSTOTLM": 19,
+          "CSTOTLT": 25,
+          "CSTOTLW": 24,
+          "CSUNKNM": 13,
+          "CSUNKNT": 20,
+          "CSUNKNW": 19,
+          "CSWHITM": 18,
+          "CSWHITT": 22,
+          "CSWHITW": 20
+        },
+        "access_vs_final_changed_cells": 509,
+        "csv_zip_sha256": "02a8229163b8187c6681f02aaccc7d51c54818ba91874d7965ef9c824be267de",
+        "url": "https://nces.ed.gov/ipeds/complete-data-files/C2024_B.zip"
+      }
+    ],
+    "schema_change_inventory": {
+      "comparison": "VarNumber normalized leading zeros + trimmed uppercase VarName; descriptive change inventory, not an approved semantic crosswalk",
+      "source_2023_definition_count": 2696,
+      "source_2024_definition_count": 2599,
+      "new_identities": 98,
+      "absent_prior_identities": 195,
+      "sfa_2023_identities_now_in_cost_2024": 254,
+      "ic_2023_identities_now_in_cost_2024": 205,
+      "cost_tables": {
+        "COST1_2024": 226,
+        "COST2_2024_FinancialAid": 221,
+        "COST2_2024_netprice": 54,
+        "DRVCOST2024": 13
+      }
+    },
+    "pipeline_probes": {
+      "schema_version": 1,
+      "created_at_utc": "2026-09-30T00:39:34.580238+00:00",
+      "scope": "Executed pure-function and workbook probes; no panel build, publication, or dataset modification.",
+      "repository_head": "53dbcf313d7afe574eb4479ce43b3f910fe2dadc",
+      "preserved_v2_ref": "799a63930f97df9a3ec35be857f340ea3743afac",
+      "workbook": {
+        "path": "/private/tmp/ipeds-post2023-audit-20260929/standalone-IPEDS202425Tablesdoc.xlsx",
+        "sha256": "e5c2197f55fb3f8853b866cde05d6d0be167c37480f9d0825ff4b7d60aaf5f6e",
+        "cost_definition_counts": {
+          "COST1_2024": 226,
+          "COST2_2024_FinancialAid": 221,
+          "COST2_2024_netprice": 54,
+          "DRVCOST2024": 13
+        },
+        "prch_cos_code_frequencies": [
+          {
+            "TableName": "FLAGS2024",
+            "VarName": "PRCH_COS",
+            "Codevalue": "1",
+            "Frequency": "0",
+            "Percent": "0",
+            "ValueLabel": "Parent record includes data from child campuses"
+          },
+          {
+            "TableName": "FLAGS2024",
+            "VarName": "PRCH_COS",
+            "Codevalue": "2",
+            "Frequency": "0",
+            "Percent": "0",
+            "ValueLabel": "Child record - all data reported with parent campus"
+          },
+          {
+            "TableName": "FLAGS2024",
+            "VarName": "PRCH_COS",
+            "Codevalue": "-2",
+            "Frequency": "6072",
+            "Percent": "100",
+            "ValueLabel": "Not applicable"
+          }
+        ]
+      },
+      "actual_2024_table_probes": [
+        {
+          "declared_table": "COST1_2024",
+          "main_canonical_source": "COST",
+          "main_prch_cos_target": true,
+          "main_prch_sfa_target": false,
+          "main_prch_sa_target": false,
+          "main_lane": "scalar",
+          "main_source_qaqc_category": "canonical",
+          "preserved_v2_canonical_source": "COST",
+          "preserved_v2_table_grain_result": "blocked",
+          "preserved_v2_table_grain_error": "[fatal] no reviewed table-grain contract for year=2024 source_file=COST access_table_name=COST1_2024"
+        },
+        {
+          "declared_table": "COST2_2024_FinancialAid",
+          "main_canonical_source": "COST_FINANCIALAID",
+          "main_prch_cos_target": false,
+          "main_prch_sfa_target": false,
+          "main_prch_sa_target": false,
+          "main_lane": "scalar",
+          "main_source_qaqc_category": "needs_review",
+          "preserved_v2_canonical_source": "COST_FINANCIALAID",
+          "preserved_v2_table_grain_result": "blocked",
+          "preserved_v2_table_grain_error": "[fatal] no reviewed table-grain contract for year=2024 source_file=COST_FINANCIALAID access_table_name=COST2_2024_FinancialAid"
+        },
+        {
+          "declared_table": "COST2_2024_netprice",
+          "main_canonical_source": "COST_NETPRICE",
+          "main_prch_cos_target": false,
+          "main_prch_sfa_target": false,
+          "main_prch_sa_target": false,
+          "main_lane": "scalar",
+          "main_source_qaqc_category": "needs_review",
+          "preserved_v2_canonical_source": "COST_NETPRICE",
+          "preserved_v2_table_grain_result": "blocked",
+          "preserved_v2_table_grain_error": "[fatal] no reviewed table-grain contract for year=2024 source_file=COST_NETPRICE access_table_name=COST2_2024_netprice"
+        },
+        {
+          "declared_table": "DRVCOST2024",
+          "main_canonical_source": "DRVCOST",
+          "main_prch_cos_target": false,
+          "main_prch_sfa_target": false,
+          "main_prch_sa_target": false,
+          "main_lane": "dimensioned",
+          "main_source_qaqc_category": "needs_review",
+          "preserved_v2_canonical_source": "DRVCOST",
+          "preserved_v2_table_grain_result": "blocked",
+          "preserved_v2_table_grain_error": "[fatal] no reviewed table-grain contract for year=2024 source_file=DRVCOST access_table_name=DRVCOST2024"
+        },
+        {
+          "declared_table": "SFA2324",
+          "main_canonical_source": "SFA",
+          "main_prch_cos_target": false,
+          "main_prch_sfa_target": true,
+          "main_prch_sa_target": true,
+          "main_lane": "scalar",
+          "main_source_qaqc_category": "canonical",
+          "preserved_v2_canonical_source": "SFA",
+          "preserved_v2_table_grain_result": "blocked",
+          "preserved_v2_table_grain_error": "[fatal] no reviewed table-grain contract for year=2024 source_file=SFA access_table_name=SFA2324"
+        },
+        {
+          "declared_table": "SFAV2324",
+          "main_canonical_source": "SFAV",
+          "main_prch_cos_target": false,
+          "main_prch_sfa_target": true,
+          "main_prch_sa_target": true,
+          "main_lane": "scalar",
+          "main_source_qaqc_category": "canonical",
+          "preserved_v2_canonical_source": "SFAV",
+          "preserved_v2_table_grain_result": "blocked",
+          "preserved_v2_table_grain_error": "[fatal] no reviewed table-grain contract for year=2024 source_file=SFAV access_table_name=SFAV2324"
+        }
+      ],
+      "synthetic_matching_probes": [
+        {
+          "probe": "known_sfa_wrong_table",
+          "synthetic": true,
+          "physical_table": "SFA2324_P1",
+          "physical_columns": [
+            "UNITID",
+            "UPGRNTN"
+          ],
+          "outcome": "blocked",
+          "error": "[fatal] physical table/variable metadata mismatch for SFA2324_P1: ['UPGRNTN']. An exact table match or a versioned source metadata correction is required."
+        },
+        {
+          "probe": "unknown_table",
+          "synthetic": true,
+          "physical_table": "NEW2024",
+          "physical_columns": [
+            "UNITID",
+            "NEW_VAR"
+          ],
+          "outcome": "returned",
+          "selected_variables": []
+        },
+        {
+          "probe": "unknown_column",
+          "synthetic": true,
+          "physical_table": "SFA2324_P2",
+          "physical_columns": [
+            "UNITID",
+            "UPGRNTN",
+            "NEW_VAR"
+          ],
+          "outcome": "returned",
+          "selected_variables": [
+            "UPGRNTN"
+          ]
+        }
+      ],
+      "proposed_2024_contract_validation": {
+        "outcome": "blocked",
+        "issues": [
+          "release.default_year_spec: contract='2004:2024' code='2004:2023'",
+          "release.end_year: contract=2024 code=2023"
+        ]
+      },
+      "preserved_v2_contract_coverage": [
+        {
+          "path": "contracts/table_grain.csv",
+          "git_ref": "799a63930f97df9a3ec35be857f340ea3743afac",
+          "rows": 114,
+          "min_year": 2004,
+          "max_year": 2023,
+          "rows_covering_2024": 0,
+          "prch_cos_rows": null
+        },
+        {
+          "path": "contracts/source_columns.csv",
+          "git_ref": "799a63930f97df9a3ec35be857f340ea3743afac",
+          "rows": 4681,
+          "min_year": 2004,
+          "max_year": 2023,
+          "rows_covering_2024": 0,
+          "prch_cos_rows": null
+        },
+        {
+          "path": "contracts/prch_policy.csv",
+          "git_ref": "799a63930f97df9a3ec35be857f340ea3743afac",
+          "rows": 1658,
+          "min_year": 2004,
+          "max_year": 2023,
+          "rows_covering_2024": 0,
+          "prch_cos_rows": 0
+        }
+      ],
+      "code_references": [
+        {
+          "path": "Scripts/01_download_access_databases.py",
+          "lines": "113-114,139-158,184-216",
+          "finding": "Final-only enforcement; missing requested final releases block; existing downloads reused while manifest page metadata is refreshed."
+        },
+        {
+          "path": "Scripts/02_extract_access_db.py",
+          "lines": "88-94,128-146,268-270",
+          "finding": "Existing exported CSVs can be reused after archive extraction; the manifest then records newly extracted database hash."
+        },
+        {
+          "path": "Scripts/source_metadata_corrections.py",
+          "lines": "85-104,160-181",
+          "finding": "Corrections are exact year/table/variable identities; known family physical-table mismatch blocks."
+        },
+        {
+          "path": "Scripts/04_harmonize.py",
+          "lines": "610-630,662-664",
+          "finding": "Unmatched tables are skipped; only dictionary-known physical variables enter long output."
+        },
+        {
+          "path": "Scripts/03_dictionary_ingest.py",
+          "lines": "230-302,505-511",
+          "finding": "SAL_A_LT missing-year metadata uses nearest-year donor; extension requires semantic revalidation."
+        },
+        {
+          "path": "Scripts/QA_QC/11_validate_panel_contract.py",
+          "lines": "116-122",
+          "finding": "Release validator hardcodes 2004:2023 and 2023 end year."
+        },
+        {
+          "path": "Scripts/prch_policy.py",
+          "lines": "61,125-132",
+          "finding": "PRCH_COS targets exact canonical COST only; new Cost families are not targeted."
+        },
+        {
+          "path": "Scripts/wide_build_common.py",
+          "lines": "160-166,348-349",
+          "finding": "Default DRV prefix automatically assigns DRVCOST to dimensioned lane."
+        },
+        {
+          "path": "Scripts/wide_build_duckdb.py",
+          "lines": "956-959",
+          "finding": "Dimensioned sources are excluded from scalar target discovery."
+        },
+        {
+          "path": "Scripts/00_run_all.py",
+          "lines": "57,74-76,218-270",
+          "finding": "Main runner generates draft analysis panels and optional QA; full readiness applies to custom export path, not automatically every build."
+        },
+        {
+          "path": "Scripts/organize_data_root.py",
+          "lines": "18-26,40-43",
+          "finding": "Publication identity is hardcoded to existing 2004-2023 corrected release."
+        },
+        {
+          "path": "Scripts/build_codebook.py",
+          "lines": "21,350-364",
+          "finding": "Codebook reads hardcoded 2004-2023 filename from Final manifest."
+        },
+        {
+          "path": "Scripts/QA_QC/25_prepare_v2_repair_pipeline.py",
+          "lines": "14-15,28-41",
+          "finding": "Canonical release reproduction uses preserved v2 commit plus narrow repair overlay and frozen PRCH policy."
+        },
+        {
+          "path": "Scripts/04_harmonize.py",
+          "git_ref": "799a63930f97df9a3ec35be857f340ea3743afac",
+          "lines": "439-445,468-486",
+          "finding": "Preserved v2 requires reviewed year-specific table-grain contracts; 2024 probes fail closed."
+        },
+        {
+          "path": "Scripts/07_clean_panel.py",
+          "git_ref": "799a63930f97df9a3ec35be857f340ea3743afac",
+          "lines": "847-857",
+          "finding": "Preserved v2 release mode rejects input PRCH flags with no year-overlapping rules."
+        }
+      ],
+      "caveats": [
+        "Current main runner differs from the preserved v2 pipeline that produced canonical Final; main omission risks must not be presented as demonstrated errors in the published Final panel.",
+        "Workbook lists PRCH_COS=1 and =2 frequencies zero, and -2 frequency 6072 (100 percent). Incomplete PRCH_COS source-family coverage is a demonstrated policy gap, not a demonstrated 2024 double-counting or data-value error. Verify raw FLAGS2024 independently.",
+        "Canonicalization/lane probes do not verify physical Access column presence or raw source values.",
+        "Synthetic SFA2324_P1/P2 probes test a hypothetical same-family mismatch; the actual workbook declares SFA2324 as a single table."
+      ],
+      "requirements": [
+        "Use a separate versioned staging and release identity for any provisional extension; do not silently replace final-only canonical release.",
+        "Extend preserved v2 year-specific source release locks, table-grain, source-column, analysis-schema and PRCH contracts using independently verified actual tables and definitions.",
+        "Require every new physical table/column to be included or explicitly excluded with a reviewed reason.",
+        "Review all four Cost source families and DRVCOST grain; do not add blanket aliases to force acceptance.",
+        "Preserve all 2004-2023 values, missingness and frozen PRCH actions; verify the historical slice exactly.",
+        "Use fresh version-bound extraction and preserve archive/database/CSV hashes.",
+        "Verify new-year reference periods, identifier conventions, units and category definitions before FSA linkage.",
+        "Parameterize publication/codebook release names and rerun labeled export, metadata, checksum, native Stata and release acceptance checks."
+      ]
+    },
+    "official_release_evidence": {
+      "schema_version": 1,
+      "generated_at_utc": "2026-09-30T00:42:57.396592+00:00",
+      "as_of_local_date": "2026-09-29",
+      "scope": "Live official post-2023 release availability, actual updated component ZIP verification, SFA cohort and imputation definitions. No repository, existing release, or downstream FSA data modified.",
+      "methods": [
+        "Fetched current official NCES HTML and primary survey PDFs over HTTPS using curl. Search snippets guided discovery but were not used as sole verification.",
+        "Public complete-data pages required standard session cookies to complete normal NCES redirects. No private access or credentials were used.",
+        "Parsed actual page text and downloadable ZIP contents; tested ZIP CRC integrity; computed SHA-256 for received files and archive members.",
+        "Compared original and revised IC2024/C2024_B CSVs on unique UNITID, including every field.",
+        "Read both academic-reporter SFA forms directly using pdftotext, distinguishing academic from program reporter forms.",
+        "Read official SFA2324 dictionary workbook with openpyxl and counted XUPGRNTN/XUPGRNTT codes in official CSV."
+      ],
+      "release_status": {
+        "2024": {
+          "access_collection": "2024-25",
+          "access_status": "Provisional",
+          "access_listing_release": "March 2026",
+          "fall_status": "Final",
+          "fall_release": "2026-09-08",
+          "winter_status": "Provisional",
+          "winter_release": "2025-12-09",
+          "spring_status": "Provisional",
+          "spring_release": "2026-01-06",
+          "finding": "March Access archive predates currently available final fall revisions; preserve component-specific source/release vintage."
+        },
+        "2025": {
+          "collection": "2025-26",
+          "access_listed": false,
+          "fall_status": "Provisional",
+          "fall_release": "2026-07-28",
+          "available_fall_components": [
+            "Institutional Characteristics / HD",
+            "Completions",
+            "12-month Enrollment"
+          ],
+          "sfa_available": false,
+          "spring_available": false,
+          "evidence": "Latest fall memo explicitly marks winter SFA and spring components data currently unavailable; 2025 complete-data listing has fall components only.",
+          "reference_periods": {
+            "IC": "Fall 2025",
+            "Completions": "July 1, 2024 through June 30, 2025",
+            "E12": "2024-25"
+          }
+        }
+      },
+      "actual_revision_comparisons": {
+        "IC2024": {
+          "comparison_method": "Exact UTF-8-sig CSV strings compared on unique UNITID across original versus _rv member; includes data and imputation-flag fields.",
+          "original_rows": 5963,
+          "revised_rows": 5963,
+          "ids_added": 0,
+          "ids_removed": 0,
+          "changed_cells": 20,
+          "changed_cells_by_variable": {
+            "DSTNUGC": 1,
+            "DSTNUGP": 3,
+            "DSTNUGN": 1,
+            "DISTCRS": 1,
+            "DISTPGS": 2,
+            "DSTNCED1": 1,
+            "DSTNCED3": 1,
+            "DISAB": 1,
+            "XDISABPC": 1,
+            "DISABPCT": 3,
+            "DSTNGC": 1,
+            "DSTNGN": 1,
+            "DSTNCED2": 1,
+            "LIBRES6": 1,
+            "DSTNGP": 1
+          }
+        },
+        "C2024_B": {
+          "comparison_method": "Exact UTF-8-sig CSV strings compared on unique UNITID across original versus _rv member; includes data and imputation-flag fields.",
+          "original_rows": 5827,
+          "revised_rows": 5827,
+          "ids_added": 0,
+          "ids_removed": 0,
+          "changed_cells": 595,
+          "changed_cells_by_variable": {
+            "CSTOTLT": 25,
+            "CSTOTLM": 19,
+            "CSTOTLW": 24,
+            "CSBKAAT": 17,
+            "CSBKAAW": 17,
+            "CSHISPT": 20,
+            "CSHISPW": 18,
+            "CSWHITT": 22,
+            "CSWHITM": 18,
+            "CSWHITW": 20,
+            "CS2MORT": 16,
+            "CS2MORW": 15,
+            "CSNRALT": 12,
+            "CSNRALW": 11,
+            "XCSGUGUN": 14,
+            "CSGUGUN": 18,
+            "XCSGUGTT": 14,
+            "CSGUGTOT": 15,
+            "CSAIANT": 8,
+            "CSAIANM": 6,
+            "CSASIAT": 15,
+            "CSASIAM": 10,
+            "CSASIAW": 12,
+            "CSBKAAM": 10,
+            "CSHISPM": 17,
+            "CS2MORM": 8,
+            "CSUNKNT": 20,
+            "CSUNKNM": 13,
+            "CSUNKNW": 19,
+            "CSNRALM": 8,
+            "CSGUUGAG": 6,
+            "CSGUUGTT": 8,
+            "CSGUTOTAG": 5,
+            "CSGUTOT": 7,
+            "CSGUKN": 20,
+            "CSAIANW": 6,
+            "CSGUGAG": 2,
+            "CSNHPIT": 3,
+            "CSNHPIW": 4,
+            "XCSNRALT": 3,
+            "XCSNRALM": 2,
+            "XCSNRALW": 3,
+            "CSGUUGUN": 7,
+            "CSGUTOTUN": 6,
+            "XCSGUUGU": 3,
+            "XCSGUUGA": 3,
+            "XCSGUUGT": 5,
+            "XCSGUTTAG": 2,
+            "XCSGUTOT": 3,
+            "XCSGUKN": 3,
+            "XCSGUGAG": 3,
+            "CSNHPIM": 2,
+            "XCSTOTLT": 1,
+            "XCSTOTLM": 1,
+            "XCSTOTLW": 1,
+            "XCSAIANT": 1,
+            "XCSAIANM": 1,
+            "XCSAIANW": 1,
+            "XCSASIAT": 1,
+            "XCSASIAM": 1,
+            "XCSASIAW": 1,
+            "XCSBKAAT": 1,
+            "XCSBKAAM": 1,
+            "XCSBKAAW": 1,
+            "XCSHISPT": 1,
+            "XCSHISPM": 1,
+            "XCSHISPW": 1,
+            "XCSNHPIT": 1,
+            "XCSNHPIM": 1,
+            "XCSNHPIW": 1,
+            "XCSWHITT": 1,
+            "XCSWHITM": 1,
+            "XCSWHITW": 1,
+            "XCS2MORT": 1,
+            "XCS2MORM": 1,
+            "XCS2MORW": 1,
+            "XCSUNKNT": 1,
+            "XCSUNKNM": 1,
+            "XCSUNKNW": 1,
+            "XCSGUTTUN": 1
+          }
+        }
+      },
+      "sfa_scope": {
+        "2023_academic_form": "Part B: all undergraduates enrolled Fall 2022, with aid awarded any time during institution-defined academic year 2022-23.",
+        "2024_academic_form": "Part B: all undergraduates enrolled Fall 2023, with aid awarded any time during institution-defined academic year 2023-24.",
+        "finding": "No new Pell cohort-definition break established between the matched 2023 and 2024 academic forms. Broad July-June table dates do not establish a universal full-year cohort.",
+        "program_reporter_caution": "2023 program form Part A uses July 1, 2022 through June 30, 2023; 2024 SCUGRAD dictionary describes a September 1-August 31 full-year cohort. These source descriptions require qualification; do not impose one universal date interval on all reporting types.",
+        "fsa_reconciliation_caution": "IPEDS reports awarded grants rather than necessarily disbursed grants; student population and reporting scope differ from whole-award-year FSA files."
+      },
+      "other_changes": {
+        "collection_2024_25": "Cost (CST) moves tuition, cost of attendance and average net price elements from IC/SFA. Source mapping requires explicit review.",
+        "award_year_2024_25": "FSA Pell eligibility changes to maximum/minimum/SAI-calculated pathways. Relevant to prospective panel year 2025 Pell; not panel year 2024 Pell simply because collection label is 2024-25.",
+        "collection_2025_26": "Academic Libraries component retired; absence is structural."
+      },
+      "pell_imputation_flags": {
+        "XUPGRNTN": {
+          "counts": {
+            "R": 5548,
+            "Z": 7,
+            "P": 7,
+            "C": 12,
+            "N": 1
+          },
+          "label_source": "SFA2324_Dict.zip / sfa2324.xlsx / Imputation values",
+          "linked_value_variable": "UPGRNTN",
+          "observed_labels": {
+            "R": "Reported",
+            "Z": "Implied zero",
+            "P": "Imputed using Carry Forward procedure",
+            "C": "Analyst corrected reported value",
+            "N": "Imputed using Nearest Neighbor procedure"
+          }
+        },
+        "XUPGRNTT": {
+          "counts": {
+            "R": 5558,
+            "Z": 7,
+            "P": 7,
+            "N": 1,
+            "C": 2
+          },
+          "label_source": "SFA2324_Dict.zip / sfa2324.xlsx / Imputation values",
+          "linked_value_variable": "UPGRNTT",
+          "observed_labels": {
+            "R": "Reported",
+            "Z": "Implied zero",
+            "P": "Imputed using Carry Forward procedure",
+            "N": "Imputed using Nearest Neighbor procedure",
+            "C": "Analyst corrected reported value"
+          }
+        }
+      },
+      "all_official_imputation_labels": {
+        "A": "Not applicable",
+        "B": "Institution left item blank",
+        "C": "Analyst corrected reported value",
+        "D": "Do not know",
+        "G": "Data generated from other data values",
+        "H": "Value not derived - data not usable",
+        "J": "Logical imputation",
+        "K": "Ratio adjustment",
+        "L": "Imputed using the Group Median procedure",
+        "N": "Imputed using Nearest Neighbor procedure",
+        "P": "Imputed using Carry Forward procedure",
+        "R": "Reported",
+        "Z": "Implied zero"
+      },
+      "sources": [
+        {
+          "url": "https://nces.ed.gov/ipeds/survey-components/data-release-schedule",
+          "local_path": "/tmp/ipeds-release-schedule.html",
+          "bytes": 67228,
+          "sha256": "bebafda51866c4c26466f42b563a8b09abad6a53cc110cfe272e6ecd6b4eb82f"
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/use-the-data/download-access-database",
+          "local_path": "/tmp/ipeds-access-download.html",
+          "bytes": 53475,
+          "sha256": "4b889887b7bbe1a6a81c37e98cfa11be5051884f59a026a1c066081c0d7d4e24"
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/survey-components/release-memo?type=winter&year=2025",
+          "local_path": "/tmp/ipeds-winter25-memo.html",
+          "bytes": 73242,
+          "sha256": "d917f5b6fbd393cbe9fa5f8fbcf3bee691aada6fc2e9cbadeab2733eb933c163"
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/survey-components/release-memo?type=fall&year=2026",
+          "local_path": "/tmp/ipeds-fall26-memo.html",
+          "bytes": 85727,
+          "sha256": "fa139b3d0c44c2a1fea78b811bea53c170859e278dc0d8295a75a3c985ce9692"
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/report-your-data/archived-changes/2024-25",
+          "local_path": "/tmp/ipeds-archived-changes2024.html",
+          "bytes": 252783,
+          "sha256": "74e6cedf3be33dff44b6b96e93ab5912940e317b5496e71e565b2399749f552d"
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/datacenter/DataFiles.aspx?year=2025&surveyNumber=-1",
+          "local_path": "/tmp/ipeds-datacenter.html",
+          "bytes": 84848,
+          "sha256": "afc6f3154edbab339f03915c95bf13bb52a88c13e3fd59770de0e82ed336a1a7"
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/datacenter/DataFiles.aspx?year=2024&surveyNumber=-1",
+          "local_path": "/tmp/ipeds-datacenter2024.html",
+          "bytes": 123118,
+          "sha256": "1e47682bad82982eb3ad952967851594ad88e9ff774b0bfd2e144d3ed0fff75d"
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/",
+          "local_path": "/tmp/ipeds-home.html",
+          "bytes": 59770,
+          "sha256": "76577a0ccade1f06883d02b6704e33c47b3ad14f82f7c423123f71a21891c4af"
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/use-the-data/download-survey-material/2024/student%20financial%20aid/package_7_16.pdf",
+          "local_path": "/tmp/ipeds-survey2024-sfa.pdf",
+          "bytes": 977403,
+          "sha256": "d76dcec16f78c157b538d496ba7a5fed0680afc7ed2aa13df4e889b26c04a52a"
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/use-the-data/download-survey-material/2023/student%20financial%20aid/package_7_19.pdf",
+          "local_path": "/tmp/ipeds-survey2023-sfa.pdf",
+          "bytes": 2011447,
+          "sha256": "381cabd426fc2c47a58dd7c0fe6e7ca866bfe8019700f76f3dab28ad4a710018"
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/use-the-data/download-survey-material/2023/student%20financial%20aid/package_7_16.pdf",
+          "local_path": "/tmp/ipeds-survey2023-sfa-academic.pdf",
+          "bytes": 1951748,
+          "sha256": "412b5b679a316c1e7623306786448f781ef467fdabe47e64df53ca871d171f34"
+        },
+        {
+          "url": "https://fsapartners.ed.gov/knowledge-center/fsa-handbook/2024-2025/application-and-verification-guide/ch3-student-aid-index-sai-and-pell-grant-eligibility",
+          "local_path": "/tmp/fsa-pell-2024-25.html",
+          "bytes": 153184,
+          "sha256": "5f321280da3005a3669ffc5332cb5670c4cd9517879a44875b1119761a132fcc"
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/complete-data-files/IC2024.zip",
+          "local_path": "/tmp/ipeds-IC2024.zip",
+          "bytes": 269921,
+          "sha256": "6dffa230ee9d58322b33d694e28ef640200987e91a675109597c04cc3b1cd2e0",
+          "zip_integrity_error": null,
+          "members": [
+            {
+              "name": "ic2024.csv",
+              "bytes": 1497810,
+              "sha256": "6fce060ce931378adfd8ed1d88f12856e45d9b60401a4140785741226a20bce4",
+              "zip_timestamp": [
+                2026,
+                8,
+                31,
+                14,
+                57,
+                6
+              ]
+            },
+            {
+              "name": "ic2024_rv.csv",
+              "bytes": 1497813,
+              "sha256": "b6487f4b3910a66eb1c47ce6acc7e90554827286725c620365537edcbea87279",
+              "zip_timestamp": [
+                2026,
+                8,
+                31,
+                14,
+                57,
+                6
+              ]
+            }
+          ]
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/complete-data-files/C2024_B.zip",
+          "local_path": "/tmp/ipeds-C2024_B.zip",
+          "bytes": 467918,
+          "sha256": "02a8229163b8187c6681f02aaccc7d51c54818ba91874d7965ef9c824be267de",
+          "zip_integrity_error": null,
+          "members": [
+            {
+              "name": "c2024_b.csv",
+              "bytes": 1064411,
+              "sha256": "dd77a67f6b9e4344f968976c51aa5467c9b394326b6f3719a902043f5a0d9892",
+              "zip_timestamp": [
+                2026,
+                9,
+                7,
+                12,
+                57,
+                28
+              ]
+            },
+            {
+              "name": "c2024_b_rv.csv",
+              "bytes": 1064417,
+              "sha256": "252bdad29be3267765d40d1d784b4a9b4e7d6b225bdb92672c202bc999ddc2d8",
+              "zip_timestamp": [
+                2026,
+                9,
+                7,
+                12,
+                57,
+                28
+              ]
+            }
+          ]
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/complete-data-files/EFFY2024.zip",
+          "local_path": "/tmp/ipeds-EFFY2024.zip",
+          "bytes": 6933660,
+          "sha256": "f1ae6c99f2a50cd77d03b6b6b36b32466da890fc9617969c41a7aea8402a0f95",
+          "zip_integrity_error": null,
+          "members": [
+            {
+              "name": "effy2024.csv",
+              "bytes": 19484774,
+              "sha256": "8bb788ad622aad8ceec02f353601b18ded814dca1d12176da2255f5bc5e95402",
+              "zip_timestamp": [
+                2026,
+                8,
+                31,
+                14,
+                55,
+                32
+              ]
+            },
+            {
+              "name": "effy2024_rv.csv",
+              "bytes": 19486276,
+              "sha256": "eaeb752e3b41eeb591ada4d20519908210786e6dd06f53d65b3aca36ca848754",
+              "zip_timestamp": [
+                2026,
+                8,
+                31,
+                14,
+                55,
+                36
+              ]
+            }
+          ]
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/complete-data-files/EFFY2025.zip",
+          "local_path": "/tmp/ipeds-EFFY2025.zip",
+          "bytes": 3435794,
+          "sha256": "ae0543ff1b9c1b233f4bb31f5be4cd19b94db098944c3dee9419f63fbfdee8af",
+          "zip_integrity_error": null,
+          "members": [
+            {
+              "name": "effy2025.csv",
+              "bytes": 18666621,
+              "sha256": "759a1b7e75318c8fb2bd6631b0eee118b6613927cd59b4183e4eaae9d65988a2",
+              "zip_timestamp": [
+                2026,
+                7,
+                21,
+                19,
+                10,
+                52
+              ]
+            }
+          ]
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/complete-data-files/SFA2324.zip",
+          "local_path": "/private/tmp/ipeds-post2023-audit-20260929/SFA2324.zip",
+          "bytes": 791653,
+          "sha256": "1cbcfb3194e68ce1fbca17812327c37c3a20c4cd03654c934dd50d02b18060bc",
+          "zip_integrity_error": null,
+          "members": [
+            {
+              "name": "sfa2324.csv",
+              "bytes": 2939666,
+              "sha256": "6ec14944821acec323851c95c4dd222b291c273ac7c16e8b1e08e813d2abeca3"
+            }
+          ]
+        },
+        {
+          "url": "https://nces.ed.gov/ipeds/complete-data-files/SFA2324_Dict.zip",
+          "local_path": "/private/tmp/ipeds-post2023-audit-20260929/SFA2324_Dict.zip",
+          "bytes": 21107,
+          "sha256": "2f65a2d1887dbd5286f4ea59dfab9fc0d21f0783df9c0c3ba48f73b4636d9bab",
+          "zip_integrity_error": null,
+          "members": [
+            {
+              "name": "sfa2324.xlsx",
+              "bytes": 22475,
+              "sha256": "5bbc0cd2e6a47d2fa73f1049f67993b01c72543d543958aa3af3ffcfd8311cb7"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "result_receipts": [
+    {
+      "name": "release_inventory.json",
+      "sha256": "a6d69489cdc25d9a455c3672e97140700897307db565e6c3664718cf9fdb04e0"
+    },
+    {
+      "name": "download_receipt.json",
+      "sha256": "891d0b01f32de20d9368ad02a0e80f4b52c6a29e72f2dad37b23bfad7c4442fa"
+    },
+    {
+      "name": "archive_receipt.json",
+      "sha256": "faf0b983c2ed2497f06c42b5f16979b9f290b2f5e32f16ba2a6322d5eed3f815"
+    },
+    {
+      "name": "standalone-doc-receipt.json",
+      "sha256": "39cb3c8641043e3a6ad570c798347e2540c4ae98e1a80a9358219c8231e2cb32"
+    },
+    {
+      "name": "access_audit.json",
+      "sha256": "b9698525349edffd2bce3df7b73b98159d9858d08da3340eab800d29876a7b1a"
+    },
+    {
+      "name": "access_vs_csv_parity.json",
+      "sha256": "7bf05b580fc6af45f436324cbd189cca08e99d6608a2c18a21ddeff3f7571bef"
+    },
+    {
+      "name": "identifier_and_flag_checks.json",
+      "sha256": "2e60db9b8071956c6bea969407d00662b168d159063deaefc8d59bcbe23466f2"
+    },
+    {
+      "name": "category_code_checks.json",
+      "sha256": "b8750934adaf0836ad0ca8b06fc380c89cdae68494efca73632ff005c362cb3f"
+    },
+    {
+      "name": "fall_revision_checks.json",
+      "sha256": "49f5170eeeff0d3581646af19aeebeb3d025185916ff4754cf6316fc688dec3e"
+    },
+    {
+      "name": "schema_change_inventory.json",
+      "sha256": "e671c3498c46a5cfd335404f545fed579a38ea3b0dfe10ff413d80d66ce72223"
+    },
+    {
+      "name": "pipeline_probes.json",
+      "sha256": "8851445120f470fa867c01ac5db3e68819b985e174a0a0f7ff7971a0a6952c4b"
+    },
+    {
+      "name": "official_release_evidence.json",
+      "sha256": "5e632b8c8a5f6385327f71db5b57bcb46e4b45a4c09e2b33b403033500e1e453"
+    }
+  ],
+  "audit_commands": {
+    "audit_access.py": "from pathlib import Path\nimport csv,hashlib,json,re,subprocess,zipfile\nimport xml.etree.ElementTree as ET\nfrom collections import Counter\nimport pandas as pd\nroot=Path('/private/tmp/ipeds-post2023-audit-20260929')\ndb=next(root.glob('*.accdb'))\ndef digest(p):\n with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()\nschema=subprocess.check_output(['mdb-schema',str(db)],text=True)\n(root/'schema.sql').write_text(schema)\nphysical={name.upper():[v.upper() for v in re.findall(r'^\\s*\\[([^]]+)\\]',body,re.M)] for name,body in re.findall(r'CREATE TABLE \\[([^]]+)\\]\\s*\\((.*?)\\n\\);',schema,re.S)}\nlisted=subprocess.check_output(['mdb-tables','-1',str(db)],text=True).splitlines()\nassert set(physical)=={n.upper() for n in listed}\nframes={}\nfor name in listed:\n if name.lower() in {'vartable24','valuesets24','tables24','flags2024','hd2024'} or name.upper().startswith(('SFA','COST')):\n  p=root/f'{name}.csv'\n  with p.open('wb') as f:subprocess.run(['mdb-export',str(db),name],stdout=f,check=True)\n  frames[name.upper()]=pd.read_csv(p,dtype=str,keep_default_na=False)\nv=frames['VARTABLE24'];audit=[]\nfor row in v.to_dict('records'):\n name=row['VarName'].strip().upper();declared=row['TableName'].strip().upper();targets=[table for table,cols in physical.items() if name in cols]\n status='consistent' if name in physical.get(declared,[]) else 'unique_physical_mismatch' if len(targets)==1 else 'absent_from_database' if not targets else 'ambiguous_physical_match'\n audit.append({'varnumber':row['VarNumber'],'raw_varname':row['VarName'],'varname':name,'declared_table':declared,'physical_tables':'|'.join(targets),'classification':status,'imputationvar':row.get('ImputationVar',''),'imputation_flag_tables':'|'.join(t for t,cols in physical.items() if row.get('ImputationVar','').upper() in cols)})\na=pd.DataFrame(audit);a.to_csv(root/'all-variable-table-audit.csv',index=False)\nsfa=a[a.declared_table.str.startswith('SFA')];sfa.to_csv(root/'sfa-variable-table-audit.csv',index=False)\n# Workbook consistency uses exact identity and plain fields, avoiding Excel's escaped CR representation.\nw=pd.read_excel(root/'standalone-IPEDS202425Tablesdoc.xlsx',sheet_name='varTable24',dtype=str,keep_default_na=False)\ncols=['VarNumber','VarName','TableName','VarTitle','ImputationVar']\nfor d in [v,w]:\n for c in cols:d[c]=d[c].str.strip()\naccess_ident=v[cols].sort_values(cols).reset_index(drop=True);workbook_ident=w[cols].sort_values(cols).reset_index(drop=True)\nworkbook_same=access_ident.equals(workbook_ident)\ns=frames['SFA2324'];hd=frames['HD2024'];flags=frames['FLAGS2024']\npellstats={}\nfor name in ['UPGRNTN','UPGRNTT']:\n n=pd.to_numeric(s[name].replace('',None),errors='raise')\n pellstats[name]={'nonmissing':int(n.notna().sum()),'missing':int(n.isna().sum()),'negative':int((n<0).sum()),'zero':int((n==0).sum()),'sum':int(n.sum()),'min':float(n.min()),'max':float(n.max())}\nprch={c:flags[c].value_counts(dropna=False).to_dict() for c in flags if c.upper().startswith('PRCH')}\nundocumented={t:[c for c in cols if c!='UNITID' and not any((a.declared_table==t)&(a.varname==c))] for t,cols in physical.items() if t not in {'VARTABLE24','VALUESETS24','TABLES24','METADATA_DEFINITIONS24'}}\nreadmes=[]\nfor p in root.glob('*.docx'):\n with zipfile.ZipFile(p) as z:\n  el=ET.fromstring(z.read('word/document.xml'))\n  ns={'w':'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}\n  paras=[''.join(t.text or '' for t in para.findall('.//w:t',ns)) for para in el.findall('.//w:p',ns)]\n  (root/(p.stem+'.txt')).write_text('\\n'.join(paras));readmes.extend(paras)\nresult={'database':{'file':db.name,'size_bytes':db.stat().st_size,'sha256':digest(db)},'physical_table_count':len(physical),'metadata_whitespace_normalizations':[{'varnumber':row['varnumber'],'raw_varname':row['raw_varname'],'normalized_varname':row['varname']} for row in audit if row['raw_varname'] != row['raw_varname'].strip()],'variable_definition_count':len(v),'table_matching_classifications':dict(Counter(a.classification)),'sfa_definition_count':len(sfa),'sfa_table_matching_classifications':dict(Counter(sfa.classification)),'sfa_exceptions':sfa[sfa.classification!='consistent'].to_dict('records'),'pell_metadata':v[v.VarName.isin(['UPGRNTN','UPGRNTT'])].to_dict('records'),'pell_table_audit':sfa[sfa.varname.isin(['UPGRNTN','UPGRNTT'])].to_dict('records'),'access_vs_separate_workbook_identity_equal':workbook_same,'sfa_rows':len(s),'sfa_unique_unitid':s.UNITID.nunique(),'sfa_missing_unitid':int(s.UNITID.eq('').sum()),'sfa_duplicate_unitid':int(s.UNITID.duplicated().sum()),'sfa_unitids_absent_from_hd':sorted(set(s.UNITID)-set(hd.UNITID)),'hd_rows':len(hd),'hd_missing_opeid':int(hd.OPEID.str.strip().eq('').sum()),'pell_raw_summary':pellstats,'prch_codes':prch,'table_documentation':frames['TABLES24'][frames['TABLES24'].TableName.str.upper().str.startswith(('SFA','COST'))].to_dict('records'),'physical_columns_without_exact_definition':{t:c for t,c in undocumented.items() if c},'release_readme_imputation_paragraphs':[p for p in readmes if 'imputation' in p.lower()]}\n(root/'access_audit.json').write_text(json.dumps(result,indent=2)+'\\n')\nprint(json.dumps({k:v for k,v in result.items() if k in ['database','physical_table_count','variable_definition_count','table_matching_classifications','sfa_definition_count','sfa_table_matching_classifications','sfa_exceptions','access_vs_separate_workbook_identity_equal','sfa_rows','sfa_unique_unitid','sfa_missing_unitid','sfa_duplicate_unitid','sfa_unitids_absent_from_hd','hd_rows','hd_missing_opeid','pell_raw_summary','prch_codes','release_readme_imputation_paragraphs']},indent=2))\n",
+    "check_codes.py": "from pathlib import Path\nfrom decimal import Decimal,InvalidOperation\nimport json,pandas as pd\nr=Path('/private/tmp/ipeds-post2023-audit-20260929')\nread=lambda p:pd.read_csv(p,dtype=str,keep_default_na=False)\nv=read(r/'varTable24.csv');codes=read(r/'valueSets24.csv')\nframes={p.stem.upper():read(p) for p in r.glob('*.csv') if p.stem.upper().startswith(('HD2024','FLAGS2024','SFA','COST')) and not p.stem.startswith('sfa-variable')}\nfor d in [v,codes]:\n for c in ['TableName','VarName']:d[c]=d[c].str.strip().str.upper()\ndef norm(x):\n x=str(x).strip()\n if x=='':return ''\n try:return str(Decimal(x).normalize())\n except InvalidOperation:return x\nchecked=[];issues=[]\nfor (table,name),group in codes.groupby(['TableName','VarName']):\n if table not in frames or name not in frames[table]:continue\n vals=frames[table][name].map(norm);allowed=set(group.Codevalue.map(norm));unknown=vals[(vals!='')&~vals.isin(allowed)].value_counts().to_dict()\n checked.append({'table':table,'varname':name,'nonblank_values':int(vals.ne('').sum()),'unknown':unknown})\n if unknown:issues.append(checked[-1])\nresult={'scope':'All valueSets24 categories with downloaded original Access HD, FLAGS, SFA, and COST tables','category_variables_checked':len(checked),'nonblank_cells_checked':sum(c['nonblank_values'] for c in checked),'unknown_code_findings':issues}\n(r/'category_code_checks.json').write_text(json.dumps(result,indent=2)+'\\n');print(json.dumps(result,indent=2))\n",
+    "check_revisions.py": "from pathlib import Path\nimport subprocess,zipfile,json,hashlib\nfrom decimal import Decimal,InvalidOperation\nimport pandas as pd\nr=Path('/private/tmp/ipeds-post2023-audit-20260929');db=r/'IPEDS202425.accdb'\ndef norm(x):\n x=str(x).strip()\n if not x:return None\n try:return Decimal(x)\n except InvalidOperation:return x\ndef prep(d):\n d.columns=d.columns.str.strip().str.upper()\n assert d.UNITID.is_unique\n return d.set_index('UNITID').sort_index()\nresults=[]\nfor table in ['IC2024','C2024_B']:\n p=r/(table+'.csv')\n with p.open('wb') as f:subprocess.run(['mdb-export',str(db),table],stdout=f,check=True)\n a=prep(pd.read_csv(p,dtype=str,keep_default_na=False))\n zpath=Path('/tmp')/('ipeds-'+table+'.zip')\n with zipfile.ZipFile(zpath) as z:\n  orig=prep(pd.read_csv(z.open(table.lower()+'.csv'),dtype=str,keep_default_na=False,encoding='utf-8-sig'))\n  rev=prep(pd.read_csv(z.open(table.lower()+'_rv.csv'),dtype=str,keep_default_na=False,encoding='utf-8-sig'))\n assert a.index.equals(orig.index) and orig.index.equals(rev.index)\n common=sorted(set(a)&set(orig)&set(rev))\n compare=lambda x,y:{c:sum(norm(u)!=norm(v) for u,v in zip(x[c],y[c])) for c in common}\n o=compare(a,orig);v=compare(a,rev)\n results.append({'table':table,'rows':len(a),'shared_nonkey_columns':len(common),'access_vs_original_mismatches':{c:n for c,n in o.items() if n},'access_vs_final_revision_mismatches':{c:n for c,n in v.items() if n},'access_vs_final_changed_cells':sum(v.values()),'csv_zip_sha256':hashlib.sha256(zpath.read_bytes()).hexdigest(),'url':'https://nces.ed.gov/ipeds/complete-data-files/'+table+'.zip'})\n(r/'fall_revision_checks.json').write_text(json.dumps(results,indent=2)+'\\n');print(json.dumps(results,indent=2))\n",
+    "compare_flatfiles.py": "from pathlib import Path\nimport json,zipfile,hashlib\nfrom decimal import Decimal\nimport pandas as pd\nroot=Path('/private/tmp/ipeds-post2023-audit-20260929')\naccess=pd.read_csv(next(root.glob('[sS][fF][aA]2324.csv')),dtype=str,keep_default_na=False)\nwith zipfile.ZipFile(root/'SFA2324.zip') as z:\n assert z.testzip() is None\n flat=pd.read_csv(z.open('sfa2324.csv'),dtype=str,keep_default_na=False,encoding='utf-8-sig')\nfor d in [access,flat]:d.columns=d.columns.str.strip().str.upper()\nassert access.UNITID.is_unique and flat.UNITID.is_unique\nassert set(access.UNITID)==set(flat.UNITID)\na=access.set_index('UNITID').sort_index();b=flat.set_index('UNITID').sort_index()\ndef norm(x):\n x=x.strip()\n if not x:return None\n try:return Decimal(x)\n except:return x\nfields=[c for c in a.columns if c in b]\ncounts={c:int((a[c].map(norm)!=b[c].map(norm)).sum()) for c in fields}\n# Comparing None after pandas mapping uses NaN; both missing must explicitly compare equal.\ncounts={c:sum(norm(x)!=norm(y) for x,y in zip(a[c],b[c])) for c in fields}\nresult={'access_rows':len(a),'csv_rows':len(b),'unitid_sets_equal':True,'common_nonkey_columns':len(fields),'compared_cells':len(a)*len(fields),'mismatches_by_column':{k:v for k,v in counts.items() if v},'access_only_columns':sorted(set(a)-set(b)),'csv_only_columns':sorted(set(b)-set(a)),'pell':{c:{'compared_cells':len(a),'mismatches':counts[c]} for c in ['UPGRNTN','UPGRNTT']},'csv_zip_sha256':hashlib.sha256((root/'SFA2324.zip').read_bytes()).hexdigest(),'comparison':'align exact UNITID; trim strings; compare numeric lexical variants via Decimal; preserve blank vs nonblank'}\n(root/'access_vs_csv_parity.json').write_text(json.dumps(result,indent=2)+'\\n');print(json.dumps(result,indent=2))\n",
+    "record_schema_changes.py": "from pathlib import Path\nimport pandas as pd,json\nr=Path('/private/tmp/ipeds-post2023-audit-20260929')\nnew=pd.read_csv(r/'varTable24.csv',dtype=str,keep_default_na=False)\nold=pd.read_csv('/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2023/tables_csv/varTable23.csv',dtype=str,keep_default_na=False)\nfor d in [new,old]:d['identity']=d.VarNumber.str.strip().str.lstrip('0')+'|'+d.VarName.str.strip().str.upper()\nnewset=set(new.identity);oldset=set(old.identity)\nresult={'comparison':'VarNumber normalized leading zeros + trimmed uppercase VarName; descriptive change inventory, not an approved semantic crosswalk','source_2023_definition_count':len(old),'source_2024_definition_count':len(new),'new_identities':len(newset-oldset),'absent_prior_identities':len(oldset-newset),'sfa_2023_identities_now_in_cost_2024':len(new[new.identity.isin(old[old.TableName.str.upper().str.startswith('SFA')].identity)&new.TableName.str.upper().str.startswith('COST')]),'ic_2023_identities_now_in_cost_2024':len(new[new.identity.isin(old[old.TableName.str.upper().str.startswith('IC')].identity)&new.TableName.str.upper().str.startswith('COST')]),'cost_tables':new[new.TableName.str.upper().str.contains('COST')].groupby('TableName').size().to_dict()}\n(r/'schema_change_inventory.json').write_text(json.dumps(result,indent=2)+'\\n');print(json.dumps(result,indent=2))\n"
+  },
+  "verification_limits": [
+    "No full 2024 harmonize/stitch/wide/clean/export pipeline was run.",
+    "Physical table matching was audited for every declared variable, but full cell parity was scoped to SFA and two revised fall tables.",
+    "Category-code coverage check was scoped to extracted HD/FLAGS/SFA/Cost tables, not every survey component.",
+    "Source-variable identities establish locations, not approved semantic continuity across years.",
+    "The prior FSA handoff needs reporter-type cohort qualification; broad table dates alone are insufficient."
+  ]
+}

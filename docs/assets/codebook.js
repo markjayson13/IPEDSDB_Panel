@@ -94,6 +94,12 @@
     content.replaceChildren();
     content.append(el('p', '', `Release: ${index.release}. Panel keys: ${(index.panel_keys || []).join(' + ')}.`));
     (index.notes || []).forEach((note) => content.append(el('p', '', note)));
+    if (index.downloads && index.downloads.column_crosswalk) {
+      const link = el('a', 'text-link', 'Download the original-to-canonical column crosswalk (CSV)');
+      link.href = `./codebook/${index.downloads.column_crosswalk}`;
+      link.download = '';
+      content.append(link);
+    }
     const gapVariables = index.variables.filter((item) => item.has_issues);
     if (gapVariables.length) {
       const notice = el('div', 'gap-callout');
@@ -312,6 +318,12 @@
   }
   function renderSources(detail, panel) {
     panel.append(el('h3', '', 'Source records'), el('p', 'section-intro', 'The physical table identifies the resolved source. Where a documented correction applies, the original dictionary table remains recorded separately.'));
+    if (detail.column_consolidation) {
+      const rule = detail.column_consolidation;
+      panel.append(el('h3', '', 'Consolidated source columns'), el('p', '', rule.rationale || 'Verified source-table moves are represented by one column. Original values and year-specific definitions are retained.'));
+      panel.append(table(['Original column', 'Years'], rule.members.map((member) => [member.column, yearsLabel(member.years)])));
+      (Array.isArray(rule.caveats) ? rule.caveats : [rule.caveats]).filter(Boolean).forEach((note) => panel.append(el('p', 'scope-note', note)));
+    }
     const records = (detail.source_records || []).filter(inYear);
     if (!records.length) { panel.append(el('p', 'blank-value', 'No source record is supplied for this year selection.')); return; }
     records.forEach((record) => {

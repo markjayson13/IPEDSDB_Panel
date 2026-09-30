@@ -133,13 +133,19 @@ def verify_labeled_layer(root: Path, layout: dict, base: dict, base_digest: str,
     return manifest
 
 
-def verify_package(package: Path, base_panel: Path, *, allow_source_gaps: bool) -> tuple[dict, dict]:
+def verify_package(package: Path, base_panel: Path, *, allow_source_gaps: bool,
+                   panel_name: str = PANEL) -> tuple[dict, dict]:
+    # Candidate extensions use the same full-data and native-label gates.
+    if Path(panel_name).name != panel_name or Path(panel_name).suffix != ".parquet":
+        raise ValueError("Expected a plain Parquet panel filename")
+    stata_name = str(Path(panel_name).with_suffix(".dta"))
+    package_files = [name + suffix for name in (panel_name, stata_name) for suffix in ("", *PACKAGE_SUFFIXES)]
     files = sorted(path for path in package.rglob("*") if path.is_file())
     if any(path.is_symlink() for path in package.rglob("*")):
         raise ValueError("A labeled release package cannot contain symlinks")
     if (package / "manifest.json").exists():
         raise ValueError("The work package already contains a release manifest")
-    required = PACKAGE_FILES + ["Checks/native_stata/validation.json"]
+    required = package_files + ["Checks/native_stata/validation.json"]
     if any(not (package / name).is_file() for name in required):
         raise ValueError("Labeled package lacks data, companions, or the full native Stata receipt")
     fingerprints, snapshots = {}, {}
@@ -150,7 +156,7 @@ def verify_package(package: Path, base_panel: Path, *, allow_source_gaps: bool) 
         if identity(path) != before:
             raise ValueError(f"Package changed during hashing: {relative}")
         snapshots[relative] = before
-    metadata = {name: json.loads((package / (name + ".metadata.json")).read_text()) for name in (PANEL, DTA)}
+    metadata = {name: json.loads((package / (name + ".metadata.json")).read_text()) for name in (panel_name, stata_name)}
     gap_diagnostics = {}
     for name, record in metadata.items():
         if record.get("data_sha256") != fingerprints[name]["sha256"]:
@@ -172,14 +178,14 @@ def verify_package(package: Path, base_panel: Path, *, allow_source_gaps: bool) 
     if gaps and not allow_source_gaps:
         raise ValueError("Source metadata gaps remain; review them and use --allow-source-gaps to publish with an explicit disclosure")
     print("Comparing every Parquet value and missing value with the immutable corrected source", flush=True)
-    parity = parquet_parity(base_panel, package / PANEL)
+    parity = parquet_parity(base_panel, package / panel_name)
     names = parity["source_names"]
     for name, record in metadata.items():
         if (record.get("row_count") != parity["rows"] or record.get("column_count") != parity["columns"]
                 or [variable["name"] for variable in record["variables"]] != names):
             raise ValueError(f"Metadata shape or named columns do not match the full panel: {name}")
-    parquet_variables = {variable["name"]: variable for variable in metadata[PANEL]["variables"]}
-    for field in pq.read_schema(package / PANEL):
+    parquet_variables = {variable["name"]: variable for variable in metadata[panel_name]["variables"]}
+    for field in pq.read_schema(package / panel_name):
         embedded = decode_embedded_variable_metadata(field)
         if embedded is None or embedded != parquet_variables[field.name]:
             raise ValueError(f"Embedded Parquet metadata differs from its companion: {field.name}")
@@ -188,15 +194,15 @@ def verify_package(package: Path, base_panel: Path, *, allow_source_gaps: bool) 
             or receipt.get("rows") != parity["rows"] or receipt.get("columns") != parity["columns"]
             or receipt.get("variable_labels_checked") != parity["columns"]
             or receipt.get("value_labels_checked") != sum(len(variable.get("stata_value_labels", {}))
-                                                          for variable in metadata[DTA]["variables"])):
+                                                          for variable in metadata[stata_name]["variables"])):
         raise ValueError("Native Stata full-panel verification did not pass")
     bound = receipt.get("inputs", {})
     base_hash = sha256(base_panel)
-    if metadata[PANEL].get("source_panel_sha256") != base_hash:
+    if metadata[panel_name].get("source_panel_sha256") != base_hash:
         raise ValueError("Labeled Parquet source fingerprint is not the original corrected panel")
-    if (bound.get("data", {}).get("sha256") != fingerprints[DTA]["sha256"]
-            or bound.get("metadata", {}).get("sha256") != fingerprints[DTA + ".metadata.json"]["sha256"]
-            or bound.get("source", {}).get("sha256") not in {base_hash, fingerprints[PANEL]["sha256"]}):
+    if (bound.get("data", {}).get("sha256") != fingerprints[stata_name]["sha256"]
+            or bound.get("metadata", {}).get("sha256") != fingerprints[stata_name + ".metadata.json"]["sha256"]
+            or bound.get("source", {}).get("sha256") not in {base_hash, fingerprints[panel_name]["sha256"]}):
         raise ValueError("Native verification receipt is not bound to this data, metadata, and source")
     checked = []
     for index, chunk in enumerate(receipt.get("chunks", []), 1):

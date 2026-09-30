@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "status": "published",
+  "recorded_utc": "2026-09-30T08:06:24.782049+00:00",
+  "release_name": "2024-extension-v1",
+  "release_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional",
+  "resolved_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Releases/2024-extension-v1",
+  "source_release_status": "Mixed final/provisional: see each 2024 source table's release status and date",
+  "manifest_sha256": "3b44c2c442c41eab0d4aed0062bc74f7fe5418945ec833bb2147d6596404e1d9",
+  "rows": 147782,
+  "columns": 2676,
+  "source_preserving_columns": 2785,
+  "original_cells_reconstructed": 411572870,
+  "all_original_values_and_missingness_equal": true,
+  "canonical_variables": [
+    "ADMCON4",
+    "ADMCON8",
+    "AGRNT_A",
+    "AGRNT_N",
+    "AGRNT_P",
+    "ANYAIDN",
+    "ANYAIDP",
+    "CINDFAM",
+    "CINDOFF",
+    "CINDON",
+    "CINSFAM",
+    "CINSOFF",
+    "CINSON",
+    "COTSFAM",
+    "COTSOFF",
+    "COTSON",
+    "DFRCUSCG",
+    "F1SYSNAM_2006_2024",
+    "FGRNT_A",
+    "FGRNT_N",
+    "FGRNT_P",
+    "FLOAN_A",
+    "FLOAN_N",
+    "FLOAN_P",
+    "FTE",
+    "FTE12MN",
+    "GBA4RTT",
+    "GBA5RTT",
+    "GBA6RT2M",
+    "GBA6RTAN",
+    "GBA6RTAP",
+    "GBA6RTBK",
+    "GBA6RTHS",
+    "GBA6RTM",
+    "GBA6RTNR",
+    "GBA6RTT",
+    "GBA6RTUN",
+    "GBA6RTW",
+    "GBA6RTWH",
+    "GBATRRT",
+    "GRRTNR",
+    "IGRNT_A",
+    "IGRNT_N",
+    "IGRNT_P",
+    "LOAN_A",
+    "LOAN_N",
+    "LOAN_P",
+    "OFGRT_A",
+    "OFGRT_N",
+    "OFGRT_P",
+    "OLOAN_A",
+    "OLOAN_N",
+    "OLOAN_P",
+    "PCTENRAN",
+    "PCTENRAP",
+    "PCTENRBK",
+    "PCTENRHS",
+    "PCTENRNR",
+    "PCTENRWH",
+    "PGRNT_A",
+    "PGRNT_N",
+    "PGRNT_P",
+    "SALASSC_PRE2012",
+    "SALASST_PRE2012",
+    "SALINST_PRE2012",
+    "SALLECT_PRE2012",
+    "SALNRNK_PRE2012",
+    "SALPROF_PRE2012",
+    "SALTOTL_PRE2012",
+    "SATMT25",
+    "SATMT75",
+    "SATVR25",
+    "SATVR75",
+    "SCFA11N",
+    "SCFA11P",
+    "SCFA12N",
+    "SCFA12P",
+    "SCFA13N",
+    "SCFA13P",
+    "SCFA14N",
+    "SCFA14P",
+    "SCFA1N",
+    "SCFA1P",
+    "SCFA2",
+    "SCFY1N",
+    "SCFY1P",
+    "SCFY2",
+    "SGRNT_A",
+    "SGRNT_N",
+    "SGRNT_P",
+    "TUFEYR1",
+    "TUFEYR2",
+    "TUFEYR3",
+    "UNDUP",
+    "UNDUPUG"
+  ],
+  "consolidated_source_columns": 204,
+  "policy_sha256": "386b62d34c64721df26fc3f9cdfbddbc376aaa965494eba2d621a2f09c991561",
+  "quarantined_keys": [
+    {
+      "UNITID": 111111,
+      "year": 2019
+    },
+    {
+      "UNITID": 111111,
+      "year": 2024
+    }
+  ],
+  "historical_final_unchanged": {
+    "manifest_sha256": "c4788db7ce5c711fb8476d8e39bd676bd26cead27593bd4231fb5aee2d20cbcd",
+    "artifacts": [
+      {
+        "path": "Final/panel_clean_prch_2004_2023.parquet",
+        "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Final/panel_clean_prch_2004_2023.parquet",
+        "release_path": "Releases/full-panel-labels-v1/panel_clean_prch_2004_2023.parquet",
+        "bytes": 330734354,
+        "sha256": "f93cf45fe50e04250465a0b583a384737f4954cb7034f5a880f853d55827bb61"
+      },
+      {
+        "path": "Final/panel_clean_prch_2004_2023.parquet.metadata.json",
+        "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Final/panel_clean_prch_2004_2023.parquet.metadata.json",
+        "release_path": "Releases/full-panel-labels-v1/panel_clean_prch_2004_2023.parquet.metadata.json",
+        "bytes": 387683354,
+        "sha256": "d9ddbd4ca12842718cfb052369bebb1d01d556c34e2db700bb25d161a44f0b0e"
+      },
+      {
+        "path": "Final/panel_clean_prch_2004_2023.dta",
+        "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Final/panel_clean_prch_2004_2023.dta",
+        "release_path": "Releases/full-panel-labels-v1/panel_clean_prch_2004_2023.dta",
+        "bytes": 3646018494,
+        "sha256": "37570f3a5f54a28a6ea02f1888d8e89e89cee499cc04100e36badcbd5f07386f"
+      },
+      {
+        "path": "Final/panel_clean_prch_2004_2023.dta.metadata.json",
+        "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Final/panel_clean_prch_2004_2023.dta.metadata.json",
+        "release_path": "Releases/full-panel-labels-v1/panel_clean_prch_2004_2023.dta.metadata.json",
+        "bytes": 392251303,
+        "sha256": "10e102c6751d37957744ad333ba7913d405b401becda67cab7aa9b5a52027a85"
+      },
+      {
+        "path": "Final/Metadata/dictionary_lake.parquet",
+        "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Final/Metadata/dictionary_lake.parquet",
+        "release_path": "Releases/2023-sfa-v1/Dictionary/v2/dictionary_lake.parquet",
+        "bytes": 12151952,
+        "sha256": "f5209f4533f675bbbd6d81448c4a7758e141bbf6cbd7b976c051c4a722474163"
+      },
+      {
+        "path": "Final/Metadata/dictionary_codes.parquet",
+        "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Final/Metadata/dictionary_codes.parquet",
+        "release_path": "Releases/2023-sfa-v1/Dictionary/v2/dictionary_codes.parquet",
+        "bytes": 1112747,
+        "sha256": "acf5dba41e9bf69b8000471ef9e6ad65e3a8a38353756c72a24ac9263619b356"
+      },
+      {
+        "path": "Final/value_lineage.parquet",
+        "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Final/value_lineage.parquet",
+        "release_path": "Releases/2023-sfa-v1/Checks/v2/wide_qc/qc_value_lineage.parquet",
+        "bytes": 1710626506,
+        "sha256": "0bfb36726fecd155d3d231ab2dc5c8237967995e2edc58937ab082c844bca307"
+      }
+    ]
+  },
+  "native_stata": {
+    "status": "pass",
+    "rows": 147782,
+    "columns": 2676,
+    "variable_labels_checked": 2676,
+    "value_labels_checked": 10930,
+    "exact_observations_in_export_representation": true
+  },
+  "historical_stata": {
+    "status": "pass",
+    "reference_sha256": "10e102c6751d37957744ad333ba7913d405b401becda67cab7aa9b5a52027a85",
+    "historical_variables_checked": 2721,
+    "historical_category_numbers_checked": 10718,
+    "all_historical_aliases_conversions_and_category_numbers_equal": false,
+    "all_historical_value_encodings_equal": true,
+    "unmerged_historical_aliases_unchanged": true
+  },
+  "reviewed_alias_changes": 204,
+  "metadata_gaps_remain_disclosed": true,
+  "artifacts": [
+    {
+      "path": "panel_clean_prch_2004_2024.parquet",
+      "bytes": 374503178,
+      "sha256": "7b9935cebf6b09a504c34679eefbbeaeebf18d696db9afd3ff0e1367b9026ba4",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/panel_clean_prch_2004_2024.parquet"
+    },
+    {
+      "path": "panel_clean_prch_2004_2024.dta",
+      "bytes": 3769272143,
+      "sha256": "1be8f6b3353eafec93891e7a492fcce7c9534f8a073a333c0c1352f53f0fc51d",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/panel_clean_prch_2004_2024.dta"
+    },
+    {
+      "path": "panel_clean_prch_2004_2024.parquet.metadata.json",
+      "bytes": 526390079,
+      "sha256": "1fb24e02074a60839cbb14a731b744d856cd9b0c1e03bd9c6ddeba8f83597471",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/panel_clean_prch_2004_2024.parquet.metadata.json"
+    },
+    {
+      "path": "panel_clean_prch_2004_2024.dta.metadata.json",
+      "bytes": 529928726,
+      "sha256": "04ac2566f4665ef54ba38d913b4afea67a0f2b31b60d9aa504498706a44b155f",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/panel_clean_prch_2004_2024.dta.metadata.json"
+    },
+    {
+      "path": "Codebook/ipeds-panel-codebook.pdf",
+      "bytes": 12665368,
+      "sha256": "b5986a2a4fc1ee35cab4a8c1def69e9b00b7e745d64c877f917fea116c785913",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/Codebook/ipeds-panel-codebook.pdf"
+    },
+    {
+      "path": "Codebook/column-crosswalk.csv",
+      "bytes": 104966,
+      "sha256": "5819df404fb3fe39fb350b0412884320bdebc2e092cf02b79efc517c2fe68324",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/Codebook/column-crosswalk.csv"
+    },
+    {
+      "path": "Codebook/manifest.json",
+      "bytes": 3242,
+      "sha256": "0459dfa48f8ca93e5aa2bb18b43c7c77b1ac0148fd788a0a6e0ece76cae37206",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/Codebook/manifest.json"
+    },
+    {
+      "path": "Metadata/consolidated_column_identities.parquet",
+      "bytes": 564951,
+      "sha256": "87ebc60bb828eeca78ae267ef6174c678af8aeb135ca0ad6d742e4beca53cf74",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/Metadata/consolidated_column_identities.parquet"
+    },
+    {
+      "path": "Supporting/panel_clean_prch_2004_2024.analysis.parquet",
+      "bytes": 258692323,
+      "sha256": "985c379d598aa33681f5867c1341a6bcecb4a3bd938a5a6741563b05cd84f1e3",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/Supporting/panel_clean_prch_2004_2024.analysis.parquet"
+    },
+    {
+      "path": "Supporting/panel_clean_prch_2004_2024.consolidated.parquet",
+      "bytes": 257357367,
+      "sha256": "339d0a38d3604b96c048f13ae81afffa5f4a6a1c14d647858914204b531d4939",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/Supporting/panel_clean_prch_2004_2024.consolidated.parquet"
+    },
+    {
+      "path": "Supporting/panel_clean_prch_2004_2024.consolidated.parquet.consolidation-validation.json",
+      "bytes": 912704,
+      "sha256": "0d86fea1f98fe2a0e72ff6b3ddf2f65fcedd9ec4b84fa51f039c266fb52e981d",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/Supporting/panel_clean_prch_2004_2024.consolidated.parquet.consolidation-validation.json"
+    },
+    {
+      "path": "Checks/raw_source_validation.json",
+      "bytes": 11412,
+      "sha256": "e5a05a318c5ef80ea6733efd0d40254d1c6f74176fa3c02eedeca5cd8822447c",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/Checks/raw_source_validation.json"
+    },
+    {
+      "path": "Checks/native_stata/validation.json",
+      "bytes": 281495,
+      "sha256": "890b26708aa75db87565bba0abdbfe6303a366c01b6091981bb3e740b8397bdb",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/Checks/native_stata/validation.json"
+    },
+    {
+      "path": "Checks/export_validation.json",
+      "bytes": 13591,
+      "sha256": "f3e79983d066ed3a605e30f067d791328315569b97ae72c5a83888346e086272",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/Checks/export_validation.json"
+    },
+    {
+      "path": "Checks/stata_history_validation.json",
+      "bytes": 11969,
+      "sha256": "09b4d66c9d9396f18130e816e063f46f1cbc56bbe8db0222434d8e5cf12cc184",
+      "absolute_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/Checks/stata_history_validation.json"
+    }
+  ],
+  "repository_validation": {
+    "tests_passed": 657,
+    "test_command": ".venv/bin/python -m pytest -q",
+    "guards": [
+      "panel contract",
+      "public release",
+      "documentation style",
+      "repository size"
+    ],
+    "local_browser_checks": [
+      "consolidated ANYAIDN original-column year scopes and caveats",
+      "original-to-canonical crosswalk download link",
+      "2023 Pell correction retained in Final codebook",
+      "2024 Pell SFA2324 release status and reporting-population note"
+    ],
+    "codebook_manifest_sha256": "0459dfa48f8ca93e5aa2bb18b43c7c77b1ac0148fd788a0a6e0ece76cae37206"
+  }
+}

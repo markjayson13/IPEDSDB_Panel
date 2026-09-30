@@ -23,6 +23,9 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v4
+        with:
+          # Reproduction tests prepare the preserved historical v2 commit.
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5

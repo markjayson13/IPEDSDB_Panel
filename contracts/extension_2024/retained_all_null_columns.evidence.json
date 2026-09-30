@@ -1,0 +1,1228 @@
+{
+  "schema_version": "1.0",
+  "created_at_utc": "2026-09-30T02:00:40.875390+00:00",
+  "year": 2024,
+  "status": "source_all_empty_verified",
+  "scope": "Exactly 11 named source fields; no blanket canonical coverage exemption",
+  "inputs": {
+    "original:COST1_2024": {
+      "path": "original/Raw_Access_Databases/2024/tables_csv/Cost1_2024.csv",
+      "sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0",
+      "inventory_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0",
+      "hash_matches_inventory": true,
+      "rows_read": 5867
+    },
+    "original:FLAGS2024": {
+      "path": "original/Raw_Access_Databases/2024/tables_csv/FLAGS2024.csv",
+      "sha256": "443e0a327aad3774712f14f9bbd9ca07a245b39868359a9f49dfcbaf49f81ff2",
+      "inventory_sha256": "443e0a327aad3774712f14f9bbd9ca07a245b39868359a9f49dfcbaf49f81ff2",
+      "hash_matches_inventory": true,
+      "rows_read": 6072
+    },
+    "effective:COST1_2024": {
+      "path": "Raw_Access_Databases/2024/tables_csv/Cost1_2024.csv",
+      "sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0",
+      "inventory_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0",
+      "hash_matches_inventory": true,
+      "rows_read": 5867
+    },
+    "effective:FLAGS2024": {
+      "path": "Raw_Access_Databases/2024/tables_csv/FLAGS2024.csv",
+      "sha256": "4a39f6253777dfcc3e64c9c60e17dad41395829391cf3c99a955a65be9ebeec6",
+      "inventory_sha256": "4a39f6253777dfcc3e64c9c60e17dad41395829391cf3c99a955a65be9ebeec6",
+      "hash_matches_inventory": true,
+      "rows_read": 6072
+    }
+  },
+  "metadata_input": {
+    "path": "Raw_Access_Databases/2024/tables_csv/varTable24.csv",
+    "sha256": "6bb8f0d516bbc14eae0971c44f38bbd32a36a3961af821531493bf97eebf1833"
+  },
+  "source_manifest": {
+    "path": "source_manifest.json",
+    "sha256": "36cf60a0d74c4cc0cf4ca58143040b3fc21cd453c6e672cbd9c4f52cad487f18"
+  },
+  "historical_contract_inputs": [
+    {
+      "git_ref": "799a63930f97df9a3ec35be857f340ea3743afac:contracts/analysis_schema.csv",
+      "sha256": "7878a8ecd22afae536190ee087f3bff107e3e5d63e99b8d44ee7e3d6e2c81859",
+      "status": "read"
+    },
+    {
+      "git_ref": "799a63930f97df9a3ec35be857f340ea3743afac:contracts/source_columns.csv",
+      "sha256": "22d72c86a94c03fc9490f7eb2947604a04f14b62de5ef6e8cab6fcddd93b5bc2",
+      "status": "read"
+    }
+  ],
+  "variables": [
+    {
+      "analysis_column": "CHG10AY0",
+      "variable_id": "nces:COST:00016236:CHG10AY0",
+      "source_varnumber": "00016236",
+      "source_table": "COST1_2024",
+      "logical_type": "float",
+      "mapping_decision": "new_2024_identity",
+      "previous_variable_id": "",
+      "definition_2024": [
+        {
+          "SurveyOrder": "110",
+          "SurveyNumber": "19",
+          "Survey": "Cost",
+          "TableNumber": "201",
+          "TableName": "COST1_2024",
+          "TableTitle": "Cost of attendance for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "VarNumber": "16236",
+          "VarOrder": "277",
+          "VarName": "CHG10AY0",
+          "ImputationVar": "XCHG10AY0",
+          "VarTitle": "Off campus (with family), food and housing 2021-22",
+          "DataType": "N",
+          "FieldWidth": "5",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "95",
+          "SectionNumber": "7",
+          "LongDescription": "Price of attendance for full-time, first-time undergraduate students for the FULL ACADEMIC YEAR: (Tuition and fees, books and supplies, food and housing, and other expenses are those amounts used by your financial aid office for determining eligibility for student financial assistance) These data are published at the IPEDS College Navigator Web site\n\nOff campus (with family) food and housing charges for 2021-22\n\nFood charges (formerly board charges)\t - Charges assessed students for an academic year for meals.\nHousing charges (formerly room charges) - \tThe charges for an academic year for housing accommodations for a typical student sharing a room with one other student.\nUNDERGRADUATE - A student enrolled in a 4- or 5-year bachelor's degree program, an associate's degree program, or a vocational or technical program below the baccalaureate. \nFULL-TIME Undergraduate - A student enrolled for 12 or more semester credits, or 12 or more quarter credits, or 24 or more clock hours a week each term \nFIRST-TIME FIRST-YEAR STUDENT - A student attending any institution for the first time at the undergraduate level. Includes students enrolled in the fall term who attended college for the first time in the prior summer term. Also includes students who entered with advanced standing (college credits earned before graduation from high school).\nFIRST-YEAR STUDENT A student who has completed less than the equivalent of 1 full year of undergraduate work; that is, less than 30 semester hours (in a 120-hour degree program) or less than 900 clock hours. \nACADEMIC YEAR - The period of time generally extending from September to June; usually equated to 2 semesters or trimesters, 3 quarters, or the period covered by a 4-1-4 plan. Also included are \"Other Academic calendar Systems\" which is a category used to describe \"non-traditional\" calendar systems at 4-year and 2-year degree-granting institutions. These can include schools that offer primarily on-line courses or \"one course at a time\".",
+          "VarSource": "",
+          "FileTitle": "Cost of attendance for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "SectionTitle": "Cost of attendance for institutions reporting by academic year"
+        }
+      ],
+      "source_release": {
+        "original_csv_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0",
+        "origin": "original_access",
+        "release_status": "Provisional",
+        "release_date": "December 2025",
+        "effective_csv_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0"
+      },
+      "raw_cell_checks": {
+        "original": {
+          "rows_read": 5867,
+          "nonblank_count": 0,
+          "exact_empty_count": 5867,
+          "whitespace_only_count": 0,
+          "source_input": "original:COST1_2024"
+        },
+        "effective": {
+          "rows_read": 5867,
+          "nonblank_count": 0,
+          "exact_empty_count": 5867,
+          "whitespace_only_count": 0,
+          "source_input": "effective:COST1_2024"
+        }
+      },
+      "extension_analysis_schema": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "analysis_column": "CHG10AY0",
+          "logical_type": "float",
+          "source_variables": "variable_id:nces:COST:00016236:CHG10AY0",
+          "transformation": "identity",
+          "inclusion_reason": "2024 exact source mapping; new_2024_identity; metadata definitions remain year-specific; no assertion of measurement equivalence.",
+          "first_year": "2024",
+          "last_year": "2024",
+          "nullable": "true",
+          "status": "active"
+        }
+      ],
+      "extension_source_column": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "decision_id": "EXT24-COL-COST1_2024-CHG10AY0",
+          "year_start": "2024",
+          "year_end": "2024",
+          "source_file": "COST",
+          "access_table_pattern": "COST1_2024",
+          "column_name": "CHG10AY0",
+          "role": "measure",
+          "canonical_dimension": "",
+          "exclusion_reason": "",
+          "source_evidence": "Original IPEDS202425.accdb SHA256 98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5; exact physical schema and varTable24; effective source_manifest.json records final fall revisions.",
+          "review_note": "2024 extension review: exact physical table and column; no cross-table wildcard or nearest-year metadata substitution.",
+          "reviewed": "true"
+        }
+      ],
+      "historical_v2_contract_rows": {
+        "analysis_schema.csv": [],
+        "source_columns.csv": []
+      }
+    },
+    {
+      "analysis_column": "CHG10AY1",
+      "variable_id": "nces:COST:00016241:CHG10AY1",
+      "source_varnumber": "00016241",
+      "source_table": "COST1_2024",
+      "logical_type": "float",
+      "mapping_decision": "new_2024_identity",
+      "previous_variable_id": "",
+      "definition_2024": [
+        {
+          "SurveyOrder": "110",
+          "SurveyNumber": "19",
+          "Survey": "Cost",
+          "TableNumber": "201",
+          "TableName": "COST1_2024",
+          "TableTitle": "Cost of attendance for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "VarNumber": "16241",
+          "VarOrder": "279",
+          "VarName": "CHG10AY1",
+          "ImputationVar": "XCHG10AY1",
+          "VarTitle": "Off campus (with family), food and housing 2022-23",
+          "DataType": "N",
+          "FieldWidth": "5",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "95",
+          "SectionNumber": "7",
+          "LongDescription": "Price of attendance for full-time, first-time undergraduate students for the FULL ACADEMIC YEAR: (Tuition and fees, books and supplies, food and housing, and other expenses are those amounts used by your financial aid office for determining eligibility for student financial assistance) These data are published at the IPEDS College Navigator Web site\n\nOff campus (with family) food and housing charges for 2022-23\n\nFood charges (formerly board charges)\t - Charges assessed students for an academic year for meals.\nHousing charges (formerly room charges) - \tThe charges for an academic year for housing accommodations for a typical student sharing a room with one other student.\nUNDERGRADUATE - A student enrolled in a 4- or 5-year bachelor's degree program, an associate's degree program, or a vocational or technical program below the baccalaureate. \nFULL-TIME Undergraduate - A student enrolled for 12 or more semester credits, or 12 or more quarter credits, or 24 or more clock hours a week each term \nFIRST-TIME FIRST-YEAR STUDENT - A student attending any institution for the first time at the undergraduate level. Includes students enrolled in the fall term who attended college for the first time in the prior summer term. Also includes students who entered with advanced standing (college credits earned before graduation from high school).\nFIRST-YEAR STUDENT A student who has completed less than the equivalent of 1 full year of undergraduate work; that is, less than 30 semester hours (in a 120-hour degree program) or less than 900 clock hours. \nACADEMIC YEAR - The period of time generally extending from September to June; usually equated to 2 semesters or trimesters, 3 quarters, or the period covered by a 4-1-4 plan. Also included are \"Other Academic calendar Systems\" which is a category used to describe \"non-traditional\" calendar systems at 4-year and 2-year degree-granting institutions. These can include schools that offer primarily on-line courses or \"one course at a time\".",
+          "VarSource": "",
+          "FileTitle": "Cost of attendance for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "SectionTitle": "Cost of attendance for institutions reporting by academic year"
+        }
+      ],
+      "source_release": {
+        "original_csv_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0",
+        "origin": "original_access",
+        "release_status": "Provisional",
+        "release_date": "December 2025",
+        "effective_csv_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0"
+      },
+      "raw_cell_checks": {
+        "original": {
+          "rows_read": 5867,
+          "nonblank_count": 0,
+          "exact_empty_count": 5867,
+          "whitespace_only_count": 0,
+          "source_input": "original:COST1_2024"
+        },
+        "effective": {
+          "rows_read": 5867,
+          "nonblank_count": 0,
+          "exact_empty_count": 5867,
+          "whitespace_only_count": 0,
+          "source_input": "effective:COST1_2024"
+        }
+      },
+      "extension_analysis_schema": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "analysis_column": "CHG10AY1",
+          "logical_type": "float",
+          "source_variables": "variable_id:nces:COST:00016241:CHG10AY1",
+          "transformation": "identity",
+          "inclusion_reason": "2024 exact source mapping; new_2024_identity; metadata definitions remain year-specific; no assertion of measurement equivalence.",
+          "first_year": "2024",
+          "last_year": "2024",
+          "nullable": "true",
+          "status": "active"
+        }
+      ],
+      "extension_source_column": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "decision_id": "EXT24-COL-COST1_2024-CHG10AY1",
+          "year_start": "2024",
+          "year_end": "2024",
+          "source_file": "COST",
+          "access_table_pattern": "COST1_2024",
+          "column_name": "CHG10AY1",
+          "role": "measure",
+          "canonical_dimension": "",
+          "exclusion_reason": "",
+          "source_evidence": "Original IPEDS202425.accdb SHA256 98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5; exact physical schema and varTable24; effective source_manifest.json records final fall revisions.",
+          "review_note": "2024 extension review: exact physical table and column; no cross-table wildcard or nearest-year metadata substitution.",
+          "reviewed": "true"
+        }
+      ],
+      "historical_v2_contract_rows": {
+        "analysis_schema.csv": [],
+        "source_columns.csv": []
+      }
+    },
+    {
+      "analysis_column": "CHG10AY2",
+      "variable_id": "nces:COST:00016246:CHG10AY2",
+      "source_varnumber": "00016246",
+      "source_table": "COST1_2024",
+      "logical_type": "float",
+      "mapping_decision": "new_2024_identity",
+      "previous_variable_id": "",
+      "definition_2024": [
+        {
+          "SurveyOrder": "110",
+          "SurveyNumber": "19",
+          "Survey": "Cost",
+          "TableNumber": "201",
+          "TableName": "COST1_2024",
+          "TableTitle": "Cost of attendance for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "VarNumber": "16246",
+          "VarOrder": "281",
+          "VarName": "CHG10AY2",
+          "ImputationVar": "XCHG10AY2",
+          "VarTitle": "Off campus (with family), food and housing 2023-24",
+          "DataType": "N",
+          "FieldWidth": "5",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "95",
+          "SectionNumber": "7",
+          "LongDescription": "Price of attendance for full-time, first-time undergraduate students for the FULL ACADEMIC YEAR: (Tuition and fees, books and supplies, food and housing, and other expenses are those amounts used by your financial aid office for determining eligibility for student financial assistance) These data are published at the IPEDS College Navigator Web site\n\nOff campus (with family) food and housing charges for 2023-24\n\nFood charges (formerly board charges)\t - Charges assessed students for an academic year for meals.\nHousing charges (formerly room charges) - \tThe charges for an academic year for housing accommodations for a typical student sharing a room with one other student.\nUNDERGRADUATE - A student enrolled in a 4- or 5-year bachelor's degree program, an associate's degree program, or a vocational or technical program below the baccalaureate. \nFULL-TIME Undergraduate - A student enrolled for 12 or more semester credits, or 12 or more quarter credits, or 24 or more clock hours a week each term \nFIRST-TIME FIRST-YEAR STUDENT - A student attending any institution for the first time at the undergraduate level. Includes students enrolled in the fall term who attended college for the first time in the prior summer term. Also includes students who entered with advanced standing (college credits earned before graduation from high school).\nFIRST-YEAR STUDENT A student who has completed less than the equivalent of 1 full year of undergraduate work; that is, less than 30 semester hours (in a 120-hour degree program) or less than 900 clock hours. \nACADEMIC YEAR - The period of time generally extending from September to June; usually equated to 2 semesters or trimesters, 3 quarters, or the period covered by a 4-1-4 plan. Also included are \"Other Academic calendar Systems\" which is a category used to describe \"non-traditional\" calendar systems at 4-year and 2-year degree-granting institutions. These can include schools that offer primarily on-line courses or \"one course at a time\".",
+          "VarSource": "",
+          "FileTitle": "Cost of attendance for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "SectionTitle": "Cost of attendance for institutions reporting by academic year"
+        }
+      ],
+      "source_release": {
+        "original_csv_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0",
+        "origin": "original_access",
+        "release_status": "Provisional",
+        "release_date": "December 2025",
+        "effective_csv_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0"
+      },
+      "raw_cell_checks": {
+        "original": {
+          "rows_read": 5867,
+          "nonblank_count": 0,
+          "exact_empty_count": 5867,
+          "whitespace_only_count": 0,
+          "source_input": "original:COST1_2024"
+        },
+        "effective": {
+          "rows_read": 5867,
+          "nonblank_count": 0,
+          "exact_empty_count": 5867,
+          "whitespace_only_count": 0,
+          "source_input": "effective:COST1_2024"
+        }
+      },
+      "extension_analysis_schema": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "analysis_column": "CHG10AY2",
+          "logical_type": "float",
+          "source_variables": "variable_id:nces:COST:00016246:CHG10AY2",
+          "transformation": "identity",
+          "inclusion_reason": "2024 exact source mapping; new_2024_identity; metadata definitions remain year-specific; no assertion of measurement equivalence.",
+          "first_year": "2024",
+          "last_year": "2024",
+          "nullable": "true",
+          "status": "active"
+        }
+      ],
+      "extension_source_column": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "decision_id": "EXT24-COL-COST1_2024-CHG10AY2",
+          "year_start": "2024",
+          "year_end": "2024",
+          "source_file": "COST",
+          "access_table_pattern": "COST1_2024",
+          "column_name": "CHG10AY2",
+          "role": "measure",
+          "canonical_dimension": "",
+          "exclusion_reason": "",
+          "source_evidence": "Original IPEDS202425.accdb SHA256 98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5; exact physical schema and varTable24; effective source_manifest.json records final fall revisions.",
+          "review_note": "2024 extension review: exact physical table and column; no cross-table wildcard or nearest-year metadata substitution.",
+          "reviewed": "true"
+        }
+      ],
+      "historical_v2_contract_rows": {
+        "analysis_schema.csv": [],
+        "source_columns.csv": []
+      }
+    },
+    {
+      "analysis_column": "CHG10PY0",
+      "variable_id": "nces:COST:00016256:CHG10PY0",
+      "source_varnumber": "00016256",
+      "source_table": "COST1_2024",
+      "logical_type": "float",
+      "mapping_decision": "new_2024_identity",
+      "previous_variable_id": "",
+      "definition_2024": [
+        {
+          "SurveyOrder": "110",
+          "SurveyNumber": "19",
+          "Survey": "Cost",
+          "TableNumber": "201",
+          "TableName": "COST1_2024",
+          "TableTitle": "Cost of attendance for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "VarNumber": "16256",
+          "VarOrder": "357",
+          "VarName": "CHG10PY0",
+          "ImputationVar": "XCHG10PY0",
+          "VarTitle": "Off campus (with family), food and housing 2021-22",
+          "DataType": "N",
+          "FieldWidth": "5",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "95",
+          "SectionNumber": "13",
+          "LongDescription": "Price of attendance for entering students in the largest program:(Books and supplies, food and housing, and other expenses are those amounts used by your financial aid office for determining eligibility for student financial assistance) These data are published at the IPEDS College Navigator Web site\n\nOff campus (with-family) food and housing charges for 2021-22\n\nFood charges (formerly board charges) - \tCharges assessed students for an academic year for meals.\nHousing charges (formerly room charges)\t - The charges for an academic year for housing accommodations for a typical student sharing a room with one other student.",
+          "VarSource": "",
+          "FileTitle": "Cost of attendance for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "SectionTitle": "Cost of attendance for institutions reporting by program"
+        }
+      ],
+      "source_release": {
+        "original_csv_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0",
+        "origin": "original_access",
+        "release_status": "Provisional",
+        "release_date": "December 2025",
+        "effective_csv_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0"
+      },
+      "raw_cell_checks": {
+        "original": {
+          "rows_read": 5867,
+          "nonblank_count": 0,
+          "exact_empty_count": 5867,
+          "whitespace_only_count": 0,
+          "source_input": "original:COST1_2024"
+        },
+        "effective": {
+          "rows_read": 5867,
+          "nonblank_count": 0,
+          "exact_empty_count": 5867,
+          "whitespace_only_count": 0,
+          "source_input": "effective:COST1_2024"
+        }
+      },
+      "extension_analysis_schema": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "analysis_column": "CHG10PY0",
+          "logical_type": "float",
+          "source_variables": "variable_id:nces:COST:00016256:CHG10PY0",
+          "transformation": "identity",
+          "inclusion_reason": "2024 exact source mapping; new_2024_identity; metadata definitions remain year-specific; no assertion of measurement equivalence.",
+          "first_year": "2024",
+          "last_year": "2024",
+          "nullable": "true",
+          "status": "active"
+        }
+      ],
+      "extension_source_column": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "decision_id": "EXT24-COL-COST1_2024-CHG10PY0",
+          "year_start": "2024",
+          "year_end": "2024",
+          "source_file": "COST",
+          "access_table_pattern": "COST1_2024",
+          "column_name": "CHG10PY0",
+          "role": "measure",
+          "canonical_dimension": "",
+          "exclusion_reason": "",
+          "source_evidence": "Original IPEDS202425.accdb SHA256 98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5; exact physical schema and varTable24; effective source_manifest.json records final fall revisions.",
+          "review_note": "2024 extension review: exact physical table and column; no cross-table wildcard or nearest-year metadata substitution.",
+          "reviewed": "true"
+        }
+      ],
+      "historical_v2_contract_rows": {
+        "analysis_schema.csv": [],
+        "source_columns.csv": []
+      }
+    },
+    {
+      "analysis_column": "CHG10PY1",
+      "variable_id": "nces:COST:00016261:CHG10PY1",
+      "source_varnumber": "00016261",
+      "source_table": "COST1_2024",
+      "logical_type": "float",
+      "mapping_decision": "new_2024_identity",
+      "previous_variable_id": "",
+      "definition_2024": [
+        {
+          "SurveyOrder": "110",
+          "SurveyNumber": "19",
+          "Survey": "Cost",
+          "TableNumber": "201",
+          "TableName": "COST1_2024",
+          "TableTitle": "Cost of attendance for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "VarNumber": "16261",
+          "VarOrder": "359",
+          "VarName": "CHG10PY1",
+          "ImputationVar": "XCHG10PY1",
+          "VarTitle": "Off campus (with family), food and housing 2022-23",
+          "DataType": "N",
+          "FieldWidth": "5",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "95",
+          "SectionNumber": "13",
+          "LongDescription": "Price of attendance for entering students in the largest program:(Books and supplies, food and housing, and other expenses are those amounts used by your financial aid office for determining eligibility for student financial assistance) These data are published at the IPEDS College Navigator Web site\n\nOff campus (with-family) food and housing charges for 2022-23\n\nFood charges (formerly board charges) - \tCharges assessed students for an academic year for meals.\nHousing charges (formerly room charges)\t - The charges for an academic year for housing accommodations for a typical student sharing a room with one other student.",
+          "VarSource": "",
+          "FileTitle": "Cost of attendance for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "SectionTitle": "Cost of attendance for institutions reporting by program"
+        }
+      ],
+      "source_release": {
+        "original_csv_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0",
+        "origin": "original_access",
+        "release_status": "Provisional",
+        "release_date": "December 2025",
+        "effective_csv_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0"
+      },
+      "raw_cell_checks": {
+        "original": {
+          "rows_read": 5867,
+          "nonblank_count": 0,
+          "exact_empty_count": 5867,
+          "whitespace_only_count": 0,
+          "source_input": "original:COST1_2024"
+        },
+        "effective": {
+          "rows_read": 5867,
+          "nonblank_count": 0,
+          "exact_empty_count": 5867,
+          "whitespace_only_count": 0,
+          "source_input": "effective:COST1_2024"
+        }
+      },
+      "extension_analysis_schema": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "analysis_column": "CHG10PY1",
+          "logical_type": "float",
+          "source_variables": "variable_id:nces:COST:00016261:CHG10PY1",
+          "transformation": "identity",
+          "inclusion_reason": "2024 exact source mapping; new_2024_identity; metadata definitions remain year-specific; no assertion of measurement equivalence.",
+          "first_year": "2024",
+          "last_year": "2024",
+          "nullable": "true",
+          "status": "active"
+        }
+      ],
+      "extension_source_column": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "decision_id": "EXT24-COL-COST1_2024-CHG10PY1",
+          "year_start": "2024",
+          "year_end": "2024",
+          "source_file": "COST",
+          "access_table_pattern": "COST1_2024",
+          "column_name": "CHG10PY1",
+          "role": "measure",
+          "canonical_dimension": "",
+          "exclusion_reason": "",
+          "source_evidence": "Original IPEDS202425.accdb SHA256 98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5; exact physical schema and varTable24; effective source_manifest.json records final fall revisions.",
+          "review_note": "2024 extension review: exact physical table and column; no cross-table wildcard or nearest-year metadata substitution.",
+          "reviewed": "true"
+        }
+      ],
+      "historical_v2_contract_rows": {
+        "analysis_schema.csv": [],
+        "source_columns.csv": []
+      }
+    },
+    {
+      "analysis_column": "CHG10PY2",
+      "variable_id": "nces:COST:00016266:CHG10PY2",
+      "source_varnumber": "00016266",
+      "source_table": "COST1_2024",
+      "logical_type": "float",
+      "mapping_decision": "new_2024_identity",
+      "previous_variable_id": "",
+      "definition_2024": [
+        {
+          "SurveyOrder": "110",
+          "SurveyNumber": "19",
+          "Survey": "Cost",
+          "TableNumber": "201",
+          "TableName": "COST1_2024",
+          "TableTitle": "Cost of attendance for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "VarNumber": "16266",
+          "VarOrder": "361",
+          "VarName": "CHG10PY2",
+          "ImputationVar": "XCHG10PY2",
+          "VarTitle": "Off campus (with family), food and housing 2023-24",
+          "DataType": "N",
+          "FieldWidth": "5",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "95",
+          "SectionNumber": "13",
+          "LongDescription": "Price of attendance for entering students in the largest program:(Books and supplies, food and housing, and other expenses are those amounts used by your financial aid office for determining eligibility for student financial assistance) These data are published at the IPEDS College Navigator Web site\n\nOff campus (with-family) food and housing charges for 2023-24\n\nFood charges (formerly board charges) - \tCharges assessed students for an academic year for meals.\nHousing charges (formerly room charges)\t - The charges for an academic year for housing accommodations for a typical student sharing a room with one other student.",
+          "VarSource": "",
+          "FileTitle": "Cost of attendance for full-time, first-time degree/certificate-seeking undergraduate students, 2021-22 to 2024-25",
+          "SectionTitle": "Cost of attendance for institutions reporting by program"
+        }
+      ],
+      "source_release": {
+        "original_csv_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0",
+        "origin": "original_access",
+        "release_status": "Provisional",
+        "release_date": "December 2025",
+        "effective_csv_sha256": "8879d4fa887d9156559b25af8a84316ec1de1bc99b3ceec5510e504eb5b7d7e0"
+      },
+      "raw_cell_checks": {
+        "original": {
+          "rows_read": 5867,
+          "nonblank_count": 0,
+          "exact_empty_count": 5867,
+          "whitespace_only_count": 0,
+          "source_input": "original:COST1_2024"
+        },
+        "effective": {
+          "rows_read": 5867,
+          "nonblank_count": 0,
+          "exact_empty_count": 5867,
+          "whitespace_only_count": 0,
+          "source_input": "effective:COST1_2024"
+        }
+      },
+      "extension_analysis_schema": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "analysis_column": "CHG10PY2",
+          "logical_type": "float",
+          "source_variables": "variable_id:nces:COST:00016266:CHG10PY2",
+          "transformation": "identity",
+          "inclusion_reason": "2024 exact source mapping; new_2024_identity; metadata definitions remain year-specific; no assertion of measurement equivalence.",
+          "first_year": "2024",
+          "last_year": "2024",
+          "nullable": "true",
+          "status": "active"
+        }
+      ],
+      "extension_source_column": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "decision_id": "EXT24-COL-COST1_2024-CHG10PY2",
+          "year_start": "2024",
+          "year_end": "2024",
+          "source_file": "COST",
+          "access_table_pattern": "COST1_2024",
+          "column_name": "CHG10PY2",
+          "role": "measure",
+          "canonical_dimension": "",
+          "exclusion_reason": "",
+          "source_evidence": "Original IPEDS202425.accdb SHA256 98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5; exact physical schema and varTable24; effective source_manifest.json records final fall revisions.",
+          "review_note": "2024 extension review: exact physical table and column; no cross-table wildcard or nearest-year metadata substitution.",
+          "reviewed": "true"
+        }
+      ],
+      "historical_v2_contract_rows": {
+        "analysis_schema.csv": [],
+        "source_columns.csv": []
+      }
+    },
+    {
+      "analysis_column": "PCCOS_F",
+      "variable_id": "nces:FLAGS:00016296:PCCOS_F",
+      "source_varnumber": "00016296",
+      "source_table": "FLAGS2024",
+      "logical_type": "float",
+      "mapping_decision": "new_2024_identity",
+      "previous_variable_id": "",
+      "definition_2024": [
+        {
+          "SurveyOrder": "10",
+          "SurveyNumber": "1",
+          "Survey": "Institutional Characteristics",
+          "TableNumber": "11",
+          "TableName": "FLAGS2024",
+          "TableTitle": "Response status ",
+          "VarNumber": "16296",
+          "VarOrder": "25",
+          "VarName": "PCCOS_F",
+          "ImputationVar": "",
+          "VarTitle": "Parent/child allocation factor - Cost component",
+          "DataType": "N",
+          "FieldWidth": "2",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "96",
+          "SectionNumber": "18",
+          "LongDescription": "This value is the allocation factors for the Cost component.  These factors are provided by the parent instituion so that data reported by the parent can be allocated to the child campuses/institutions.",
+          "VarSource": "IPEDS, Fall 2024,  Cost component",
+          "FileTitle": "Response status ",
+          "SectionTitle": "Response status"
+        }
+      ],
+      "source_release": {
+        "original_csv_sha256": "443e0a327aad3774712f14f9bbd9ca07a245b39868359a9f49dfcbaf49f81ff2",
+        "origin": "official_csv_overlay",
+        "release_status": "Mixed: final fall / provisional winter and spring",
+        "release_date": "2026-09-08",
+        "effective_csv_sha256": "4a39f6253777dfcc3e64c9c60e17dad41395829391cf3c99a955a65be9ebeec6"
+      },
+      "raw_cell_checks": {
+        "original": {
+          "rows_read": 6072,
+          "nonblank_count": 0,
+          "exact_empty_count": 6072,
+          "whitespace_only_count": 0,
+          "source_input": "original:FLAGS2024"
+        },
+        "effective": {
+          "rows_read": 6072,
+          "nonblank_count": 0,
+          "exact_empty_count": 6072,
+          "whitespace_only_count": 0,
+          "source_input": "effective:FLAGS2024"
+        }
+      },
+      "extension_analysis_schema": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "analysis_column": "PCCOS_F",
+          "logical_type": "float",
+          "source_variables": "variable_id:nces:FLAGS:00016296:PCCOS_F",
+          "transformation": "identity",
+          "inclusion_reason": "2024 exact source mapping; new_2024_identity; metadata definitions remain year-specific; no assertion of measurement equivalence.",
+          "first_year": "2024",
+          "last_year": "2024",
+          "nullable": "true",
+          "status": "active"
+        }
+      ],
+      "extension_source_column": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "decision_id": "EXT24-COL-FLAGS2024-PCCOS_F",
+          "year_start": "2024",
+          "year_end": "2024",
+          "source_file": "FLAGS",
+          "access_table_pattern": "FLAGS2024",
+          "column_name": "PCCOS_F",
+          "role": "measure",
+          "canonical_dimension": "",
+          "exclusion_reason": "",
+          "source_evidence": "Original IPEDS202425.accdb SHA256 98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5; exact physical schema and varTable24; effective source_manifest.json records final fall revisions.",
+          "review_note": "2024 extension review: exact physical table and column; no cross-table wildcard or nearest-year metadata substitution.",
+          "reviewed": "true"
+        }
+      ],
+      "historical_v2_contract_rows": {
+        "analysis_schema.csv": [],
+        "source_columns.csv": []
+      }
+    },
+    {
+      "analysis_column": "PCGR_F",
+      "variable_id": "nces:FLAGS:00080018:PCGR_F",
+      "source_varnumber": "00080018",
+      "source_table": "FLAGS2024",
+      "logical_type": "float",
+      "mapping_decision": "same_source_variable_identity",
+      "previous_variable_id": "nces:FLAGS:00080018:PCGR_F",
+      "definition_2024": [
+        {
+          "SurveyOrder": "10",
+          "SurveyNumber": "1",
+          "Survey": "Institutional Characteristics",
+          "TableNumber": "11",
+          "TableName": "FLAGS2024",
+          "TableTitle": "Response status ",
+          "VarNumber": "80018",
+          "VarOrder": "41",
+          "VarName": "PCGR_F",
+          "ImputationVar": "",
+          "VarTitle": "Parent/child allocation factor - Graduation Rates",
+          "DataType": "N",
+          "FieldWidth": "2",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "41",
+          "SectionNumber": "1",
+          "LongDescription": "This value is the allocation factor for the Graduation Rates component.  The variable IDX_GR contains the unitid of the parent or child, depending on the record type, that defines the relationship of the parent to it's children for the Graduation Rates component.  ",
+          "VarSource": "IPEDS, Winter 2024-25, Graduation Rates component",
+          "FileTitle": "Response status ",
+          "SectionTitle": "Response status information"
+        }
+      ],
+      "source_release": {
+        "original_csv_sha256": "443e0a327aad3774712f14f9bbd9ca07a245b39868359a9f49dfcbaf49f81ff2",
+        "origin": "official_csv_overlay",
+        "release_status": "Mixed: final fall / provisional winter and spring",
+        "release_date": "2026-09-08",
+        "effective_csv_sha256": "4a39f6253777dfcc3e64c9c60e17dad41395829391cf3c99a955a65be9ebeec6"
+      },
+      "raw_cell_checks": {
+        "original": {
+          "rows_read": 6072,
+          "nonblank_count": 0,
+          "exact_empty_count": 6072,
+          "whitespace_only_count": 0,
+          "source_input": "original:FLAGS2024"
+        },
+        "effective": {
+          "rows_read": 6072,
+          "nonblank_count": 0,
+          "exact_empty_count": 6072,
+          "whitespace_only_count": 0,
+          "source_input": "effective:FLAGS2024"
+        }
+      },
+      "extension_analysis_schema": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "analysis_column": "PCGR_F",
+          "logical_type": "float",
+          "source_variables": "variable_id:nces:FLAGS:00080018:PCGR_F",
+          "transformation": "identity",
+          "inclusion_reason": "2024 exact source mapping; same_source_variable_identity; metadata definitions remain year-specific; no assertion of measurement equivalence.",
+          "first_year": "2024",
+          "last_year": "2024",
+          "nullable": "true",
+          "status": "active"
+        }
+      ],
+      "extension_source_column": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "decision_id": "EXT24-COL-FLAGS2024-PCGR_F",
+          "year_start": "2024",
+          "year_end": "2024",
+          "source_file": "FLAGS",
+          "access_table_pattern": "FLAGS2024",
+          "column_name": "PCGR_F",
+          "role": "measure",
+          "canonical_dimension": "",
+          "exclusion_reason": "",
+          "source_evidence": "Original IPEDS202425.accdb SHA256 98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5; exact physical schema and varTable24; effective source_manifest.json records final fall revisions.",
+          "review_note": "2024 extension review: exact physical table and column; no cross-table wildcard or nearest-year metadata substitution.",
+          "reviewed": "true"
+        }
+      ],
+      "historical_v2_contract_rows": {
+        "analysis_schema.csv": [
+          {
+            "contract_id": "ipedsdb-panel-2004-2023-access-v2",
+            "analysis_column": "PCGR_F",
+            "logical_type": "float",
+            "source_variables": "variable_id:nces:FLAGS:00080018:PCGR_F",
+            "transformation": "identity",
+            "inclusion_reason": "One exact scalar identity uses this literal VarName with one stable exact official VarTitle; conservative identity mapping author-reviewed exact decision. Author-reviewed by Mark Jayson Martinez Farol on 2026-07-24 under hash-bound authorization AUTH-B03-B09-20260724; exact-byte application only.",
+            "first_year": "2004",
+            "last_year": "2023",
+            "nullable": "true",
+            "status": "active"
+          }
+        ],
+        "source_columns.csv": [
+          {
+            "contract_id": "ipedsdb-panel-2004-2023-access-v2",
+            "decision_id": "B04-PROJ-04D1BEFF7F61",
+            "year_start": "2004",
+            "year_end": "2004",
+            "source_file": "FLAGS",
+            "access_table_pattern": "*",
+            "column_name": "PCGR_F",
+            "role": "measure",
+            "canonical_dimension": "",
+            "exclusion_reason": "",
+            "source_evidence": "Exact Stage04 source-column candidate SHA-256 17d5e0d818126a7a6e71dd4f67245ffca6f080ac770007e97cf77b92fbd0db4a; complete exact-identity round-trip proof. Wildcards are used only after same-year exact table semantics agree.",
+            "review_note": "Author-reviewed by Mark Jayson Martinez Farol on 2026-07-24 under hash-bound authorization AUTH-B03-B09-20260724; exact-byte application only.",
+            "reviewed": "true"
+          },
+          {
+            "contract_id": "ipedsdb-panel-2004-2023-access-v2",
+            "decision_id": "B04-PROJ-42FC997C9284",
+            "year_start": "2006",
+            "year_end": "2023",
+            "source_file": "FLAGS",
+            "access_table_pattern": "*",
+            "column_name": "PCGR_F",
+            "role": "measure",
+            "canonical_dimension": "",
+            "exclusion_reason": "",
+            "source_evidence": "Exact Stage04 source-column candidate SHA-256 17d5e0d818126a7a6e71dd4f67245ffca6f080ac770007e97cf77b92fbd0db4a; complete exact-identity round-trip proof. Wildcards are used only after same-year exact table semantics agree.",
+            "review_note": "Author-reviewed by Mark Jayson Martinez Farol on 2026-07-24 under hash-bound authorization AUTH-B03-B09-20260724; exact-byte application only.",
+            "reviewed": "true"
+          }
+        ]
+      }
+    },
+    {
+      "analysis_column": "PCGR2_F",
+      "variable_id": "nces:FLAGS:00080117:PCGR2_F",
+      "source_varnumber": "00080117",
+      "source_table": "FLAGS2024",
+      "logical_type": "float",
+      "mapping_decision": "same_source_variable_identity",
+      "previous_variable_id": "nces:FLAGS:00080117:PCGR2_F",
+      "definition_2024": [
+        {
+          "SurveyOrder": "10",
+          "SurveyNumber": "1",
+          "Survey": "Institutional Characteristics",
+          "TableNumber": "11",
+          "TableName": "FLAGS2024",
+          "TableTitle": "Response status ",
+          "VarNumber": "80117",
+          "VarOrder": "48",
+          "VarName": "PCGR2_F",
+          "ImputationVar": "",
+          "VarTitle": "Parent/child allocation factor - Graduation Rates 200",
+          "DataType": "N",
+          "FieldWidth": "2",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "41",
+          "SectionNumber": "1",
+          "LongDescription": "This value is the allocation factor for the Graduation Rates 200 component.  The variable IDX_GR2 contains the unitid of the parent or child, depending on the record type, that defines the relationship of the parent to it's children for the Graduation Rates 200 component.  ",
+          "VarSource": "IPEDS, Winter 2024-25, Outcome Measure component",
+          "FileTitle": "Response status ",
+          "SectionTitle": "Response status information"
+        }
+      ],
+      "source_release": {
+        "original_csv_sha256": "443e0a327aad3774712f14f9bbd9ca07a245b39868359a9f49dfcbaf49f81ff2",
+        "origin": "official_csv_overlay",
+        "release_status": "Mixed: final fall / provisional winter and spring",
+        "release_date": "2026-09-08",
+        "effective_csv_sha256": "4a39f6253777dfcc3e64c9c60e17dad41395829391cf3c99a955a65be9ebeec6"
+      },
+      "raw_cell_checks": {
+        "original": {
+          "rows_read": 6072,
+          "nonblank_count": 0,
+          "exact_empty_count": 6072,
+          "whitespace_only_count": 0,
+          "source_input": "original:FLAGS2024"
+        },
+        "effective": {
+          "rows_read": 6072,
+          "nonblank_count": 0,
+          "exact_empty_count": 6072,
+          "whitespace_only_count": 0,
+          "source_input": "effective:FLAGS2024"
+        }
+      },
+      "extension_analysis_schema": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "analysis_column": "PCGR2_F",
+          "logical_type": "float",
+          "source_variables": "variable_id:nces:FLAGS:00080117:PCGR2_F",
+          "transformation": "identity",
+          "inclusion_reason": "2024 exact source mapping; same_source_variable_identity; metadata definitions remain year-specific; no assertion of measurement equivalence.",
+          "first_year": "2024",
+          "last_year": "2024",
+          "nullable": "true",
+          "status": "active"
+        }
+      ],
+      "extension_source_column": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "decision_id": "EXT24-COL-FLAGS2024-PCGR2_F",
+          "year_start": "2024",
+          "year_end": "2024",
+          "source_file": "FLAGS",
+          "access_table_pattern": "FLAGS2024",
+          "column_name": "PCGR2_F",
+          "role": "measure",
+          "canonical_dimension": "",
+          "exclusion_reason": "",
+          "source_evidence": "Original IPEDS202425.accdb SHA256 98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5; exact physical schema and varTable24; effective source_manifest.json records final fall revisions.",
+          "review_note": "2024 extension review: exact physical table and column; no cross-table wildcard or nearest-year metadata substitution.",
+          "reviewed": "true"
+        }
+      ],
+      "historical_v2_contract_rows": {
+        "analysis_schema.csv": [
+          {
+            "contract_id": "ipedsdb-panel-2004-2023-access-v2",
+            "analysis_column": "PCGR2_F",
+            "logical_type": "float",
+            "source_variables": "variable_id:nces:FLAGS:00080117:PCGR2_F",
+            "transformation": "identity",
+            "inclusion_reason": "One exact scalar identity uses this literal VarName with one stable exact official VarTitle; conservative identity mapping author-reviewed exact decision. Author-reviewed by Mark Jayson Martinez Farol on 2026-07-24 under hash-bound authorization AUTH-B03-B09-20260724; exact-byte application only.",
+            "first_year": "2015",
+            "last_year": "2023",
+            "nullable": "true",
+            "status": "active"
+          }
+        ],
+        "source_columns.csv": [
+          {
+            "contract_id": "ipedsdb-panel-2004-2023-access-v2",
+            "decision_id": "B04-PROJ-2FB415F69CFB",
+            "year_start": "2015",
+            "year_end": "2023",
+            "source_file": "FLAGS",
+            "access_table_pattern": "*",
+            "column_name": "PCGR2_F",
+            "role": "measure",
+            "canonical_dimension": "",
+            "exclusion_reason": "",
+            "source_evidence": "Exact Stage04 source-column candidate SHA-256 17d5e0d818126a7a6e71dd4f67245ffca6f080ac770007e97cf77b92fbd0db4a; complete exact-identity round-trip proof. Wildcards are used only after same-year exact table semantics agree.",
+            "review_note": "Author-reviewed by Mark Jayson Martinez Farol on 2026-07-24 under hash-bound authorization AUTH-B03-B09-20260724; exact-byte application only.",
+            "reviewed": "true"
+          }
+        ]
+      }
+    },
+    {
+      "analysis_column": "PCOM_F",
+      "variable_id": "nces:FLAGS:00082121:PCOM_F",
+      "source_varnumber": "00082121",
+      "source_table": "FLAGS2024",
+      "logical_type": "float",
+      "mapping_decision": "same_source_variable_identity",
+      "previous_variable_id": "nces:FLAGS:00082121:PCOM_F",
+      "definition_2024": [
+        {
+          "SurveyOrder": "10",
+          "SurveyNumber": "1",
+          "Survey": "Institutional Characteristics",
+          "TableNumber": "11",
+          "TableName": "FLAGS2024",
+          "TableTitle": "Response status ",
+          "VarNumber": "82121",
+          "VarOrder": "54",
+          "VarName": "PCOM_F",
+          "ImputationVar": "",
+          "VarTitle": "Parent/child allocation factor - Outcome Measures",
+          "DataType": "N",
+          "FieldWidth": "2",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "47",
+          "SectionNumber": "1",
+          "LongDescription": "This value is the allocation factor for the Outcome Measures component.  The variable IDX_OM contains the unitid of the parent or child, depending on the record type, that defines the relationship of the parent to it's children for the Outcome Measures component.  ",
+          "VarSource": "IPEDS, Winter 2024-25, Outcome Measure component",
+          "FileTitle": "Response status ",
+          "SectionTitle": "Response status information"
+        }
+      ],
+      "source_release": {
+        "original_csv_sha256": "443e0a327aad3774712f14f9bbd9ca07a245b39868359a9f49dfcbaf49f81ff2",
+        "origin": "official_csv_overlay",
+        "release_status": "Mixed: final fall / provisional winter and spring",
+        "release_date": "2026-09-08",
+        "effective_csv_sha256": "4a39f6253777dfcc3e64c9c60e17dad41395829391cf3c99a955a65be9ebeec6"
+      },
+      "raw_cell_checks": {
+        "original": {
+          "rows_read": 6072,
+          "nonblank_count": 0,
+          "exact_empty_count": 6072,
+          "whitespace_only_count": 0,
+          "source_input": "original:FLAGS2024"
+        },
+        "effective": {
+          "rows_read": 6072,
+          "nonblank_count": 0,
+          "exact_empty_count": 6072,
+          "whitespace_only_count": 0,
+          "source_input": "effective:FLAGS2024"
+        }
+      },
+      "extension_analysis_schema": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "analysis_column": "PCOM_F",
+          "logical_type": "float",
+          "source_variables": "variable_id:nces:FLAGS:00082121:PCOM_F",
+          "transformation": "identity",
+          "inclusion_reason": "2024 exact source mapping; same_source_variable_identity; metadata definitions remain year-specific; no assertion of measurement equivalence.",
+          "first_year": "2024",
+          "last_year": "2024",
+          "nullable": "true",
+          "status": "active"
+        }
+      ],
+      "extension_source_column": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "decision_id": "EXT24-COL-FLAGS2024-PCOM_F",
+          "year_start": "2024",
+          "year_end": "2024",
+          "source_file": "FLAGS",
+          "access_table_pattern": "FLAGS2024",
+          "column_name": "PCOM_F",
+          "role": "measure",
+          "canonical_dimension": "",
+          "exclusion_reason": "",
+          "source_evidence": "Original IPEDS202425.accdb SHA256 98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5; exact physical schema and varTable24; effective source_manifest.json records final fall revisions.",
+          "review_note": "2024 extension review: exact physical table and column; no cross-table wildcard or nearest-year metadata substitution.",
+          "reviewed": "true"
+        }
+      ],
+      "historical_v2_contract_rows": {
+        "analysis_schema.csv": [
+          {
+            "contract_id": "ipedsdb-panel-2004-2023-access-v2",
+            "analysis_column": "PCOM_F",
+            "logical_type": "float",
+            "source_variables": "variable_id:nces:FLAGS:00082121:PCOM_F",
+            "transformation": "identity",
+            "inclusion_reason": "One exact scalar identity uses this literal VarName with one stable exact official VarTitle; conservative identity mapping author-reviewed exact decision. Author-reviewed by Mark Jayson Martinez Farol on 2026-07-24 under hash-bound authorization AUTH-B03-B09-20260724; exact-byte application only.",
+            "first_year": "2015",
+            "last_year": "2023",
+            "nullable": "true",
+            "status": "active"
+          }
+        ],
+        "source_columns.csv": [
+          {
+            "contract_id": "ipedsdb-panel-2004-2023-access-v2",
+            "decision_id": "B04-PROJ-C64F7DAE2B2E",
+            "year_start": "2015",
+            "year_end": "2023",
+            "source_file": "FLAGS",
+            "access_table_pattern": "*",
+            "column_name": "PCOM_F",
+            "role": "measure",
+            "canonical_dimension": "",
+            "exclusion_reason": "",
+            "source_evidence": "Exact Stage04 source-column candidate SHA-256 17d5e0d818126a7a6e71dd4f67245ffca6f080ac770007e97cf77b92fbd0db4a; complete exact-identity round-trip proof. Wildcards are used only after same-year exact table semantics agree.",
+            "review_note": "Author-reviewed by Mark Jayson Martinez Farol on 2026-07-24 under hash-bound authorization AUTH-B03-B09-20260724; exact-byte application only.",
+            "reviewed": "true"
+          }
+        ]
+      }
+    },
+    {
+      "analysis_column": "PCADM_F",
+      "variable_id": "nces:FLAGS:00017003:PCADM_F",
+      "source_varnumber": "00017003",
+      "source_table": "FLAGS2024",
+      "logical_type": "float",
+      "mapping_decision": "same_source_variable_identity",
+      "previous_variable_id": "nces:FLAGS:00017003:PCADM_F",
+      "definition_2024": [
+        {
+          "SurveyOrder": "10",
+          "SurveyNumber": "1",
+          "Survey": "Institutional Characteristics",
+          "TableNumber": "11",
+          "TableName": "FLAGS2024",
+          "TableTitle": "Admission considerations, applications, admissions, enrollees and test scores",
+          "VarNumber": "17003",
+          "VarOrder": "60",
+          "VarName": "PCADM_F",
+          "ImputationVar": "",
+          "VarTitle": "Parent/child allocation factor - Admissions",
+          "DataType": "N",
+          "FieldWidth": "2",
+          "Format": "Cont",
+          "MultiRecord": "0",
+          "HasRV": "",
+          "FileNumber": "85",
+          "SectionNumber": "9",
+          "LongDescription": "This value is the allocation factors for the Admissions component.  These factors are provided by the parent instituion so that data reported by the parent can be allocated to the child campuses/institutions.",
+          "VarSource": "IPEDS, Winter 2024-25, Admissions component",
+          "FileTitle": "Admission considerations, applications, admissions, enrollees and test scores",
+          "SectionTitle": "Response status information"
+        }
+      ],
+      "source_release": {
+        "original_csv_sha256": "443e0a327aad3774712f14f9bbd9ca07a245b39868359a9f49dfcbaf49f81ff2",
+        "origin": "official_csv_overlay",
+        "release_status": "Mixed: final fall / provisional winter and spring",
+        "release_date": "2026-09-08",
+        "effective_csv_sha256": "4a39f6253777dfcc3e64c9c60e17dad41395829391cf3c99a955a65be9ebeec6"
+      },
+      "raw_cell_checks": {
+        "original": {
+          "rows_read": 6072,
+          "nonblank_count": 0,
+          "exact_empty_count": 6072,
+          "whitespace_only_count": 0,
+          "source_input": "original:FLAGS2024"
+        },
+        "effective": {
+          "rows_read": 6072,
+          "nonblank_count": 0,
+          "exact_empty_count": 6072,
+          "whitespace_only_count": 0,
+          "source_input": "effective:FLAGS2024"
+        }
+      },
+      "extension_analysis_schema": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "analysis_column": "PCADM_F",
+          "logical_type": "float",
+          "source_variables": "variable_id:nces:FLAGS:00017003:PCADM_F",
+          "transformation": "identity",
+          "inclusion_reason": "2024 exact source mapping; same_source_variable_identity; metadata definitions remain year-specific; no assertion of measurement equivalence.",
+          "first_year": "2024",
+          "last_year": "2024",
+          "nullable": "true",
+          "status": "active"
+        }
+      ],
+      "extension_source_column": [
+        {
+          "contract_id": "ipedsdb-panel-2004-2024-mixed-v1",
+          "decision_id": "EXT24-COL-FLAGS2024-PCADM_F",
+          "year_start": "2024",
+          "year_end": "2024",
+          "source_file": "FLAGS",
+          "access_table_pattern": "FLAGS2024",
+          "column_name": "PCADM_F",
+          "role": "measure",
+          "canonical_dimension": "",
+          "exclusion_reason": "",
+          "source_evidence": "Original IPEDS202425.accdb SHA256 98e9175e54ba719cf7f0bfcc8e043fac4d11babd1b73ba1701ebbdc23e5470f5; exact physical schema and varTable24; effective source_manifest.json records final fall revisions.",
+          "review_note": "2024 extension review: exact physical table and column; no cross-table wildcard or nearest-year metadata substitution.",
+          "reviewed": "true"
+        }
+      ],
+      "historical_v2_contract_rows": {
+        "analysis_schema.csv": [
+          {
+            "contract_id": "ipedsdb-panel-2004-2023-access-v2",
+            "analysis_column": "PCADM_F",
+            "logical_type": "float",
+            "source_variables": "variable_id:nces:FLAGS:00017003:PCADM_F",
+            "transformation": "identity",
+            "inclusion_reason": "One exact scalar identity uses this literal VarName with one stable exact official VarTitle; conservative identity mapping author-reviewed exact decision. Author-reviewed by Mark Jayson Martinez Farol on 2026-07-24 under hash-bound authorization AUTH-B03-B09-20260724; exact-byte application only.",
+            "first_year": "2019",
+            "last_year": "2023",
+            "nullable": "true",
+            "status": "active"
+          }
+        ],
+        "source_columns.csv": [
+          {
+            "contract_id": "ipedsdb-panel-2004-2023-access-v2",
+            "decision_id": "B04-PROJ-996DEC3C792E",
+            "year_start": "2019",
+            "year_end": "2023",
+            "source_file": "FLAGS",
+            "access_table_pattern": "*",
+            "column_name": "PCADM_F",
+            "role": "measure",
+            "canonical_dimension": "",
+            "exclusion_reason": "",
+            "source_evidence": "Exact Stage04 source-column candidate SHA-256 17d5e0d818126a7a6e71dd4f67245ffca6f080ac770007e97cf77b92fbd0db4a; complete exact-identity round-trip proof. Wildcards are used only after same-year exact table semantics agree.",
+            "review_note": "Author-reviewed by Mark Jayson Martinez Farol on 2026-07-24 under hash-bound authorization AUTH-B03-B09-20260724; exact-byte application only.",
+            "reviewed": "true"
+          }
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "variables": 11,
+    "raw_cells_read_per_version": 65562,
+    "nonblank_cells_original": 0,
+    "nonblank_cells_effective": 0,
+    "all_extension_fields_nullable_active": true
+  },
+  "retention_rationale": [
+    "Every field physically exists in its declared 2024 source table, has an exact current variable identity/definition, and is explicitly active and nullable in the 2024 analysis contract.",
+    "All source cells for these 11 fields are literal empty strings in both original and effective sources. This is verified source missingness; no zeros, values, observations, or missingness causes are inferred.",
+    "An explicit year/table/variable-ID allowlist can retain these 11 all-null schema columns while preserving source and value-lineage distinctions and keeping canonical coverage enforcement for every other field.",
+    "Cost source is provisional (December 2025); FLAGS effective source is mixed final fall and provisional winter/spring (2026-09-08). These statuses do not establish the cause of the empty cells."
+  ],
+  "modifications": "Only this audit receipt was written; no code or source changes.",
+  "source_audit_receipt_sha256": "5af9fbaa278caae06afb6eca69af23f637bb56ad1e2708da2c7cdaa6bff00308"
+}

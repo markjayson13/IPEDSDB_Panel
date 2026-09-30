@@ -1,0 +1,148 @@
+--- a/Scripts/03_dictionary_ingest.py
++++ b/Scripts/03_dictionary_ingest.py
+@@ -26,6 +26,7 @@
+ 
+ import pandas as pd
+ from source_metadata_corrections import apply_source_metadata_corrections
++from extension_2024_metadata import attach_2024_provenance
+ 
+ from access_build_utils import (
+     DATA_TABLE_CANDIDATES,
+@@ -223,7 +224,7 @@
+ def load_backfill_approvals(path: Path) -> pd.DataFrame:
+     if not path.exists():
+         raise SystemExit(f"Missing metadata backfill approval contract: {path}")
+-    approvals = pd.read_csv(path, dtype=str).fillna("")
++    approvals = pd.read_csv(path, dtype=str, keep_default_na=False).fillna("")
+     missing = [col for col in BACKFILL_APPROVAL_COLUMNS if col not in approvals.columns]
+     if missing:
+         raise SystemExit(f"Metadata backfill approval contract missing columns: {', '.join(missing)}")
+@@ -678,7 +679,7 @@
+         csv_path = year_dir / rec["csv_path"]
+         if not csv_path.exists():
+             continue
+-        df = pd.read_csv(csv_path, dtype=str).fillna("")
++        df = pd.read_csv(csv_path, dtype=str, keep_default_na=False).fillna("")
+         varnum_col = pick_column(df.columns, VAR_NUMBER_CANDIDATES)
+         varname_col = pick_column(df.columns, VAR_NAME_CANDIDATES)
+         access_table_col = pick_column(df.columns, DATA_TABLE_CANDIDATES)
+@@ -912,6 +913,8 @@
+     dictionary_qc_dir = layout.checks / "dictionary_qc"
+     dictionary_qc_dir.mkdir(parents=True, exist_ok=True)
+     years = parse_years(args.years)
++    if years != [2024]:
++        raise SystemExit("This extension pipeline accepts only --years 2024; historical data must be reused unchanged")
+     backfill_approvals = load_backfill_approvals(Path(args.metadata_backfill_approvals))
+     candidate_rows: list[dict] = []
+     lake_rows: list[dict] = []
+@@ -958,7 +961,7 @@
+             csv_path = year_dir / rec["csv_path"]
+             if not csv_path.exists():
+                 continue
+-            df = pd.read_csv(csv_path, dtype=str).fillna("")
++            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False).fillna("")
+             varnum_col = pick_column(df.columns, VAR_NUMBER_CANDIDATES)
+             varname_col = pick_column(df.columns, VAR_NAME_CANDIDATES)
+             vartitle_col = pick_column(df.columns, VAR_TITLE_CANDIDATES)
+@@ -1018,7 +1021,7 @@
+             csv_path = year_dir / rec["csv_path"]
+             if not csv_path.exists():
+                 continue
+-            df = pd.read_csv(csv_path, dtype=str).fillna("")
++            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False).fillna("")
+             varnum_col = pick_column(df.columns, VAR_NUMBER_CANDIDATES)
+             varname_col = pick_column(df.columns, VAR_NAME_CANDIDATES)
+             code_col = pick_column(df.columns, CODE_VALUE_CANDIDATES)
+@@ -1053,7 +1056,7 @@
+             csv_path = year_dir / rec["csv_path"]
+             if not csv_path.exists():
+                 continue
+-            df = pd.read_csv(csv_path, dtype=str).fillna("")
++            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False).fillna("")
+             code_col = pick_column(df.columns, CODE_VALUE_CANDIDATES)
+             label_col = pick_column(df.columns, VALUE_LABEL_CANDIDATES)
+             access_table_col = pick_column(df.columns, DATA_TABLE_CANDIDATES)
+@@ -1187,6 +1190,7 @@
+     lake, synth_imp_count = append_synthetic_imputation_rows(lake)
+     lake, unitid_count = append_unitid_metadata_rows(lake)
+     lake = apply_source_metadata_corrections(lake, root=layout.root)
++    lake = attach_2024_provenance(lake, root=layout.root)
+     contract_id = current_contract_id()
+     if not contract_id:
+         raise SystemExit("[fatal] panel contract_id is blank")
+@@ -1211,6 +1215,7 @@
+ 
+     codes = codes.drop_duplicates().reset_index(drop=True)
+     codes = apply_source_metadata_corrections(codes, root=layout.root, codebook=True)
++    codes = attach_2024_provenance(codes, root=layout.root)
+     codes["contract_id"] = contract_id
+     codes = codes[["contract_id", *[column for column in codes.columns if column != "contract_id"]]]
+     codes.to_parquet(v2_dictionary_dir / "dictionary_codes.parquet", index=False)
+--- a/Scripts/04_harmonize.py
++++ b/Scripts/04_harmonize.py
+@@ -2018,6 +2018,8 @@
+     setup_logging(args.log_file)
+     layout = ensure_data_layout(args.root)
+     years = parse_years(args.years)
++    if years != [2024]:
++        raise SystemExit("This extension pipeline accepts only --years 2024; historical data must be reused unchanged")
+     output_dir = pathlib.Path(args.output_dir) if args.output_dir else layout.cross_sections / "v2"
+     parts_dir_base = pathlib.Path(args.parts_dir_base) if args.parts_dir_base else layout.build / "v2" / "harmonize_parts"
+     output_dir.mkdir(parents=True, exist_ok=True)
+@@ -2097,12 +2099,14 @@
+             raise SystemExit(f"Missing manifest or table inventory for year {year}")
+         manifest = pd.read_csv(manifest_path, dtype=str).fillna("")
+         release_type = manifest.iloc[0]["release_type"].strip().lower()
+-        release_summary = pd.DataFrame([{"year": year, "release_type": release_type, "allowed": release_type == "final"}])
++        approved_2024 = (year == 2024 and args.contract_id == "ipedsdb-panel-2004-2024-mixed-v1" and release_type in {"provisional", "mixed"})
++        release_allowed = release_type == "final" or approved_2024
++        release_summary = pd.DataFrame([{"year": year, "release_type": release_type, "allowed": release_allowed, "extension_contract": args.contract_id}])
+         release_summary_target = checks_v2 / "release_qc" / f"release_summary_{year}.csv"
+         release_summary_pending = pending_artifact_path(release_summary_target, run_id)
+         release_summary.to_csv(release_summary_pending, index=False)
+         artifact_pairs.append((release_summary_pending, release_summary_target))
+-        if args.release_strict and release_type != "final":
++        if args.release_strict and not release_allowed:
+             raise SystemExit(f"Unexpected non-final release for year {year}: {release_type}")
+ 
+         inventory = pd.read_csv(inventory_path, dtype=str).fillna("")
+--- a/Scripts/wide_build_duckdb.py
++++ b/Scripts/wide_build_duckdb.py
+@@ -32,6 +32,7 @@
+ from datetime import datetime, timezone
+ from pathlib import Path
+ 
++from extension_2024_null_columns import validate_retained_null_columns
+ import pandas as pd
+ import pyarrow as pa
+ import pyarrow.dataset as ds
+@@ -2896,6 +2897,12 @@
+         WHERE eligible_value_rows > 0 AND non_null_value_rows = 0
+         """,
+     )
++    retained_null_columns = validate_retained_null_columns(
++        con, runtime.years, qc_dir,
++        Path(args.analysis_schema_contract).parent
++        / "extension_2024" / "retained_all_null_columns.csv",
++    )
++    all_null_columns -= retained_null_columns
+     if no_eligible_columns or all_null_columns:
+         raise SystemExit(
+             "canonical analysis columns require eligible, non-null source evidence: "
+--- a/Scripts/07_clean_panel.py
++++ b/Scripts/07_clean_panel.py
+@@ -824,11 +824,10 @@
+     input_keys, years_sorted = validate_panel_keys(dataset)
+     if not years_sorted:
+         raise SystemExit("Input contains no non-null years for PRCH cleaning.")
+-    if len(years_sorted) == 1:
+-        yr = years_sorted[0]
++    if years_sorted != [2024] or args.policy_mode != "release":
+         raise SystemExit(
+-            f"Refusing to run: input appears to contain only one year ({yr}). "
+-            "Provide the full stitched panel to avoid a single-year cleaned output."
++            "This extension cleaner requires exactly year 2024 and release policy mode; "
++            "historical cleaned data must be reused unchanged."
+         )
+     all_cols = dataset.schema.names
+     prch_flags = [c for c in all_cols if c.upper().startswith("PRCH")]

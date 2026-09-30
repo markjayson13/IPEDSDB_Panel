@@ -91,7 +91,10 @@ def source_record(record: dict) -> dict:
     for key in ("academic_year_label", "release_type", "source_table_reference_period",
                 "reference_period_start", "reference_period_end", "imputation_flag_availability",
                 "source_archive_sha256", "source_database_sha256", "source_physical_table_sha256",
-                "metadata_correction_registry_sha256", "metadata_correction_evidence"):
+                "metadata_correction_registry_sha256", "metadata_correction_evidence",
+                "source_release_date", "source_release_status", "source_url",
+                "source_member", "source_member_sha256", "source_snapshot_id",
+                "reporting_population_note", "reporting_population_source"):
         if record.get(key) not in (None, ""):
             result[key] = record[key]
     return result
@@ -194,6 +197,8 @@ def make_detail(variable: dict, issues: list[dict]) -> dict:
     if provenance:
         result["code_provenance"] = grouped(provenance)
         result["original_codes"] = original_codes
+    if variable.get("column_consolidation"):
+        result["column_consolidation"] = variable["column_consolidation"]
     return compact_definitions(result)
 
 
@@ -226,7 +231,7 @@ def parquet_codebook(metadata: dict) -> tuple[dict, dict[str, dict]]:
             "Blank definitions and labels mean Not supplied by the verified source. Undocumented observed category values remain unresolved.",
             "Nulls are missing observations, distinct from negative or special source codes. Ordinary string nulls become empty strings in Stata.",
             "Stata may encode categorical strings as numbers. The Stata mapping preserves the original source token and native export label.",
-            "The full dataset has 2,721 variables. Stata/BE requires a selected variable list; Stata/SE or MP can open the whole file.",
+            f"The full dataset has {metadata['column_count']:,} variables. Stata/BE requires a selected variable list; Stata/SE or MP can open the whole file.",
             "Metadata completeness does not establish comparability across years. Definitions, units, price basis and reference periods must be considered for each analysis.",
         ],
     }
@@ -333,6 +338,14 @@ def write_assets(index: dict, details: dict[str, dict], output: Path) -> None:
                            [{"variable": name, **code} for name in sorted(details) for code in details[name]["codes"]])
     index["downloads"] = {"dictionary": csv_name, "definitions": definitions_name, "value_labels": labels_name,
                           "pdf": "ipeds-panel-codebook.pdf"}
+    consolidated = [detail for detail in details.values() if detail.get("column_consolidation")]
+    if consolidated:
+        index["downloads"]["column_crosswalk"] = write_csv(
+            output, "column-crosswalk.csv", ["canonical_name", "original_column", "years", "rationale", "caveats"],
+            [{"canonical_name": detail["name"], "original_column": member["column"],
+              "years": member["years"], "rationale": detail["column_consolidation"].get("rationale", ""),
+              "caveats": detail["column_consolidation"].get("caveats", [])}
+             for detail in consolidated for member in detail["column_consolidation"]["members"]])
     data = (compact(index) + "\n").encode("utf-8")
     if len(data) >= MAX_ASSET_BYTES:
         raise ValueError("Codebook index exceeds 5 MiB")
@@ -347,14 +360,26 @@ def load_verified_metadata(path: Path, expected: str) -> tuple[dict, str]:
     return json.loads(data), actual
 
 
-def build(root: Path, output: Path) -> dict:
-    final = root / "Final"
-    manifest = json.loads((final / "manifest.json").read_text())
+def build(root: Path, output: Path, *, manifest_path: Path | None = None,
+          panel_relative: str | None = None) -> dict:
+    """Build from a hash-bound manifest; defaults retain the existing Final API.
+
+    Explicit candidates must supply both options. Their artifact paths are
+    relative to root, so provisional documentation never falls back to Final.
+    """
+    if (manifest_path is None) != (panel_relative is None):
+        raise ValueError("Supply both manifest_path and panel_relative for a candidate")
+    manifest_path = manifest_path or root / "Final/manifest.json"
+    panel_relative = panel_relative or f"Final/{PANEL}"
+    relative_path = Path(panel_relative)
+    if relative_path.is_absolute() or ".." in relative_path.parts or relative_path.suffix:
+        raise ValueError("Panel path must be a safe relative stem without an extension")
+    manifest = json.loads(manifest_path.read_text())
     artifacts = {record["path"]: record["sha256"] for record in manifest["artifacts"]}
     fingerprints = {}
     index, details = {}, {}
     for ext in ("parquet", "dta"):
-        relative = f"Final/{PANEL}.{ext}"
+        relative = f"{panel_relative}.{ext}"
         metadata_relative = relative + ".metadata.json"
         if relative not in artifacts or metadata_relative not in artifacts:
             raise ValueError(f"Published manifest does not list data and metadata: {ext}")
@@ -371,7 +396,17 @@ def build(root: Path, output: Path) -> dict:
             add_stata(index, details, metadata)
         del metadata
         gc.collect()
-    index["release"] = manifest.get("labeled_panel_release", index["release"])
+    index["release"] = manifest.get("release_name", manifest.get("labeled_panel_release", index["release"]))
+    index["data_directory"] = str(relative_path.parent)
+    index["release_status"] = manifest.get("source_release_status", "Final")
+    if index["release_status"] != "Final":
+        index["notes"].insert(0, f"Source release status: {index['release_status']}. Consult each variable's source release and date.")
+    notes = manifest.get("codebook_notes", [])
+    if not isinstance(notes, list) or any(not isinstance(note, str) for note in notes):
+        raise ValueError("Manifest codebook_notes must be a list of strings")
+    index["notes"].extend(notes)
+    index["release_notes"] = notes
+    index["codebook_url"] = manifest.get("codebook_url", "https://markjayson13.github.io/IPEDSDB_Panel/")
     index["generated_from"] = fingerprints
     write_assets(index, details, output)
     return {"variables": len(details), "issues": len(index["issues"]), "generated_from": fingerprints,
@@ -382,8 +417,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True, help="Published IPEDSDB_PANEL output root")
     parser.add_argument("--output-dir", type=Path, default=Path(__file__).resolve().parents[1] / "docs/codebook")
+    parser.add_argument("--manifest", type=Path, help="Explicit hash-bound candidate manifest; requires --panel-relative")
+    parser.add_argument("--panel-relative", help="Panel stem relative to --root, without .parquet/.dta; requires --manifest")
     args = parser.parse_args()
-    print(json.dumps(build(args.root, args.output_dir), indent=2))
+    print(json.dumps(build(args.root, args.output_dir, manifest_path=args.manifest,
+                           panel_relative=args.panel_relative), indent=2))
 
 
 if __name__ == "__main__":
