@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "operation": "Relocate existing IPEDS source and working files to CIRAGO; no dataset transformation",
+  "status": "complete",
+  "completed_utc": "2026-10-01T04:00:21.679412+00:00",
+  "validation_utc": "2026-10-01T04:01:53.380523+00:00",
+  "bytes_relocated_from_local_disk": 16736631962,
+  "regular_files_sha256_verified_before_local_removal": 1442,
+  "per_file_manifest": {
+    "path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Work/Storage_moves/2026-09-30/manifest.json",
+    "sha256": "5ea0b8e557c824811496251b57a6a74b58426bb10da07c8049f0943adf12a004"
+  },
+  "moves": [
+    {
+      "source": "/private/tmp/ipeds-2024-extension",
+      "destination": "/Volumes/CIRAGO/IPEDSDB_PANEL/Work/2024-extension-v1/local-build-retained",
+      "label": "2024 development workspace: intermediate panels, cross-sections, prepared sources, code and receipts; not the published dataset.",
+      "reused_existing": false,
+      "status": "relocated_and_local_path_linked",
+      "regular_files": 1250,
+      "bytes": 14692831209,
+      "internal_links": 11
+    },
+    {
+      "source": "/private/tmp/ipeds-post2023-audit-20260929",
+      "destination": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/2024_source_audit_2026-09-29",
+      "label": "Original 2024 Access download, extracted metadata and source-audit evidence.",
+      "reused_existing": false,
+      "status": "relocated_and_local_path_linked",
+      "regular_files": 43,
+      "bytes": 779462850,
+      "internal_links": 0
+    },
+    {
+      "source": "/private/tmp/ipeds-2024-download-cache",
+      "destination": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/2024_download_cache",
+      "label": "Official 2024 component archives, dictionaries and Stata import definitions.",
+      "reused_existing": false,
+      "status": "relocated_and_local_path_linked",
+      "regular_files": 42,
+      "bytes": 24224456,
+      "internal_links": 0
+    },
+    {
+      "source": "/private/tmp/ipeds-full-labels-audit",
+      "destination": "/Volumes/CIRAGO/IPEDSDB_PANEL/Archive/full_panel_label_audit",
+      "label": "Retained label audit: original dictionary downloads and intermediate metadata; not a final data release.",
+      "reused_existing": false,
+      "status": "relocated_and_local_path_linked",
+      "regular_files": 99,
+      "bytes": 1004213528,
+      "internal_links": 0
+    },
+    {
+      "source": "/private/tmp/ipeds-cip-investigate",
+      "destination": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Post2023_exploration/cip_completions_probe",
+      "label": "Exploratory 2024 completions extracts; not an independently approved source snapshot.",
+      "reused_existing": false,
+      "status": "relocated_and_local_path_linked",
+      "regular_files": 2,
+      "bytes": 43822062,
+      "internal_links": 0
+    },
+    {
+      "source": "/private/tmp/ipeds-C2024_A-access.csv",
+      "destination": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Post2023_exploration/ipeds-C2024_A-access.csv",
+      "label": "Original Access completions extract used for investigation.",
+      "reused_existing": false,
+      "status": "relocated_and_local_path_linked",
+      "regular_files": 1,
+      "bytes": 139275062,
+      "internal_links": 0
+    },
+    {
+      "source": "/private/tmp/ipeds-C2024_B.zip",
+      "destination": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Post2023_exploration/ipeds-C2024_B.zip",
+      "label": "Exploratory 2024 completions download.",
+      "reused_existing": false,
+      "status": "relocated_and_local_path_linked",
+      "regular_files": 1,
+      "bytes": 467918,
+      "internal_links": 0
+    },
+    {
+      "source": "/private/tmp/ipeds-EFFY2024.zip",
+      "destination": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Post2023_exploration/ipeds-EFFY2024.zip",
+      "label": "Exploratory 2024 enrollment download.",
+      "reused_existing": false,
+      "status": "relocated_and_local_path_linked",
+      "regular_files": 1,
+      "bytes": 6933660,
+      "internal_links": 0
+    },
+    {
+      "source": "/private/tmp/ipeds-EFFY2025.zip",
+      "destination": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Post2023_exploration/ipeds-EFFY2025.zip",
+      "label": "Exploratory 2025 enrollment download; not included in the 2004-2024 release.",
+      "reused_existing": false,
+      "status": "relocated_and_local_path_linked",
+      "regular_files": 1,
+      "bytes": 3435794,
+      "internal_links": 0
+    },
+    {
+      "source": "/private/tmp/ipeds-IC2024.zip",
+      "destination": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Post2023_exploration/ipeds-IC2024.zip",
+      "label": "Exploratory 2024 institutional-characteristics download.",
+      "reused_existing": false,
+      "status": "relocated_and_local_path_linked",
+      "regular_files": 1,
+      "bytes": 269921,
+      "internal_links": 0
+    },
+    {
+      "source": "~/Downloads/IPEDS_2004-05_Final.zip",
+      "destination": "/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/Raw_Access_Databases/2004/downloads/IPEDS_2004-05_Final.zip",
+      "label": "Duplicate original 2004 archive: reuse existing verified external copy.",
+      "reused_existing": true,
+      "status": "relocated_and_local_path_linked",
+      "regular_files": 1,
+      "bytes": 41695502,
+      "internal_links": 0
+    }
+  ],
+  "validation": {
+    "every_original_path_is_now_a_resolving_compatibility_link": true,
+    "destination_file_sizes_match_manifest": true,
+    "copied_internal_links_resolve": true,
+    "local_backup_and_destination_staging_paths_absent": true,
+    "external_build_and_pipeline_links_stay_on_cirago": true,
+    "parquet_footer_readbacks": [
+      {
+        "path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Work/2024-extension-v1/build/Panels/v2/panel_clean_prch_2024_2024.parquet",
+        "resolved_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Work/2024-extension-v1/local-build-retained/build/Checks/v2/prch_qc_runs/87260-d161d87fb9c64c3e86a39e6f2573dea8/panel_clean.parquet",
+        "rows": 6073,
+        "columns": 2093
+      },
+      {
+        "path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Work/2024-extension-v1/build/Panels/v2/panel_wide_analysis_2024_2024.parquet",
+        "resolved_path": "/Volumes/CIRAGO/IPEDSDB_PANEL/Work/2024-extension-v1/local-build-retained/build/Panels/v2/wide_release/runs/20260930T020408.611947Z-ecd5f8a8345e44ad87d3b401476df79d/output/panel_wide_analysis_2024_2024.parquet",
+        "rows": 6073,
+        "columns": 2093
+      }
+    ],
+    "published_release_manifests_unchanged": {
+      "Final/manifest.json": "c4788db7ce5c711fb8476d8e39bd676bd26cead27593bd4231fb5aee2d20cbcd",
+      "Releases/2024-extension-v1/manifest.json": "3b44c2c442c41eab0d4aed0062bc74f7fe5418945ec833bb2147d6596404e1d9",
+      "Releases/2024-extension-v1/Sources/2024/source_manifest.json": "36cf60a0d74c4cc0cf4ca58143040b3fc21cd453c6e672cbd9c4f52cad487f18"
+    },
+    "relocated_source_snapshot_artifacts_reverified": 284,
+    "relocated_source_manifest_matches_published_snapshot": true,
+    "published_datasets_rebuilt_or_modified": false,
+    "fsa_ipeds_ds_modified": false
+  },
+  "folder_guides": [
+    "Sources/README.md",
+    "Sources/Post2023_exploration/README.md",
+    "Work/2024-extension-v1/README.md",
+    "Archive/full_panel_label_audit/README.storage.md",
+    "README.md"
+  ],
+  "local_backup_cleanup": {
+    "reason": "Read-only sealed-build directories blocked local backup cleanup.",
+    "remaining_local_files_reverified": 1216,
+    "action": "Granted owner access only to verified local backup directories, then completed their removal."
+  },
+  "local_free_bytes_after_verification": 39874768896,
+  "external_free_bytes_after_verification": 67818340352,
+  "space_note": "Relocated bytes are verified file lengths; filesystem free-space changes may also reflect unrelated activity."
+}

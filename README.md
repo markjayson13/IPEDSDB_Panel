@@ -139,6 +139,10 @@ Use `Provisional` for the latest 2004-2024 extension or `Final` for final-only
 and inspect its outputs in `Work/Checks`. The archive preserves the earlier
 folder relationships so its relative links continue to resolve.
 
+Large local source downloads and the 2024 working build have been relocated
+to CIRAGO. See [local data storage](docs/LOCAL_STORAGE.md) for their labeled
+folders, compatibility links, verification receipt and future source defaults.
+
 ## Release status
 
 The current corrected release is `2023-sfa-v1`, described in the

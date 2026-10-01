@@ -24,6 +24,8 @@ from pathlib import Path
 import openpyxl
 import pandas as pd
 
+from access_build_utils import data_root, require_data_volume
+
 
 ACCESS_NAME = "IPEDS_2024-25_Provisional.zip"
 ACCESS_SHA = "ef134955ba5003a07d37e46fae6286a76dca4c15767c3c4cd9086b1887896713"
@@ -475,18 +477,34 @@ def build_snapshot(root: Path, audit: Path, cache: Path, download: bool, reuse_v
     return manifest
 
 
-def main():
+def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--audit-root", type=Path, default=Path("/private/tmp/ipeds-post2023-audit-20260929"))
-    parser.add_argument("--output-root", type=Path, default=Path("/private/tmp/ipeds-2024-extension/sources"))
-    parser.add_argument("--cache-root", type=Path, default=Path("/private/tmp/ipeds-2024-download-cache"))
+    parser.add_argument("--root", type=Path, default=data_root(), help="Data root; defaults to IPEDSDB_ROOT or the CIRAGO data folder")
+    parser.add_argument("--audit-root", type=Path, help="Original audit downloads; defaults to ROOT/Sources/2024_source_audit_2026-09-29")
+    parser.add_argument("--output-root", type=Path, help="New source snapshot; defaults to ROOT/Work/2024-source-preparation/sources")
+    parser.add_argument("--cache-root", type=Path, help="Official download cache; defaults to ROOT/Sources/2024_download_cache")
     parser.add_argument("--download", action="store_true")
     parser.add_argument("--reuse-verified-snapshot", type=Path, help="Reuse only original Access extraction after verifying every artifact in an existing snapshot")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
+    args.root = args.root.expanduser()
+    for name, relative in (("audit_root", "Sources/2024_source_audit_2026-09-29"),
+                           ("output_root", "Work/2024-source-preparation/sources"),
+                           ("cache_root", "Sources/2024_download_cache")):
+        value = getattr(args, name)
+        setattr(args, name, value.expanduser() if value is not None else args.root / relative)
+    return args
+
+
+def main(argv=None):
+    args = parse_args(argv)
     if args.output_root.exists():
         manifest = verify_snapshot(args.output_root)
         print(f"Verified existing immutable snapshot: {args.output_root} ({len(manifest['artifacts'])} artifacts)")
         return
+    # Resolve compatibility links too: a local link must not create directories
+    # at an unmounted external destination. Existing snapshots above are read-only.
+    require_data_volume(args.output_root.resolve())
+    require_data_volume(args.cache_root.resolve())
     args.output_root.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".sources-building-", dir=args.output_root.parent) as temp:
         root = Path(temp)

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Relocate large local IPEDS sources and working data to CIRAGO with per-file checksums and compatibility links; default future source preparation to the external data root.
 - Correct native Stata labels in both public codebook PDFs and preserve tied latest-year definitions in dictionary summaries; add interaction regression checks, request recovery, and mobile accessibility fixes.
 - Redesign both public codebooks as compact reference tools, with original-column lookup, persistent year/section links, clearer source records, mobile year controls, and release-specific downloads.
 - Include a checksum-pinned historical pipeline source snapshot so fresh clones can reproduce the metadata repair and extension without an unavailable local Git commit.

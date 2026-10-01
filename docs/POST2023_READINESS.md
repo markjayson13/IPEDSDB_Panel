@@ -165,9 +165,11 @@ Machine-readable results, source receipts and pipeline probes:
 [`Artifacts/post2023_readiness_2026-09-29.json`](../Artifacts/post2023_readiness_2026-09-29.json).
 Every declared variable's physical-table check:
 [`Artifacts/post2023_variable_table_audit_2026-09-29.csv`](../Artifacts/post2023_variable_table_audit_2026-09-29.csv).
-Raw downloads and temporary audit commands remain at
-`/private/tmp/ipeds-post2023-audit-20260929/`; the JSON records source URLs and
-digests independently of that temporary location.
+Raw downloads and temporary audit commands were relocated to
+`/Volumes/CIRAGO/IPEDSDB_PANEL/Sources/2024_source_audit_2026-09-29/`.
+The original `/private/tmp/ipeds-post2023-audit-20260929/` path is a compatibility
+link. The JSON retains its original locations and records source URLs and
+digests independently of that location. See [local data storage](LOCAL_STORAGE.md).
 
 | Source | SHA-256 |
 | --- | --- |

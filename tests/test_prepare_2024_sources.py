@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import json
 import zipfile
+from pathlib import Path
 
 import pandas as pd
 import pytest
 
+import prepare_2024_sources as source_builder
+from access_build_utils import DEFAULT_IPEDSDB_ROOT
 from prepare_2024_sources import (
     canonical, compare_sources, dictionary_info, extract_zip, indexed, read_csv,
     sha256, verify_snapshot,
@@ -141,3 +144,75 @@ def test_matching_blank_strings_are_not_false_revisions():
     result = compare_sources(a, o, r, ["UNITID"], {"UNITID", "PELL", "ALL_BLANK_NUMBER"})
     assert result["access_vs_original_changed_cells"] == 0
     assert result["access_vs_effective_changes"] == {"PELL": 1}
+
+
+def test_source_preparation_defaults_to_external_work_and_sources(monkeypatch):
+    monkeypatch.delenv("IPEDSDB_ROOT", raising=False)
+    args = source_builder.parse_args([])
+    assert args.audit_root == DEFAULT_IPEDSDB_ROOT / "Sources/2024_source_audit_2026-09-29"
+    assert args.cache_root == DEFAULT_IPEDSDB_ROOT / "Sources/2024_download_cache"
+    assert args.output_root == DEFAULT_IPEDSDB_ROOT / "Work/2024-source-preparation/sources"
+
+
+def test_source_preparation_honors_environment_and_explicit_roots(tmp_path, monkeypatch):
+    configured = tmp_path / "configured"
+    monkeypatch.setenv("IPEDSDB_ROOT", str(configured))
+    assert source_builder.parse_args([]).output_root == configured / "Work/2024-source-preparation/sources"
+    explicit = tmp_path / "explicit"
+    args = source_builder.parse_args(["--root", str(explicit), "--audit-root", str(tmp_path / "audit"),
+                                     "--cache-root", str(tmp_path / "cache"), "--output-root", str(tmp_path / "snapshot")])
+    assert args.root == explicit
+    assert (args.audit_root, args.cache_root, args.output_root) == (tmp_path / "audit", tmp_path / "cache", tmp_path / "snapshot")
+    assert source_builder.parse_args(["--root", str(explicit)]).output_root == explicit / "Work/2024-source-preparation/sources"
+
+
+@pytest.mark.parametrize("external_destination", ["output", "cache", "linked_cache"])
+def test_source_preparation_rejects_unmounted_destinations_before_writing(tmp_path, monkeypatch, external_destination):
+    missing = Path("/Volumes/IPEDS_TEST_ABSENT_DRIVE/source-preparation")
+    output, cache = tmp_path / "new/snapshot", tmp_path / "cache"
+    if external_destination == "output":
+        output = missing / "sources"
+    elif external_destination == "cache":
+        cache = missing / "cache"
+    else:
+        cache = tmp_path / "linked-cache"
+        cache.symlink_to(missing / "cache", target_is_directory=True)
+    monkeypatch.setattr(Path, "is_mount", lambda self: False)
+    def unexpected_write(*args, **kwargs):
+        raise AssertionError("A write was attempted before the mount guard")
+    monkeypatch.setattr(Path, "mkdir", unexpected_write)
+    monkeypatch.setattr(source_builder, "build_snapshot", unexpected_write)
+    with pytest.raises(FileNotFoundError, match="Data volume is not mounted"):
+        source_builder.main(["--root", str(tmp_path), "--output-root", str(output), "--cache-root", str(cache)])
+
+
+def test_existing_snapshot_verification_does_not_require_unused_drive(tmp_path, monkeypatch, capsys):
+    snapshot = tmp_path / "snapshot"
+    snapshot.mkdir()
+    source = snapshot / "source.csv"
+    source.write_text("UNITID\n1\n")
+    (snapshot / "source_manifest.json").write_text(json.dumps({"artifacts": [{"path": source.name, "sha256": sha256(source)}]}))
+    def unexpected_write(*args, **kwargs):
+        raise AssertionError("Existing snapshot verification must remain read-only")
+    monkeypatch.setattr(Path, "mkdir", unexpected_write)
+    monkeypatch.setattr(source_builder, "require_data_volume", unexpected_write)
+    source_builder.main(["--root", "/Volumes/IPEDS_TEST_ABSENT_DRIVE/data", "--output-root", str(snapshot)])
+    assert "Verified existing immutable snapshot" in capsys.readouterr().out
+
+
+def test_new_source_snapshot_stays_under_configured_work_root(tmp_path, monkeypatch):
+    calls = []
+    def build_stub(output, audit, cache, download, reuse):
+        calls.append((output, audit, cache, download, reuse))
+        (output / "source_manifest.json").write_text('{"artifacts": [], "tables": []}')
+        return {"artifacts": [], "tables": []}
+    monkeypatch.setattr(source_builder, "build_snapshot", build_stub)
+    source_builder.main(["--root", str(tmp_path)])
+    output, audit, cache, download, reuse = calls[0]
+    assert output.parent == tmp_path / "Work/2024-source-preparation"
+    assert audit == tmp_path / "Sources/2024_source_audit_2026-09-29"
+    assert cache == tmp_path / "Sources/2024_download_cache"
+    assert not download and reuse is None
+    assert (tmp_path / "Work/2024-source-preparation/sources/source_manifest.json").is_file()
+    assert not (tmp_path / "Releases").exists()
+    assert not (tmp_path / "Final").exists()
