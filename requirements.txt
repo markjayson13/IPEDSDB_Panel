@@ -3,5 +3,6 @@ pyarrow>=14
 openpyxl>=3.1
 requests>=2.31
 beautifulsoup4>=4.12
-duckdb>=0.10.0
+# DuckDB 2 drops result.fetch_arrow_table and changes casts the pipeline uses.
+duckdb>=0.10.0,<2
 pytest>=8.0

@@ -1,5 +1,128 @@
 # IPEDSDB_Panel
 
+[![CI](https://github.com/markjayson13/IPEDSDB_Panel/actions/workflows/ci.yml/badge.svg)](https://github.com/markjayson13/IPEDSDB_Panel/actions/workflows/ci.yml)
+[![code license](https://img.shields.io/badge/code-MIT-blue)](LICENSE)
+[![derived data](https://img.shields.io/badge/derived%20data-CC%20BY%204.0-lightgrey)](DATA_LICENSE.md)
+[![CI Python](https://img.shields.io/badge/CI%20Python-3.11-blue)](.github/workflows/ci.yml)
+
+An unbalanced panel of U.S. postsecondary institutions: one row per `UNITID` and IPEDS collection year, built from final NCES IPEDS Access databases.
+
+Higher-education and education-economics research can use it when the unit is the institution-year, the definitions have to stay tied to the year, and the file has to be rebuildable from the official Access releases. The institution-level file is outside git. This repository holds the pipeline, the public codebook, and the release contracts.
+
+## Who it is for
+
+- Researchers who want one institution-year IPEDS file instead of a stack of annual Access databases.
+- Readers checking a variable's definition, years with values, or category codes before using it.
+- Anyone reproducing the extract, harmonization, parent-child cleaning, and QA steps.
+
+## What you get
+
+The labeled final release `full-panel-labels-v1` is recorded in [`docs/codebook/manifest.json`](docs/codebook/manifest.json) and [`docs/FULL_PANEL_LABELS.md`](docs/FULL_PANEL_LABELS.md).
+
+| Item | Recorded value |
+| --- | --- |
+| Unit | `UNITID` by collection `year` |
+| Years | 2004-2023, final Access releases |
+| Rows | 141,711 |
+| Columns | 2,721 |
+| Shape | unbalanced |
+| Dictionary | [interactive codebook](https://markjayson13.github.io/IPEDSDB_Panel/) and [`docs/codebook/codebook.csv`](docs/codebook/codebook.csv) |
+
+A separate 2004-2024 extension records 147,782 rows and 2,676 columns in the validated consolidated analysis file. Its 2024 tables mix final and provisional sources. See [`docs/2024_EXTENSION_RESULTS.md`](docs/2024_EXTENSION_RESULTS.md).
+
+A variable-browser snapshot built on 2026-03-17 from `panel_clean_analysis_2004_2023.parquet` records 141,711 rows and 1,864 columns (`Customize_Panel/variable_browser.html`). That file is an earlier analysis snapshot. The labeled release above is the current final panel.
+
+`Scripts/QA_QC/08_acceptance_audit.py` writes one row per acceptance check. With every expected artifact present, including the discrete-conflict summary, that inventory is 39 checks. The acceptance summary for the published panel lives outside this repository, so this page gives the check count and points to the labeled-release validation in [`docs/FULL_PANEL_LABELS.md`](docs/FULL_PANEL_LABELS.md).
+
+## Panel preview
+
+Institution microdata stays outside git. [`Artifacts/panel_schema_preview.csv`](Artifacts/panel_schema_preview.csv) is a schema excerpt copied from [`docs/codebook/codebook.csv`](docs/codebook/codebook.csv). Null counts below are that codebook's `null_count` on the 141,711-row release. `INSTSIZE` has values from 2005. `UPGRNTN` has values from 2009.
+
+| Name | Label | Source | Years with values | Null count |
+| --- | --- | --- | --- | --- |
+| `UNITID` | IPEDS institution identifier | KEYS | 2004-2023 | 0 |
+| `year` | IPEDS reporting year |  | 2004-2023 | 0 |
+| `INSTNM` | Institution (entity) name | HD | 2004-2023 | 14 |
+| `CONTROL` | Control of institution | HD | 2004-2023 | 14 |
+| `SECTOR` | Sector of institution | HD | 2004-2023 | 14 |
+| `TUITION2` | In-state average tuition for full-time undergraduates | IC_AY | 2004-2023 | 59,841 |
+| `UPGRNTN` | Number of undergraduate students awarded Federal Pell grants | SFA_P | 2009-2023 | 44,858 |
+| `INSTSIZE` | Institution size category | HD | 2005-2023 | 6,930 |
+
+The codebook marks `UPGRNTN` with `[varies by year]` because the source title changes. In `docs/codebook/value-labels.csv`, `CONTROL` for 2004-2023 is 1 Public, 2 Private not-for-profit, and 3 Private for-profit. Code -3 is `{Not available}`. The same file holds the other category labels.
+
+## Quickstart
+
+These commands print the pipeline plan, check the panel contract, and show the schema preview. NCES stays untouched, and the external data drive is not required.
+
+```bash
+git clone https://github.com/markjayson13/IPEDSDB_Panel.git
+cd IPEDSDB_Panel
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python Scripts/00_run_all.py --root /tmp/ipedsdb-dry-run --years "2022:2023" --dry-run
+python Scripts/QA_QC/11_validate_panel_contract.py
+python -c "import pandas as pd; print(pd.read_csv('Artifacts/panel_schema_preview.csv', keep_default_na=False).to_string(index=False))"
+```
+
+On Windows, activate `.venv\Scripts\activate` instead of `source .venv/bin/activate`.
+
+The searchable dictionary is https://markjayson13.github.io/IPEDSDB_Panel/. The 2004-2024 codebook is https://markjayson13.github.io/IPEDSDB_Panel/provisional/. PDF, dictionary CSV, and category-label CSV downloads are on those pages. Rebuild notes are in [`docs/CODEBOOK.md`](docs/CODEBOOK.md).
+
+## Reproduce the panel
+
+A full build downloads final Access archives from NCES, extracts them with `mdb-tools`, and writes draft outputs under `IPEDSDB_ROOT`. Publication into `Final/` is a separate step.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+# mdb-tables, mdb-schema, and mdb-export must be on PATH
+export IPEDSDB_ROOT="/path/to/IPEDSDB_PANEL"
+bash manual_commands.sh
+```
+
+`manual_commands.sh` runs years `2004:2023` with cleaning and QA. Smoke tests, folder layout, and stage-by-stage outputs are in the operator sections below. Method notes: [`METHODS_PANEL_CONSTRUCTION.md`](METHODS_PANEL_CONSTRUCTION.md) and [`METHODS_PRCH_CLEANING.md`](METHODS_PRCH_CLEANING.md).
+
+## Data source and licenses
+
+Upstream files are NCES IPEDS Access databases: https://nces.ed.gov/ipeds/use-the-data/download-access-database
+
+NCES publishes that source as public data. This repository does not relicense NCES material. Cite NCES/IPEDS for the source data and cite IPEDSDB_Panel for the panel construction, cleaning policy, manifests, and QA evidence.
+
+Code in this repository is under the MIT License in [`LICENSE`](LICENSE). Derived release data, QA tables, manifests, and metadata produced here are under CC BY 4.0, as stated in [`DATA_LICENSE.md`](DATA_LICENSE.md). Suggested citation text is in [`CITATION.cff`](CITATION.cff).
+
+## Limitations
+
+- The panel is unbalanced. Institutions enter and leave. The 141,711 rows are institution-years, a different object from 20 copies of one institution list.
+- `PRCH_F` code 6 stays visible for review. Blanket nulling of that code would drop reported finance values. See [`contracts/known_limitations.csv`](contracts/known_limitations.csv).
+- Finance variables can cross accounting-standard and reporting-structure changes.
+- Sector, level, Carnegie, and related classifications can change across years.
+- `UNITID` is the panel key. OPEID links are diagnostic.
+- Five variables lack a source description in some years (`F1C196`, `LINE_55`, `PCF_F_RV`, `REV_IC`, `SFTETOTL`). Another 6,256 observations lack a verified same-year code meaning. See [`docs/FULL_PANEL_LABELS.md`](docs/FULL_PANEL_LABELS.md).
+- Stata/BE loads at most 2,048 variables. The labeled final file has 2,721 columns. See the [official edition limits](https://www.stata.com/products/which-stata-is-right-for-me/).
+- The 2024 extension is outside the default final-only build.
+- The predecessor flat-file project is [`IPEDS_Paneling`](https://github.com/markjayson13/IPEDS_Paneling). See [`MIGRATION.md`](MIGRATION.md).
+
+## Related projects
+
+Other public IPEDS tools cover different slices of the same source.
+
+- [ipeds-database](https://github.com/paulgp/ipeds-database) (Paul Goldsmith-Pinkham) builds a harmonized DuckDB database from IPEDS. Its README describes one command that downloads NCES files and loads survey tables, including directory, enrollment, completions, tuition, financial aid, graduation rates, staffing, and finance. Each table has `unitid` and `year`. The year spans in that README differ by table: the earliest listed span starts in 1997 (`gr`) and several tables run through 2024. Some directory and admissions columns are renamed. Other tables keep original IPEDS names in lowercase.
+- [scipeds](https://github.com/scienceforamerica/scipeds) is a Python package from Science for America, with DrivenData, for a preprocessed IPEDS database and query tools. Documentation: https://docs.scipeds.org. The README says release `v0.0.9` includes 2025 data, and that the surveys currently supported are completions by 6-digit CIP, award level, race/ethnicity, and gender for 1984-2025, plus directory information for 2011-2025. The same README says the package is for that preprocessed database, and that raw IPEDS files should be downloaded from NCES.
+- The [Urban Institute Education Data Portal](https://educationdata.urban.org/documentation/) returns harmonized education data as JSON. Its documentation lists the Common Core of Data, the Civil Rights Data Collection, SAIPE, IPEDS, the College Scorecard, and the National Historical Geographic Information System. It describes URL queries, Stata and R packages, and Python and JavaScript examples that call the API. Portal data are under the Open Data Commons Attribution License (ODC-By) v1.0. The portal asks users to cite both the portal and the underlying dataset.
+
+This repository's default product is one wide `UNITID`-by-year file for final Access releases, 2004-2023, with parent-child cleaning, a year-scoped codebook, and QA contracts. Combined FSA and IPEDS analysis files are in [IPEDS-FSA_Panel](https://github.com/markjayson13/IPEDS-FSA_Panel). Title IV volume reports are panelized in [FSAVolumeReports_Panel](https://github.com/markjayson13/FSAVolumeReports_Panel).
+
+## Get involved
+
+Questions about the panel, the codebook, or a rebuild belong in [Q&A discussions](https://github.com/markjayson13/IPEDSDB_Panel/discussions/categories/q-a). A paper, class, or replication that uses the panel belongs in [Show and tell](https://github.com/markjayson13/IPEDSDB_Panel/discussions/categories/show-and-tell).
+
+A code defect uses the [bug report](.github/ISSUE_TEMPLATE/bug_report.yml). A suspicious value, coverage gap, or missing collection year uses the [data quality report](.github/ISSUE_TEMPLATE/data_quality_report.yml). A variable or survey component to add uses the [variable request](.github/ISSUE_TEMPLATE/variable_request.yml). The `good first issue` label marks a bounded first change. Steps for a pull request are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+## Build guide
+
 Build an unbalanced IPEDS institution-year panel from NCES IPEDS Access databases.
 
 This repo converts annual IPEDS Access databases into one institution-by-year panel and writes QA files that document each release decision.
@@ -45,7 +168,7 @@ For example:
 use UNITID year UPGRNTN UPGRNTT ANYAIDN FTE using "/Volumes/CIRAGO/IPEDSDB_PANEL/Provisional/panel_clean_prch_2004_2024.dta", clear
 ```
 
-## Quickstart
+## Operator quickstart
 
 Open your `IPEDSDB_Panel` repository and use the CIRAGO data root:
 
@@ -312,7 +435,7 @@ For a short review, open these five files first:
 | `Scripts/` | pipeline stages and utilities |
 | `Scripts/QA_QC/` | QA, parity, and repo guards |
 | `contracts/` | versioned declarations of the canonical panel contract |
-| `Artifacts/` | small tracked reference files and guide figures |
+| `Artifacts/` | small tracked reference files, `panel_schema_preview.csv`, and guide figures |
 | `Customize_Panel/selectedvars.txt` | starter variable list for custom extracts |
 | `docs/` | GitHub Pages publish directory for the public variable-browser snapshot, landing page, and user guide |
 | `Queries/` | saved starter SQL for DuckDB inspection |

@@ -1,7 +1,7 @@
 {
   "title": "IPEDSDB_Panel",
   "upload_type": "software",
-  "description": "Code, contracts, and release metadata for building an unbalanced IPEDS institution-year panel from final NCES IPEDS Access databases for 2004-2023.",
+  "description": "Code, contracts, and release metadata for an unbalanced IPEDS institution-year panel built from final NCES IPEDS Access databases, 2004-2023. The labeled panel recorded in the repository codebook has 141,711 rows and 2,721 columns. The institution-level file is outside this software archive.",
   "creators": [
     {
       "name": "Farol, Mark Jayson"

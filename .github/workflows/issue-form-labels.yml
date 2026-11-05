@@ -1,0 +1,35 @@
+name: Issue form labels
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply menu labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || "";
+            function selected(heading, option) {
+              const escape = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+              const pattern = new RegExp(
+                "### " + escape(heading) + "\\r?\\n+\\s*" + escape(option) + "\\s*(?:\\r?\\n|$)"
+              );
+              return pattern.test(body);
+            }
+            const labels = [];
+            if (selected("Collection year", "New data year")) labels.push("new data year");
+            if (selected("Horizon", "Roadmap")) labels.push("roadmap");
+            if (labels.length === 0) return;
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              labels,
+            });

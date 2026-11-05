@@ -122,10 +122,11 @@ def run_audit(source_dir: Path, wide_path: Path, clean_path: Path, lineage_path:
         try:
             # The filter/projection is applied in DuckDB before the distinct
             # metadata result crosses into Python; do not load the lineage lake.
-            lineage = con.execute("""SELECT DISTINCT analysis_column, varname, source_varnumber,
+            lineage_query = con.execute("""SELECT DISTINCT analysis_column, varname, source_varnumber,
                 access_table_name, source_file, transformation_id, lineage_role
                 FROM read_parquet(?) WHERE year = ? AND upper(access_table_name) LIKE 'SFA%'""",
-                [str(lineage_path), year]).to_arrow_table().to_pylist()
+                [str(lineage_path), year])
+            lineage = (getattr(lineage_query, "to_arrow_table", None) or lineage_query.fetch_arrow_table)().to_pylist()
             write_csv(out_dir / "value_lineage_mapping.csv", lineage)
             lookup = defaultdict(list)
             for row in lineage:
@@ -138,9 +139,10 @@ def run_audit(source_dir: Path, wide_path: Path, clean_path: Path, lineage_path:
             if set(raw.index) != set(clean.index):
                 raise ValueError("Wide and clean institution-year universes differ.")
             con.register("sfa_columns", pa.table({"column": columns}))
-            actions = con.execute('''SELECT a.* FROM read_parquet(?) a
+            actions_query = con.execute('''SELECT a.* FROM read_parquet(?) a
                 WHERE year = ? AND "column" IN (SELECT "column" FROM sfa_columns)''',
-                [str(actions_path), year]).to_arrow_table().to_pylist()
+                [str(actions_path), year])
+            actions = (getattr(actions_query, "to_arrow_table", None) or actions_query.fetch_arrow_table)().to_pylist()
         finally:
             con.close()
     print(f"[audit] {len(lineage)} mapped columns, {len(raw)} panel rows, {len(actions)} SFA cleaning actions", flush=True)

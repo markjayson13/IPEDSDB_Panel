@@ -109,7 +109,7 @@ def test_collect_acceptance_rows_and_render_markdown(tmp_path: Path) -> None:
     )
 
     rows = audit_mod.collect_acceptance_rows(root, years)
-    assert rows
+    assert len(rows) == 39
     assert all(row["passed"] for row in rows)
 
     md = audit_mod.render_markdown(rows, years)

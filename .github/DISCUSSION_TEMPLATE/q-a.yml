@@ -1,0 +1,26 @@
+title: "[Q&A] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask about using the panel, reading the codebook, or running a rebuild. Search open Q&A threads before posting. The codebook is at https://markjayson13.github.io/IPEDSDB_Panel/
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+    validations:
+      required: true
+  - type: textarea
+    id: tried
+    attributes:
+      label: What you already tried
+      description: A command, a variable name, or a page you already checked.
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Release or commit
+      placeholder: ipedsdb-panel-2004-2023-access-final-v1
+    validations:
+      required: false

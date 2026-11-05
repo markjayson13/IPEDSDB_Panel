@@ -1,0 +1,39 @@
+name: Data quality report
+description: A suspicious value, coverage gap, QA result, or collection year missing from the panel.
+title: "[data quality] "
+labels: ["data quality"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for checking the data. The data quality label is applied when you open this report. Choose New data year below when the collection year is not in the panel yet.
+  - type: dropdown
+    id: collection-year
+    attributes:
+      label: Collection year
+      description: The data quality label is applied with this form. Choosing New data year also adds the new data year label.
+      options:
+        - Published year
+        - New data year
+    validations:
+      required: true
+  - type: input
+    id: scope
+    attributes:
+      label: Years, UNITIDs, or variables
+      placeholder: 2018, UNITID 100654, UPGRNTN
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: What looks wrong
+      description: A codebook row, source table, manifest line, or QA file is enough context.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: false

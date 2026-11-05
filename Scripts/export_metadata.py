@@ -451,7 +451,7 @@ def build_export_metadata(
                         f'SELECT DISTINCT {", ".join(projection)} FROM read_parquet(?) WHERE {predicate}', params,
                     )
                     # Keep compatibility with the minimum supported DuckDB.
-                    fetch_table = getattr(query, "to_arrow_table", query.fetch_arrow_table)
+                    fetch_table = getattr(query, "to_arrow_table", None) or query.fetch_arrow_table
                     records = fetch_table().to_pylist()
             return [_json_value(record) for record in records]
         except Exception as exc:

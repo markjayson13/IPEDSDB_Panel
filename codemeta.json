@@ -2,7 +2,7 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "Dataset",
   "name": "IPEDSDB_Panel",
-  "description": "An unbalanced IPEDS institution-year panel built from final NCES IPEDS Access databases for 2004-2023.",
+  "description": "An unbalanced IPEDS institution-year panel built from final NCES IPEDS Access databases for 2004-2023. The labeled release recorded in docs/codebook/manifest.json has 141,711 rows and 2,721 columns.",
   "version": "ipedsdb-panel-2004-2023-access-final-v1",
   "url": "https://github.com/markjayson13/IPEDSDB_Panel",
   "codeRepository": "https://github.com/markjayson13/IPEDSDB_Panel",
@@ -46,7 +46,9 @@
   "softwareRequirements": "pandas, pyarrow, openpyxl, requests, beautifulsoup4, duckdb, pytest",
   "keywords": [
     "IPEDS",
+    "NCES",
     "higher education",
+    "education economics",
     "panel data",
     "research data"
   ]
