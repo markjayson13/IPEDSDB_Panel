@@ -25,3 +25,16 @@ python3 Scripts/QA_QC/05_repo_size_guard.py --max-file-size-mb 5 --top-n 25
 ```
 
 Do not commit generated data, parquet files, DuckDB files, Access downloads, or local build folders. The generated data root belongs outside git under `IPEDSDB_ROOT`.
+
+## Get involved
+
+Ask questions in [Q&A discussions](https://github.com/markjayson13/IPEDSDB_Panel/discussions/categories/q-a). Share a paper, class, or replication in [Show and tell](https://github.com/markjayson13/IPEDSDB_Panel/discussions/categories/show-and-tell).
+
+The issue forms apply the repository labels:
+
+- [Bug report](.github/ISSUE_TEMPLATE/bug_report.yml) applies `bug`. Choosing Roadmap also applies `roadmap`.
+- [Data quality report](.github/ISSUE_TEMPLATE/data_quality_report.yml) applies `data quality`. Choosing New data year also applies `new data year`.
+- [Variable request](.github/ISSUE_TEMPLATE/variable_request.yml) applies `variable request`. Choosing New data year also applies `new data year`.
+- Show and tell applies `research use case`.
+
+The public dictionary is the codebook at https://markjayson13.github.io/IPEDSDB_Panel/ and `docs/codebook/codebook.csv`. A mapping conflict still has a [variable mapping](.github/ISSUE_TEMPLATE/variable_mapping.yml) form, a failed rebuild has a [reproducibility failure](.github/ISSUE_TEMPLATE/reproducibility_failure.yml) form, and a docs correction has a [documentation](.github/ISSUE_TEMPLATE/documentation.yml) form. The `good first issue` label marks a bounded first change.

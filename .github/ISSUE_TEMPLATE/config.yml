@@ -1,8 +1,14 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Maintainer contact
-    url: https://markjayson.com
-    about: Current public contact information for Mark Jayson Farol.
+  - name: Ask a question
+    url: https://github.com/markjayson13/IPEDSDB_Panel/discussions/categories/q-a
+    about: Questions about the panel, the codebook, or a rebuild go in Q&A discussions.
+  - name: Show and tell
+    url: https://github.com/markjayson13/IPEDSDB_Panel/discussions/categories/show-and-tell
+    about: Share a paper, class, or replication that uses the panel.
   - name: Security concern
     url: https://github.com/markjayson13/IPEDSDB_Panel/security/advisories/new
     about: Report secrets, private records, or executable-file concerns privately.
+  - name: Maintainer contact
+    url: https://markjayson.com
+    about: Current public contact information for Mark Jayson Farol.

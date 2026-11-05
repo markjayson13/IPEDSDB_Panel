@@ -1,0 +1,41 @@
+name: Variable request
+description: Ask for an IPEDS variable or survey component to be added to the panel.
+title: "[variable request] "
+labels: ["variable request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the request. The variable request label is applied when you open this. The codebook lists what is already in the labeled release.
+  - type: input
+    id: variable
+    attributes:
+      label: Variable or survey component
+      description: An IPEDS variable name, variable number, or survey component.
+      placeholder: UPGRNTN, or Student Financial Aid
+    validations:
+      required: true
+  - type: dropdown
+    id: collection-year
+    attributes:
+      label: Collection year
+      description: The variable request label is applied with this form. Choosing New data year also adds the new data year label.
+      options:
+        - Already in 2004-2023
+        - New data year
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Research use
+      description: What question this variable would help you answer.
+    validations:
+      required: true
+  - type: input
+    id: years
+    attributes:
+      label: Years needed
+      placeholder: 2009:2023
+    validations:
+      required: false

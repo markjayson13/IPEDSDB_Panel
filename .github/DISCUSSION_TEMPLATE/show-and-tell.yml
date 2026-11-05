@@ -1,0 +1,37 @@
+title: "[Show and tell] "
+labels:
+  - "research use case"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share a paper, a class, a replication, or another project that uses the panel. The research use case label is applied to this post.
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      placeholder: Institution-year aid trends, 2009-2023
+    validations:
+      required: true
+  - type: textarea
+    id: use
+    attributes:
+      label: How you use the panel
+      description: The question, the sample, and the variables or years you kept.
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link
+      description: Paper, syllabus, repository, or notes. Optional.
+      placeholder: https://
+    validations:
+      required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes for other users
+      description: A limitation you hit, or a variable list that others could reuse.
+    validations:
+      required: false

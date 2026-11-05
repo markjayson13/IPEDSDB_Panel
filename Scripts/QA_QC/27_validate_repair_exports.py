@@ -73,7 +73,7 @@ def affected_columns(schema: pa.Schema, mapping_path: Path, registry: dict, year
         with tempfile.TemporaryDirectory(prefix="ipeds-repair-mapping-") as spill:
             with duckdb.connect(config={"memory_limit": "256MB", "temp_directory": spill, "threads": "2"}) as connection:
                 query = connection.execute(f'SELECT DISTINCT {projection} FROM read_parquet(?) WHERE {predicate}', parameters)
-                fetch_table = getattr(query, "to_arrow_table", query.fetch_arrow_table)
+                fetch_table = getattr(query, "to_arrow_table", None) or query.fetch_arrow_table
                 mapping = fetch_table().to_pylist()
     matches = {identity: set() for identity in required}
     for row in mapping:
